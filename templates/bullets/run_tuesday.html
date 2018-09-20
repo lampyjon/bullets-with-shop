@@ -1,0 +1,88 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - About Our Runs{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+                {% include 'bullets/snippets/run_headers.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Run Faster and Further - Every Tuesday</h1>
+            <br>
+            <p>The Boldmere Bullets Run Faster sessions are designed to work for all abilities, whether you are aiming to run a marathon in world-record time, complete your first ever 5k, or something in-between. Each session is based around segments – either flat or a hill, and the aim is to complete the segment a set number of times as fast as you can but trying to keep each repeat at the same pace. Don’t go too hard on the first rep, or you won’t maintain it for later ones!</p>
+
+<p>The Run Faster and Further sessions run every Tuesday evening at 7pm. From the start of October until the Spring we meet outside The Harvester on Boldmere Road (over the summer we meet in at Boldmere Gate in Sutton Park, or at the Blackroot Bistro car park - see the schedule for details). Check out the schedule below and keep an eye on our <a href="https://www.facebook.com/BoldmereBulletsRunningCollective/">Facebook Page</a> for announcements.</p>
+
+<p>Our Tuesday evening sessions are based on repetitions. The weeks alternate between flat reps and hill reps. The session starts with a gentle group warm up to where reps will take place (in the winter it will be on the roads, in the Summer it is in the Park), then we spend around 35 minutes exercising, before doing a group warm-down back to the start. In total the session is around 1 hour long.</p>
+
+<p>The session is a test against yourself. Please come along and give it a go! Anyone over the age of 18 is welcome at any Bullets activity, no matter what your pace or your fitness. You pay nothing to join us, just bring your enthusiasm.</p>
+
+<p>Please <a href="{% url 'register' %}">register</a> as a Boldmere Bullet before you attend a session. Make yourself known, and you will be pointed in the right direction!</p>
+
+<h3>Schedule</h3>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Date</th>
+			<th>Session Type</th>
+			<th>Details</th>
+			<th>Meeting Point</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for run in runs %}
+		<tr>
+			<td>{{run.date}}</td>
+			<td>{{run.session_type}}</td>
+			<td>{{run.session_details}}</td>
+			<td>{{run.get_meeting_point_display}}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+
+<h3>Meeting points</h3>
+
+<h4>The Harvester (Winter Tuesdays 7pm)</h4>
+
+<iframe
+  width="600"
+  height="400"
+  frameborder="0" style="border:0"
+  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCcZLY_Ta7vINUXG6DPh-JUWX_a5DGyg9Y&q=The Harvester,Boldmere&zoom=16" allowfullscreen>
+</iframe>
+	  
+
+<h4>Boldmere Gate (Summer Tuesdays 7pm - depending on schedule)</h4>
+
+<iframe
+  width="600"
+  height="400"
+  frameborder="0" style="border:0"
+  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCcZLY_Ta7vINUXG6DPh-JUWX_a5DGyg9Y&q=52.557318,-1.845662&zoom=16" allowfullscreen>
+</iframe>
+
+<h4>Blackroot Bistro (Summer Tuesdays 7pm - depending on schedule)</h4>
+
+<iframe
+  width="600"
+  height="400"
+  frameborder="0" style="border:0"
+  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCcZLY_Ta7vINUXG6DPh-JUWX_a5DGyg9Y&q=52.572255,-1.8409956&zoom=16" allowfullscreen>
+</iframe>
+
+
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

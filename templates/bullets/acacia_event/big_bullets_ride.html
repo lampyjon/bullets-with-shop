@@ -1,0 +1,91 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - 10/10 for Acacia Mums{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+<li><a href="#ride">Ride</a></li>
+<li><a href="#run">Run</a></li>
+<li><a href="#social">Social</a></li>
+<li><a href="#register">Register</a></li>
+<li><a href="{% url 'big-bullets-ride-total' %}">Collective Progress</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+    <h1>10/10 For Acacia Mums</h1>
+<p>What is <i>10/10 For Acacia Mums</i>? Put simply, it is the Boldmere Bullets' big collective effort for 2018 to raise money for our Charity of the Year, Acacia Family Support. Our aspiration is to run and ride over 10,000km to raise over &pound;10,000, for the over 10,000 mums and families supported by Acacia to date.</p>
+<p><a href="#register" class="btn btn-primary">Register Now</a></p>
+<p>Acacia are a great charity providing support to mums and families affected by ante or postnatal depression (PND) in Birmingham. The event on Sunday 16 September will provide runs, rides, and other exciting activities, to help to raise money for this great group.</p>
+<p>Our goal for the day is to run and ride over 10,000km - all <a href="{% url 'big-bullets-ride-total' %}">tracked online</a>! We'll all start at Boldmere Gate in Sutton Park, departing at 8am.</p>
+<p>The rides and runs are free to participate in, although we would encourage you to make a donation to Acacia via Just Giving, or to consider raising sponsorship.</p>
+<h3>Key Information</h3>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Date:</strong></div>
+		<div class="col-sm-8">Sun 16 Sep 2018</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Meet from:</strong></div>
+		<div class="col-sm-8">07:30</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Depart:</strong></div>
+		<div class="col-sm-8">Staggered starts from 08:00</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Location:</strong></div>
+		<div class="col-sm-8"><a href="#">Boldmere Gate, Sutton Park</a></div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Duration:</strong></div>
+		<div class="col-sm-8">Depends on distance and speed!</div>
+	</div>
+
+<h2 id="ride">Rides</h2>
+<p>There will be four different routes for you to challenge yourself with:</p>
+<ul>
+<li><a href="https://www.strava.com/routes/14182391"><b>50km</b> - "The big 50"</a></li>
+<li><a href="https://www.strava.com/routes/14181618"><b>100km</b> - "The Metric Century"</a></li>
+<li><a href="https://www.strava.com/routes/14181225"><b>165km</b> - "The Imperial Century"</a></li>
+<li><a href="https://www.strava.com/routes/14180642"><b>200km</b> - "The Randonnée"</a></li>
+</ul>
+<p>The rides will not be officially led, but supported by volunteer domestiques who will be offering route guidance and basic mechanical support. Staff from Evans Cycles will be offering some mobile support and some nutritional back up. The routes take in a number of tea shops where food and drinks can be purchased.</p>
+
+<h2 id="run">Run</h2>
+<p>We'll be starting at 8am in our normal speed groups.</p>
+<p>Something a little different to our normal 5k or 10k Sunday run. Taking in three of the local parks on the 5 mile route or four on the 10 mile route there should be a little something for everyone. Starting in Sutton Park before heading towards Rectory Park, through New Hall Valley then back to Sutton Park on 5 miler or carry on through Pype Hayes before heading back into Sutton Park on the longer run. </p>
+<p>The two routes are:</p>
+<ul>
+<li><b><a href="https://www.strava.com/routes/14414057">5 miles</a></b></li>
+<li><b><a href="https://www.strava.com/routes/14413797">10 miles</a></b></li>
+</ul>
+
+<h2 id="social">Social</h2>
+<p>Join us at The Harvester, Boldmere, from 5pm after the event, for an evening of fun to celebrate our collective success.</p>
+
+<h2 id="fundraising">Fundraising</h2>
+<p>There's no charge to take part in these runs or rides! We are seeking to raise money for our charity of the year, Acacia Family Support, so we would encourage a donation to them via our <a href="https://www.justgiving.com/fundraising/boldmere-bullets-10-10-for-acacia-mums">JustGiving page</a> if you are able. </p>
+<p>If you are plannning to get sponsorship for this event, then we'd love you to <a href="https://www.justgiving.com/companyteams/boldmerebullets1010event">join our JustGiving team</a>, so we can see our collective progress!</p>
+
+<h2 id="register">Register to take part</h2>
+<p>You must register to take part in the 10/10 For Acacia Mums run or ride events:</p>
+    </p>
+        <form method="post" class="form-horizontal" onsubmit="mySubmit.disabled = true; return true;">
+            {% csrf_token %}
+            {% bootstrap_form rider_form layout="horizontal" %}
+ 	    <p>By clicking on 'sign up now' you are agreeing to the <a href="{% url 'collective-code' %}">Collective Code</a>.</p>
+            <p class="text-right">
+                <button name="mySubmit" type="submit" class="btn btn-primary">Sign up now...</button>
+            </p>
+        </form>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

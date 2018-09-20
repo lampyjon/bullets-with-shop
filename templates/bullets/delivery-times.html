@@ -1,0 +1,30 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Order and Delivery Times{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+     <li><a href="{% url 'home' %}">Boldmere Bullets Shop</a></li>  
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Order and Delivery Times</h1>
+            <br>
+	    <p>Unfortunately we only hold a limited amount of stock, and many items in our online shop have to be ordered from our suppliers. In the online shop, we indicate where items are not currently in-stock, and where delivery will be delayed.</p>
+	    <h3>Casualwear (printed t-shirts, hoodies, etc.):</h3>
+	    <p>For items which are not currently in-stock, we order from our supplier on the first working day of the month, with delivery approximately three to four weeks later. For example, an item ordered on the 20th of September, you should expect delivery at the end of October. For an item ordered on the 4th of October, you should expect delivery at the end of November.</p>
+	    <h3>Technical Kit (jerseys, gilets, running tops, etc.):</h3>
+	    <p>We generally order technical kit four times a year (spring, summer, autumn and winter) from our supplier. See the front page of our <a href="{% url 'home' %}">online shop</a> for details on our next order.</p>
+	    <h3>Questions?</h3>
+	    <p>If you have any questions about the ordering process or delivery timescales, please <a href="{% url 'contact' %}">contact us</a>.</p>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

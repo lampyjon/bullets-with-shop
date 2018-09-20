@@ -1,0 +1,41 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - 10/10 Acacia Mums Admin{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+<li><a href="{% url 'core-team-admin' %}">Core Team</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+<h1>10/10 Acacia Mums - Admin</h1>
+<br>
+
+<table class="table sortable">
+	<thead>
+		<tr>
+			<th data-defaultsort="asc">Date added</th>
+			<th>Name</th>
+			<th>Event</th>
+			<th>Strava?</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for rider in object_list %}
+		<tr>
+			<td>{{rider.date_added}}</td>
+			<td>{{rider.name}}</td>
+			<td>{{rider.get_distance_display}}</td>
+			<td>{{rider.access_token|yesno|capfirst}}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+</div>
+ 
+      {% endblock %}
+
+
+

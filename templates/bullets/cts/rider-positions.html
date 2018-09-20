@@ -1,0 +1,356 @@
+{% extends 'mainsite/cts/base.html' %}
+
+{% block content%}
+<div class="container">
+     <h2>Rider Positions</h2>
+
+    <p>What distance were the riders last seen at, and what are their estimated speeds?</p>
+
+<ul class="nav nav-tabs">
+  <li id="byName" role="presentation" class="active"><a href="#">Name</a></li>
+  <li id="byGroup" role="presentation"><a href="#">Group</a></li>
+  <li id="bySpeed" role="presentation"><a href="#">Speed</a></li>
+  <li id="byDistance" role="presentation"><a href="#">Distance</a></li>
+	
+</ul>
+	<ul id="riderList" class="list-group">
+	</ul>
+
+      <a class="btn btn-default" href="{% url 'cts-mobile-menu' %}">Menu</a>
+
+</div>
+
+
+{% endblock %}
+
+
+
+{% block footerscript %}
+
+ <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaZlqptFZDfHjxl2sh2u6ivczcVjgG88o&libraries=geometry"></script>
+
+
+<script>
+
+var myTimer;
+
+var riders = [];
+var groups = [];
+
+var displayFunction = riderListByName;
+
+$('.nav > li').on('click', function(e) {
+    $('.nav > li').removeClass('active');
+    $(this).addClass('active');
+   			
+}); 
+
+$('#byGroup').on('click', function() {
+	console.log("Sort by Group");
+	displayFunction = riderListByGroup;
+	displayFunction();
+
+});
+
+$('#byName').on('click', function() {
+	console.log("Sort by Name");
+	displayFunction = riderListByName;
+	displayFunction();
+
+});
+
+$('#bySpeed').on('click', function() {
+	console.log("Sort by Speed");
+	displayFunction = riderListBySpeed;
+	displayFunction();
+});
+
+$('#byDistance').on('click', function() {
+	console.log("Sort by Distance");
+	displayFunction = riderListByDistance;
+	displayFunction();
+});
+
+
+
+$( document ).ready(function () {
+	myTimer = setInterval(function () {
+			riderUpdates();
+		},
+		20000);
+	riderUpdates();	// fire at once
+	
+});
+
+
+function riderUpdates() {
+	console.log("riderUpdates()");
+
+//	var myLoc = {'x':12, 'timestamp': Date.now()};		// anything real to send?
+
+	$.ajax({		// send data to server, and get other endpoints 
+		type: "POST",
+        	url: "{% url 'cts-rider-position-ajax' %}",
+       // 	data: JSON.stringify(myLoc),	
+       //	dataType: 'json',
+        	success: function (data) {
+			//console.log("--------------");
+			//console.log("SUCCESS data="+data);	
+			groups.length = 0;	// empty groups
+		
+			$.each(data, function(index, element) {
+			//	console.log(" element = " + element);
+				var rider = {riderID: element.riderID.toString(),  lat: parseFloat(element.lat), lon:parseFloat(element.lon), timestamp:element.timestamp, name:element.name, distance: parseFloat(element.distance), seen:false};
+
+			//	console.log("Rider = " + element.riderID + " - " + rider.name);
+
+				if ("undefined" === typeof riders[element.riderID]) {
+				//	console.log(" adding " + element.riderID);	
+					riders[element.riderID] = rider;
+				} else {	
+				//	console.log(" updating " + element.riderID);
+					riders[element.riderID].lat = rider.lat;
+					riders[element.riderID].lon = rider.lon;
+					riders[element.riderID].distance = rider.distance;
+					riders[element.riderID].timestamp = rider.timestamp;
+					riders[element.riderID].name = rider.name;
+				}
+			
+				var rider_latest_distance = -1;
+				var rider_latest_timestamp = new Date("2017-06-15T06:00:00.644Z");
+				var rider_pen_distance = -1;
+				var rider_pen_timestamp = new Date("2017-06-15T06:00:00.644Z");
+
+				$.each(element.old_positions, function(index, old_pos) {
+				//	console.log("Old position for " + rider.name + " = " + old_pos.timestamp + " - " + old_pos.distance);
+					var this_date = new Date(old_pos.timestamp);
+					if (this_date > rider_latest_timestamp) {
+					//	console.log("date is in the future");
+						rider_pen_timestamp = rider_latest_timestamp;
+						rider_pen_distance = rider_latest_distance;
+						rider_latest_timestamp = this_date;
+						rider_latest_distance = old_pos.distance;
+					}
+					
+				});
+
+				if ((rider_pen_distance != -1) && (rider_latest_distance != -1)) {
+					console.log("sufficient data to estimate a rider speed");
+					var timeTaken = Math.abs(rider_pen_timestamp.getTime() - rider_latest_timestamp.getTime());
+					timeTaken = timeTaken / (1000 * 60 * 60);	// hours
+					var distanceTravelled = Math.abs(rider_pen_distance - rider_latest_distance);
+					var mph = distanceTravelled / timeTaken;
+
+					if (distanceTravelled == 0) {
+						mph = 15;
+					}
+					console.log("travelled " + distanceTravelled + "miles in " + timeTaken + " hours = " + mph.toFixed() + "mph");
+				 	riders[element.riderID].speed = mph;
+				} else {
+					riders[element.riderID].speed = 13;	// guess!!!
+				}
+
+							
+					
+				var timeDiff = 1000 * 60 * 3;	// 3 minutes, probably
+
+
+				//console.log("groups.length = " + groups.length)
+
+				// add the rider to the right group
+				if (groups.length == 0) { 	// first entry for the groups, so just add it
+					var groupEntry = { arrivalTime: rider.timestamp, distance: rider.distance};
+					groupEntry.riders = [rider];
+					groups.push(groupEntry);
+				} else {			// got to work out which group to put this rider in
+					var matched = false;
+					for (i in groups) {
+						// console.log("groups[i].distance = " + groups[i].distance + " - rider.distance = " + rider.distance);
+						if (groups[i].distance == rider.distance) {
+							//console.log(" group & rider dist matched");
+
+							var riderTime = new Date(rider.timestamp);
+							var groupTime = new Date(groups[i].arrivalTime);
+							var beforeTime = Math.abs(riderTime.getTime() - groupTime.getTime());
+						
+						//	console.log("beforeTime = " + beforeTime);
+							if (beforeTime < timeDiff) {
+								// console.log("and timestamp was within 3 mins");
+								// rider is in this group (probably)
+								groups[i].riders.push(rider);
+								matched = true;
+						    }
+						}
+					}
+
+					if (matched == false) {
+						var groupEntry = { arrivalTime: rider.timestamp, distance: rider.distance};
+						groupEntry.riders = [rider];
+						groups.push(groupEntry);
+					}
+				}	
+				// console.log("Groups are : " + groups);
+			});
+			//console.log(riders);
+			displayFunction();
+		}          		
+      	});
+
+	
+}
+
+
+function riderListByGroup() {
+	console.log("riderListByGroup()");
+
+	// create some groups based on groups[]! :-)
+	var sorted_riders = [];
+	var splitter = {split: true};
+
+	for (i in groups) {
+		for (r in groups[i].riders) {
+			sorted_riders.push(riders[groups[i].riders[r].riderID]);
+		}
+		sorted_riders.push(splitter);
+	}
+	sorted_riders.pop();	// ??? 
+
+	displayRiders(sorted_riders);
+
+}
+
+
+function riderListBySpeed() {
+	console.log("ridersByName()");
+	var sorted_riders = riders.slice(0);
+	sorted_riders = sorted_riders.sort(compare_riders_speed);
+	displayRiders(sorted_riders);
+}
+
+function riderListByName() {
+	console.log("ridersByName()");
+	var sorted_riders = riders.slice(0);
+	sorted_riders = sorted_riders.sort(compare_riders_name);
+	displayRiders(sorted_riders);
+}
+
+function riderListByDistance() {
+	console.log("ridersByName()");
+	var sorted_riders = riders.slice(0);
+	sorted_riders = sorted_riders.sort(compare_riders_distance);
+	displayRiders(sorted_riders);
+}
+
+function compare_riders_name(a,b) {
+  if (a.name < b.name)
+    return -1;
+  if (a.name > b.name)
+    return 1;
+  return 0;
+}
+
+function compare_riders_speed(a,b) {
+  if (a.speed < b.speed)
+    return -1;
+  if (a.speed > b.speed)
+    return 1;
+  return 0;
+}
+function compare_riders_distance(a,b) {
+  if (a.distance > b.distance)
+    return -1;
+  if (a.distance < b.distance)
+    return 1;
+  return 0;
+}
+
+
+
+function displayRiders(riderList) {
+	$("#riderList").empty();
+
+	for (i in riderList) {
+		var rider = riderList[i];
+		var s = "";
+		if ("undefined" === typeof rider.split) {
+		
+			s = "<li id='rider" + rider.riderID +"' class='rider list-group-item'>" + rider.name;
+			s = s + " " + rider.distance + " miles";
+			s = s + " <span class='pull-right'>" + rider.speed.toFixed() + "mph</span>";
+			s = s + "</li>";
+		} else {
+			// this is a splitter in the groups section
+			s = "<li class='list-group-item'>---</div>";
+		}
+		
+		$("#riderList").append(s);
+
+	}
+
+}
+
+
+function distance_along_route(p) {	/* return how far along the route point p is */
+	var low_dist = 10000000;
+	var low_ind = 0;
+
+	for (r in route_points) {
+		var d = google.maps.geometry.spherical.computeDistanceBetween(route_points[r].latlon, p);
+		if (d < low_dist) {
+			low_dist = d;
+			low_ind = r;
+		}
+	}
+
+
+	// (distance_from_here / 1609.344);
+
+	var d = route_points[low_ind].distance_along_route;
+	d = d / 1609.344;		/// convert to miles
+	return d;
+}
+
+
+
+
+
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');   
+
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+
+</script>
+
+{% endblock %}
+
+
+
+

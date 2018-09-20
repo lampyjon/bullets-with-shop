@@ -1,0 +1,30 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - Big Bullets Ride{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+    <h1>Big Bullets Ride - Cancel Participation</h1>
+	    <p>If you would like to cancel your registration for the Big Bullets Ride, {{ rider }}, please confirm by clicking below.</p>
+	           <p class="text-right"><form method="post" class="form-horizontal" action="{% url 'big-bullets-ride-delete' rider.email_check_ref %}">
+            		{% csrf_token %}
+                	<button type="submit" class="btn btn-primary">Cancel registration</button>
+            		</p>
+        	</form>
+<a href="{% url 'index' %}" class="btn btn-primary btn-xl">Back to the main site</a>  
+    </div>
+  
+</div>
+
+ 
+      {% endblock %}
+
+
+

@@ -1,0 +1,32 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - About Registration{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+
+{% block header-links %}
+                {% include 'bullets/snippets/register_headers.html' %}
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>About registering as a Boldmere Bullet</h1>
+            <br>
+            <p>We ask that anyone intending to join us for one of our led rides or runs registers with us first. Registering as a Boldmere Bullet is <strong>free</strong>, and you can unregister at any time if you wish.</p>
+	    <h2>Why do I need to register?</h2>
+	    <p>As part of our collective's insurance arrangements and to help us plan and manage our events, we ask that all who participate in led Boldmere Bullets activities register with us. We also use details of those who have registered and agreed to receive communications from us to make up our email list, where we occasionally share information about forthcoming special events and carefully selected promotional offers.</p>
+            <h2>Is my personal data looked after?</h2>
+            <p>When you register we add your details (name, contact information, the first part of your postcode, and your preference for receiving emails from us) into our membership system. Only members of the Boldmere Bullets team with a requirement to see this information have access to it. We will delete your information if you decide to <a href="{% url 'unregister' %}">unregister</a> as a Boldmere Bullet.</p>
+	    
+	    <a href="{% url 'register' %}" class="btn btn-primary btn-xl">Register now</a>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

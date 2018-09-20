@@ -1,0 +1,30 @@
+{% extends "simple.html" %}
+{% load bootstrap_form from bootstrap3 %}
+
+{% load static %}
+
+{% block title %} - Delete Womens Event Participant{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<h1>Delete Women's Event Participant</h1>
+
+<p>Are you sure you wish to delete this participant? "{{object}}"?</p>
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+                       <p class="text-right">
+                		<button type="submit" class="btn btn-primary">Delete!</button>
+            		</p>
+        </form>
+
+<a href="{% url 'iwd-list-admin' %}" class="btn btn-primary btn-xl">Participant List</a>
+ 
+{% endblock %}
+
+
+{% block extrafooter %}
+{% endblock %}
+

@@ -1,0 +1,30 @@
+{% extends "simple.html" %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% load static %}
+
+{% block title %} - Delete News{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<h1>Delete News Item</h1>
+
+<p>Are you sure you wish to delete the news story "{{object}}"?</p>
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+                       <p class="text-right">
+                		<button type="submit" class="btn btn-primary">Delete!</button>
+            		</p>
+        </form>
+
+<a href="{% url 'news-list-admin' %}" class="btn btn-primary btn-xl">News Items</a>
+ 
+{% endblock %}
+
+
+{% block extrafooter %}
+{% endblock %}
+

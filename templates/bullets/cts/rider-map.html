@@ -1,0 +1,384 @@
+{% extends 'mainsite/cts/base.html' %}
+
+{% block content%}
+
+	<style>
+html { height: 100% }
+body { height: 100%;
+padding-top: 50px; }
+
+	#map-canvas { height: 100%; padding: 0; position:absolute; }
+
+.container-fluid {
+    height: 100%;
+    position: relative;
+}
+	</style>
+
+ <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Bullets Chase the Sun</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4">
+                <h2>Where are the Bullets?</h2>
+		<p>This shows the approximate position of the Bullets Chase the Sun riders, based on when a support vehicle last saw them. Hopefully!</p>
+		<h4>Riders</h4>
+		<table id="riderList" class="table table-condensed">
+		</table>
+
+            </div>
+            <div id="map-canvas" class="col-xs-8 col-xs-offset-4">
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+{% block footerscript %}
+ <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaZlqptFZDfHjxl2sh2u6ivczcVjgG88o&libraries=geometry"></script>
+
+
+ <script>
+
+var myMap;						// holds google map
+var watchID;						// the ID of our watchCurrentPosition() callback thingy
+var myTimeout;						// the ID of our recurring javascript timeout thing
+
+var car_details = [];					// populate this with details from the server of the other cars
+var route_points = [];
+var riders = [];
+
+$( document ).ready(function () {
+	initMap();
+});
+
+
+$('#riderList').on('click', 'a.rider', function() {
+	var x = $(this).attr('id');
+	//console.log(x);
+	x = x.substring(10);
+	// have got ID
+	//console.log(x);
+	rider = riders[x];
+//	console.log("clicked on " + rider.name);
+	for (i in riders) {
+		riders[i].marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+		riders[i].marker.setZIndex(1.0);
+	}
+	rider.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+	rider.marker.setZIndex(2.0);
+//	rider.marker.setPosition(new google.maps.LatLng(rider.lat, rider.lon));
+//	rider.marker.setMap(myMap);
+	
+});
+
+
+function initMap() {
+	console.log("initMap()");
+
+	if (myMap) {
+		return;
+	}
+
+	var c = new google.maps.LatLng(51.427467,-1.1589137);
+	
+        var myOptions = {
+            zoom: 10,
+            centre: c,
+            streetViewControl: false,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        myMap = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+
+	
+	$.ajax({
+  		type: "GET",
+  		url: "{% url 'cts-route-ajax' %}",
+  		dataType: "xml",
+  		success: function(xml) {
+			console.log("Got XML for route - let's map it");	
+			var bounds = new google.maps.LatLngBounds();
+			var prevLatLng = null;
+			var pathDistance = 0;
+			var points = [];
+
+			$(xml).find("trkpt").each(function() {
+	  			var lat = $(this).attr("lat");
+	  			var lon = $(this).attr("lon");
+	  			var p = new google.maps.LatLng(lat, lon);
+				var d = 0;
+				if (prevLatLng == null) {
+					d=0;
+				} else {
+					d = google.maps.geometry.spherical.computeDistanceBetween(prevLatLng, p);  // distance from previous
+				}
+				pathDistance = pathDistance + d;
+				prevLatLng = p;
+			//	console.log("Path distance = " + pathDistance);
+
+				var x = {latlon:p, distance_along_route: pathDistance};
+	 			route_points.push(x);
+				points.push(p);
+			//	console.log("extend()");
+	  			bounds.extend(p);
+			});
+
+			var poly = new google.maps.Polyline({
+	  			// use your own style here
+	  			path: points,
+	  			strokeColor: "#FF00AA",
+	  			strokeOpacity: .7,
+	  			strokeWeight: 4
+			});
+	
+			poly.setMap(myMap);
+			myMap.fitBounds(bounds);
+			startBackgroundUpdates();	
+  		}
+	});
+
+}
+
+
+
+function startBackgroundUpdates() { 
+    console.log("StartBackgroundUpdates()");
+
+    regularUpdate();
+
+
+}
+
+
+
+function regularUpdate() {		// if true then start it, if false, stop it (if running)
+	console.log("regularupdates() ");
+
+	if (myTimeout) {
+		return;		// don't run multiple times 
+	}
+
+	myTimeout = setInterval(function () {
+		//	console.log("In regular polling function - checking in with server");
+			riderUpdates();
+		},
+		20000);
+
+	riderUpdates();	// trigger once on launch
+}
+
+
+
+
+function riderUpdates() {
+	console.log("riderUpdates()");
+
+//	var myLoc = {'x':12, 'timestamp': Date.now()};		// anything real to send?
+
+	$.ajax({		// send data to server, and get other endpoints 
+		type: "POST",
+        	url: "{% url 'cts-rider-position-ajax' %}",
+
+        	success: function (data) {
+
+			$.each(data, function(index, element) {
+			//	console.log(" element = " + element);
+				var rider = {riderID: element.riderID.toString(),  lat: parseFloat(element.lat), lon:parseFloat(element.lon), timestamp:element.timestamp, name:element.name, distance: parseFloat(element.distance), seen:false};
+
+			//	console.log("Rider = " + element.riderID + " - " + rider.name);
+
+				if ("undefined" === typeof riders[element.riderID]) {
+				//	console.log(" adding " + element.riderID);	
+					riders[element.riderID] = rider;
+					riders[element.riderID].marker = new google.maps.Marker({map:myMap, position: new google.maps.LatLng(rider.lat, rider.lon)});
+					riders[element.riderID].marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+
+				} else {	
+				//	console.log(" updating " + element.riderID);
+					riders[element.riderID].lat = rider.lat;
+					riders[element.riderID].lon = rider.lon;
+					riders[element.riderID].distance = rider.distance;
+					riders[element.riderID].timestamp = rider.timestamp;
+					riders[element.riderID].name = rider.name;
+					riders[element.riderID].marker.setPosition(new google.maps.LatLng(rider.lat, rider.lon));
+				}
+			
+				var rider_latest_distance = -1;
+				var rider_latest_timestamp = new Date("2017-06-15T06:00:00.644Z");
+				var rider_pen_distance = -1;
+				var rider_pen_timestamp = new Date("2017-06-15T06:00:00.644Z");
+
+				$.each(element.old_positions, function(index, old_pos) {
+				//	console.log("Old position for " + rider.name + " = " + old_pos.timestamp + " - " + old_pos.distance);
+					var this_date = new Date(old_pos.timestamp);
+					if (this_date > rider_latest_timestamp) {
+					//	console.log("date is in the future");
+						rider_pen_timestamp = rider_latest_timestamp;
+						rider_pen_distance = rider_latest_distance;
+						rider_latest_timestamp = this_date;
+						rider_latest_distance = old_pos.distance;
+					}
+					
+				});
+
+				if ((rider_pen_distance != -1) && (rider_latest_distance != -1)) {
+					console.log("sufficient data to estimate a rider speed");
+					var timeTaken = Math.abs(rider_pen_timestamp.getTime() - rider_latest_timestamp.getTime());
+					timeTaken = timeTaken / (1000 * 60 * 60);	// hours
+					var distanceTravelled = Math.abs(rider_pen_distance - rider_latest_distance);
+					var mph = distanceTravelled / timeTaken;
+
+					if (distanceTravelled == 0) {
+						mph = 15;
+					}
+					console.log("travelled " + distanceTravelled + "miles in " + timeTaken + " hours = " + mph.toFixed() + "mph");
+				 	riders[element.riderID].speed = mph;
+				} else {
+					riders[element.riderID].speed = 13;	// guess!!!
+				}
+
+							
+					
+				// console.log("Groups are : " + groups);
+			});
+			//console.log(riders);
+			displayFunction();
+		}          		
+      	});
+
+	
+}
+
+
+function displayFunction() {
+	$("#riderList").empty();
+
+	var sorted_riders = riders.slice(0);
+	sorted_riders = sorted_riders.sort(compare_riders_name);
+
+	for (i in sorted_riders) {
+		var rider = sorted_riders[i];
+		var s = "";
+		s = "<tr><td><a href='#' id='riderClick" + rider.riderID + "' class='rider'>" + rider.name + "</a></td>";
+		s = s + "<td>" + rider.distance + " miles</td>";
+		s = s + "<td>"+ rider.speed.toFixed() + "mph</td>";
+
+		h = new Date(rider.timestamp).getHours();
+		m = new Date(rider.timestamp).getMinutes();
+		if (h < 10) { h = "0" + h; }
+		if (m < 10) { m = "0" + m; }
+		
+		s = s + "<td>" + h + ":" + m + "</td>";
+		s = s + "</tr>";
+		$("#riderList").append(s);
+	}
+}
+
+
+
+
+function compare_riders_name(a,b) {
+  if (a.name < b.name)
+    return -1;
+  if (a.name> b.name)
+    return 1;
+  return 0;
+}
+
+ 
+function carMarkers() {
+	console.log("carMarkers()");
+
+	for (i in car_details) {
+	//	console.log(" i = " + i);
+		if ("undefined" === typeof car_details[i].marker) {	
+			console.log(" creating marker for car");
+			car_details[i].marker = new google.maps.Marker();
+		}
+
+		if ("undefined" === typeof car_details[i].infowindow) {
+			console.log(" creating infowindow for car");
+			var s = '<div>'+
+            		        '<h3>' + car_details[i].name + '</h3>'+
+                    	        '</div>';
+			car_details[i].infowindow = makeInfoWindow(car_details[i].marker, s);			
+		}
+
+			
+		car_details[i].marker.setPosition( new google.maps.LatLng(car_details[i].lat, car_details[i].lon));
+		car_details[i].marker.setMap(myMap);
+
+	//	console.log(" car " + car_details[i].name + " is now at " + car_details[i].marker.getPosition());
+
+		car_details[i].marker.setLabel(car_details[i].vehicleID);
+
+	//	console.log(" vehicle ID " + car_details[i].vehicleID + " marker is at " + car_details[i].marker.getPosition());
+	}
+
+
+}
+
+function makeInfoWindow(marker, message) {
+	var infoWindow = new google.maps.InfoWindow({
+		content: message
+	});
+
+	marker.addListener('click', function() {
+	//	console.log("click event on marker " + message);
+          	infoWindow.open(marker.get('map'),marker);
+        });
+
+	return infoWindow;
+}
+
+
+
+
+
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');   
+
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+
+
+ </script>
+
+{%endblock %}

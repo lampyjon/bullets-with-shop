@@ -1,0 +1,34 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - Unregister{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+
+{% block header-links %}
+                {% include 'bullets/snippets/register_headers.html' %}
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+        <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+            <h1>Unregister as a Boldmere Bullet</h1>
+            <br>
+            {% bootstrap_form unregister_form layout="horizontal" %}
+	    <p>By unregistering as a Boldmere Bullet, you will need to <a href="{% url 'register' %}">register</a> again if you would like to join us on a future led run or ride.</p>
+            <p class="text-right">
+                <button type="submit" class="btn btn-primary">Unregister</button>
+            </p>
+        </form>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

@@ -1,0 +1,38 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_field from bootstrap4 %}
+
+{% block title %} - Register{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+                {% include 'bullets/snippets/register_headers.html' %}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+        <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+            <h1>Register as a Boldmere Bullet</h1>
+            <br>
+            {% bootstrap_field register_form.name layout="horizontal" %}
+	    {% bootstrap_field register_form.email layout="horizontal" %}
+	    {% bootstrap_field register_form.postcode layout="horizontal" horizontal_field_class="col-md-2" %}
+	    {% bootstrap_field register_form.contact_no layout="horizontal" %}
+            {% bootstrap_field register_form.over_18 layout="horizontal" set_required="True" %}
+            {% bootstrap_field register_form.get_emails layout="horizontal" %}
+
+	    <p class="small">If you tick the box above, we will occassionally contact you about Boldmere Bullets events and promotional activities. You can always let us know if you don't want to receive such messages at any time. Registration is free. If you have any questions about your registration, please <a href="{% url 'contact' %}">contact us</a>. If you want to leave the Boldmere Bullets, please <a href="{% url 'unregister'%}">unregister</a>.</p>
+	    <p>By clicking on 'register' you are agreeing to the <a href="{% url 'collective-code' %}">Collective Code</a>.</p>
+            <p class="text-right">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </p>
+        </form>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

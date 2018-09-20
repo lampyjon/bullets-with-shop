@@ -1,0 +1,359 @@
+{% extends 'mainsite/cts/base.html' %}
+
+{% block content%}
+
+
+
+
+
+	<style>
+html { height: 100% }
+body { height: 100%;
+padding-bottom: 50px; }
+
+	#map-canvas { width: 100%; height: 100%; padding: 0; }
+	</style>
+
+
+    	<div id="map-canvas">
+        	<!-- map loads here... -->
+   	</div>
+
+
+
+<nav class="navbar navbar-default navbar-fixed-bottom">
+  <div class="container">        
+      
+        <a class="btn btn-default" href="{% url 'cts-mobile-menu' %}">Menu</a>
+        <button id="map-me" type="button" class="btn btn-default">Here</button>
+        <a class="btn btn-primary" href="{% url 'cts-mobile-support-stop' %}">Support Stop</a>
+  </div>
+</nav>
+
+{% endblock %}
+
+
+
+{% block footerscript %}
+
+
+ <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaZlqptFZDfHjxl2sh2u6ivczcVjgG88o&libraries=geometry"></script>
+
+
+ <script>
+var defaultLatLng = new google.maps.LatLng(52.4449844,-1.6700628);  // Default to Meriden when no geolocation support
+
+var myMap;						// holds google map
+var watchID;						// the ID of our watchCurrentPosition() callback thingy
+var myTimeout;						// the ID of our recurring javascript timeout thing
+
+var myVehicleID = "{{ vehicle.id }}";			// which vehicle Number are we
+var myName = "{{ vehicle.name }}";		// who do we claim to be?
+
+var car_details = [];					// populate this with details from the server of the other cars
+var route_points = [];
+
+var followMode = false;
+var followCar = "{% if centre_on %}{{ centre_on.id }}{% else %}{{ vehicle.id }}{% endif %}"
+
+$( document ).ready(function () {
+	initMap();
+});
+
+
+
+$('#map-me').on('click', function() {
+	console.log("Switch to map page + center on us");
+	scrollToCar(myVehicleID);
+});
+
+
+$('#followMe').on('click', function() {
+	var x = $(this).hasClass('active');
+	console.log("Toggle button = " + x);
+	followMode = x;
+	if (followMode) {
+		scrollToCar(followCar);
+	}	
+});
+
+
+function initMap() {
+	console.log("initMap()");
+	console.log(" we are vehicle ID = " + myVehicleID);
+
+
+	car = {vehicleID:myVehicleID, lat: defaultLatLng.lat(), lon: defaultLatLng.lng(), name:myName, timestamp:"2017-05-31T19:25:37.446Z"};
+	car_details[myVehicleID] = car;
+
+	if (myMap) {
+		return;
+	}
+
+        var myOptions = {
+            zoom: 10,
+            center: defaultLatLng,
+	    streetViewControl: false,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        myMap = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+
+	
+
+	$.ajax({
+  		type: "GET",
+  		url: "{% url 'cts-route-ajax' %}",
+  		dataType: "xml",
+  		success: function(xml) {
+			console.log("Got XML for route - let's map it");	
+			var bounds = new google.maps.LatLngBounds ();
+			var prevLatLng = null;
+			var pathDistance = 0;
+			var points = [];
+
+			$(xml).find("trkpt").each(function() {
+	  			var lat = $(this).attr("lat");
+	  			var lon = $(this).attr("lon");
+	  			var p = new google.maps.LatLng(lat, lon);
+				var d = 0;
+				if (prevLatLng == null) {
+					d=0;
+				} else {
+					d = google.maps.geometry.spherical.computeDistanceBetween(prevLatLng, p);  // distance from previous
+				}
+				pathDistance = pathDistance + d;
+				prevLatLng = p;
+			//	console.log("Path distance = " + pathDistance);
+
+				var x = {latlon:p, distance_along_route: pathDistance};
+	 			route_points.push(x);
+				points.push(p);
+			//	console.log("extend()");
+	  			bounds.extend(p);
+			});
+
+			var poly = new google.maps.Polyline({
+	  			// use your own style here
+	  			path: points,
+	  			strokeColor: "#FF00AA",
+	  			strokeOpacity: .7,
+	  			strokeWeight: 4
+			});
+	
+			poly.setMap(myMap);
+			startBackgroundUpdates();	
+  		}
+	});
+
+}
+
+
+
+function startBackgroundUpdates() { 
+    console.log("StartBackgroundUpdates()");
+
+    if (watchID) {
+	return;
+    }
+
+    if ( navigator.geolocation ) {
+
+         function success(pos) {
+		console.log(" success()");
+            	// Location found, show map with these coordinates
+		
+		car_details[myVehicleID].lat = pos.coords.latitude;
+		car_details[myVehicleID].lon = pos.coords.longitude;
+            	carMarkers();
+
+		if (followMode) {
+			scrollToCar(followCar);
+		}
+         }
+
+         function fail(error) {
+		console.log(" fail()");
+         	carMarkers();  // Failed to find location, show default map
+         }
+
+         var options = {maximumAge: 60000, enableHighAccuracy:true, timeout: 6000};	// subject to debate
+         geoLoc = navigator.geolocation;
+         watchID = geoLoc.watchPosition(success, fail, options);
+
+    } else {
+        carMarkers();  // No geolocation support, show default map
+    }
+
+
+    regularUpdate();
+
+
+}
+
+
+
+function regularUpdate() {		// if true then start it, if false, stop it (if running)
+	console.log("regularupdates() ");
+
+	if (myTimeout) {
+		return;		// don't run multiple times 
+	}
+
+	myTimeout = setInterval(function () {
+		//	console.log("In regular polling function - checking in with server");
+			checkInWithServer();
+		},
+		20000);
+
+	checkInWithServer();	// trigger once on launch
+}
+
+
+
+
+function checkInWithServer() {
+	console.log("checkInWithServer()");
+	var myLoc = {'vehicleID':myVehicleID, 'lat':car_details[myVehicleID].lat, 'lon': car_details[myVehicleID].lon, 'timestamp': Date.now()};
+
+	$.ajax({		// send data to server, and get other endpoints 
+		type: "POST",
+        	url: "{% url 'cts-vehicle-position-ajax' %}",
+        	data: JSON.stringify(myLoc),
+		//	data: myLoc,
+        	dataType: 'json',
+        	success: function (data) {
+		//	console.log("Got data back from server!");
+		//	console.log(data);
+			
+			$.each(data, function(index, element) {
+				//console.log(" Index = " + index);
+				//console.log(" element = " + element);
+				// console.log(" element.vehicleID = " + element.vehicleID);
+// 'lat':x.lat, 'lon':x.lon, 'timestamp':x.timestamp
+				if (element.vehicleID != myVehicleID) {
+					var car = {vehicleID: element.vehicleID.toString(),  lat: parseFloat(element.lat), lon:parseFloat(element.lon), timestamp:element.timestamp, name:element.name};
+					if ("undefined" === typeof car_details[element.vehicleID]) {	
+						car_details[element.vehicleID] = car;
+					} else {
+						car_details[element.vehicleID].name = car.name;
+						car_details[element.vehicleID].lat = car.lat;
+						car_details[element.vehicleID].lon = car.lon;
+						car_details[element.vehicleID].timestamp = car.timestamp;
+					}
+				}
+
+
+		//	console.log(" creating " + car);
+			//	console.log(" vID = " + car.vehicleID);
+				// do something about maintaining marker here?
+							//	console.log(" Cars = " + car_details);
+			});
+			carMarkers();
+		}          		
+      	});
+}
+
+
+
+
+ 
+function carMarkers() {
+	console.log("carMarkers()");
+
+	for (i in car_details) {
+	//	console.log(" i = " + i);
+		if ("undefined" === typeof car_details[i].marker) {	
+			console.log(" creating marker for car");
+			car_details[i].marker = new google.maps.Marker();
+		}
+
+		if ("undefined" === typeof car_details[i].infowindow) {
+			console.log(" creating infowindow for car");
+			var s = '<div>'+
+            		        '<h3>' + car_details[i].name + '</h3>'+
+                    	        '</div>';
+			car_details[i].infowindow = makeInfoWindow(car_details[i].marker, s);			
+		}
+
+			
+		car_details[i].marker.setPosition( new google.maps.LatLng(car_details[i].lat, car_details[i].lon));
+		car_details[i].marker.setMap(myMap);
+
+	//	console.log(" car " + car_details[i].name + " is now at " + car_details[i].marker.getPosition());
+
+		car_details[i].marker.setLabel(car_details[i].vehicleID);
+
+	//	console.log(" vehicle ID " + car_details[i].vehicleID + " marker is at " + car_details[i].marker.getPosition());
+	}
+
+
+}
+
+function makeInfoWindow(marker, message) {
+	var infoWindow = new google.maps.InfoWindow({
+		content: message
+	});
+
+	marker.addListener('click', function() {
+	//	console.log("click event on marker " + message);
+          	infoWindow.open(marker.get('map'),marker);
+        });
+
+	return infoWindow;
+}
+
+
+
+// TODO: make this a bit smarter in terms of zoom / focus... follow mode maybe?
+function scrollToCar(vehicleID) {
+	console.log("scrollToCar = " + vehicleID);
+
+	carMarkers();	// ensure they've all got a marker
+	
+//	myMap.setZoom(11);
+
+	myMap.setCenter(car_details[vehicleID].marker.getPosition());
+		
+}
+
+
+
+
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');   
+
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+
+
+ </script>
+
+{%endblock %}

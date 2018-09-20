@@ -1,0 +1,193 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Run Routes{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+                {% include 'bullets/snippets/run_headers.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Bullets Running Routes</h1>
+            <br>
+            <p>The Boldmere Bullets Cycling Collective post the run routes out on Strava in advance of our runs. Upcoming routes can be found on <a href="https://www.strava.com/clubs/BoldmereBulletsRunningCollective">Strava</a>. </p>
+	    <p>
+If you would like to try some of the previous routes used by the Bullets, here are some good ones. Click on the name to open the route on Strava. Distances are in miles.</p>
+
+<table class="table table-striped">
+<thead>
+<tr>
+<th valign="top"><b>Running Routes</b></th>
+<th valign="top"><b>Location</b></th>
+<th valign="top"><b>Distance</b></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/887335">Stage 1</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.2 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/segments/8056257">Stage 1 Reverse</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.1 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/segments/8768819">Stage 2</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.2 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/864868">Stage 2 Reverse</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.3 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/1126098">Stage 3</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.5 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/segments/8338740">Stage 3 Reverse</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.5 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/892534">Stage 4</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.5 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/1152240">Stage 4 Reverse</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.6 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/2097020">Stage 5</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.0 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/2182150">Stage 5 Reverse</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.0 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/7070342">Stage 6</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.3 miles</td>
+</tr>
+
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/7429624">Stage 5 Reverse into Stage 6 Reverse</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">6.4 miles</td>
+</tr>
+
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/3954222">Winter Route 1</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.4 miles</td>
+</tr>
+
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/3954237">Winter Route 2</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.7 miles</td>
+</tr>
+
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/1378915">Boathouse Run</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">6.3 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/858447">Gate to Gate</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">5.3 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/1204765">c25k route</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">3.2 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/1378655">c25k Prove-it Run</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">2.9 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/3729945">BBRC - Hill Junkie 11k</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">7.1 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/3758074">Stage 4R + Stage 3R Combo</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">7.2 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/3807692">Stage 1 + Stage 2 Combo</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">7.2 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/segments/8953690">Great Midlands Fun Run</a></td>
+<td valign="top">Sutton Coldfield</td>
+<td valign="top">8.3 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/3010192">BBRC Great Midlands Fun Run Reverse</a></td>
+<td valign="top">Sutton Park</td>
+<td valign="top">7.2 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/2657545">BBRC 2015 Running Series Stage I</a></td>
+<td valign="top">New Hall Valley</td>
+<td valign="top">1.5 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/2634143">BBRC 2015 Running Series Stage II</a></td>
+<td valign="top">Four Oaks</td>
+<td valign="top">3.0 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/2667512">BBRC 2015 Running Series Stage III</a></td>
+<td valign="top">Boldmere</td>
+<td valign="top">3.4 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/2570051">BBRC 2015 Running Series Stage IV</a></td>
+<td valign="top">Barr Beacon </td>
+<td valign="top">5.0 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/2656154">BBRC 2015 Running Series Stage V</a></td>
+<td valign="top">7 pools in Sutton Park</td>
+<td valign="top">5.6 miles</td>
+</tr>
+<tr>
+<td valign="top"><a href="https://www.strava.com/routes/986159">BBRC 2015 Running Series Stage VI</a></td>
+<td valign="top">Anticlockwise Sutton Park perimeter</td>
+<td valign="top">7.7 miles</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<strong>Please note:</strong> These routes were created using Strava and their <a href="https://www.strava.com/terms">terms and conditions</a> apply. The routes were prepared for use as part of organised led runs for the particular dates listed. The routes are provided as-is for information only and use of them for any purpose other than as part of an organised Boldmere Bullets led run is entirely at your own risk.</p>
+
+<p>Whenever you're running, always remember <a href="{% url 'collective-code' %}">our Collective code</a>.</p>
+
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

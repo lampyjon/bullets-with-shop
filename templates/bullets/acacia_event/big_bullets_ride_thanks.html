@@ -1,0 +1,31 @@
+{% extends "simple.html" %}
+{% load static %}
+{% block title %} - 10/10 for Acacia Mums{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+    <h1>10/10 For Acacia Mums - Strava Sorted</h1>
+    <p>Thank you for signing up to our Strava-powered distance totaliser, {{ rider }}! We look forward to tracking our overall distance on the day, and hopefully beating our target of 10,000km walked, run, or ridden!</p>
+
+<p>We look forward to seeing you on Sunday 16th for our 10/10 Acacia Mums event.</p>
+
+   <h2>Make a donation?</h2>
+<p>There's no charge to take part in these runs or rides! We are seeking to raise money for our charity of the year, Acacia Family Support, so we would encourage a donation to them via our <a href="https://www.justgiving.com/fundraising/boldmere-bullets-10-10-for-acacia-mums">JustGiving page</a> if you are able. </p>
+<p>If you are plannning to get sponsorship for this event, then we'd love you to <a href="https://www.justgiving.com/companyteams/boldmerebullets1010event">join our JustGiving team</a>, so we can see our collective progress!</p>
+
+<a href="{% url 'index' %}" class="btn btn-primary btn-xl">Back to the main site</a>  
+<br/>
+    </div>
+  
+</div>
+
+ 
+      {% endblock %}
+
+
+

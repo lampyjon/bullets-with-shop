@@ -1,0 +1,385 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Welcome to the Boldmere Bullets">
+    <meta name="author" content="Boldmere Bullets">
+
+    <meta property="og:url"                content="https://www.boldmerebullets.com/" />
+    <meta property="og:type"               content="website" />
+    <meta property="og:title"              content="The Boldmere Bullets" />
+    <meta property="og:description"        content="Welcome to the Boldmere Bullets Running and Cycling Collective" />
+    <meta property="og:image"              content="{% static 'images/logo.png'%}" />
+    <meta property="fb:app_id" 		   content="1861837574051990" />
+    <meta property="og:image:width"	   content="955">
+    <meta property="og:image:height"	   content="960">
+
+    <meta name="verification" content="508fbe8e86238646d4e5f14b1be8402a" />
+
+
+    <title>Boldmere Bullets - Home Page</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Custom Fonts -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+
+    <!-- Plugin CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="{% static 'css/creative.css' %}" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+</head>
+
+<body id="page-top">
+<div id="fb-root"></div>
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top"><span class="hidden-xs"><span class="coalitionfont">Boldmere</span> <span class="spyfont">Bullets</span></span><span class="visible-xs-inline">Boldmere Bullets</span></a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="page-scroll" href="#about">About<span class="visible-lg-inline"> us</span></a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#involved">Get involved</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#register">Register</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#events">Events</a>
+                    </li>
+		    <li>
+			<a href="#shop" class="page-scroll">Bullets Shop</a>
+		    </li>             
+		   <li>
+                        <a class="page-scroll" href="#charity">Charity</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#contact">Contact<span class="visible-lg-inline"> us</span></a>
+                    </li>
+		    <li>
+			<a href="{% url 'ride-info' %}">Rides</a>
+		    </li>
+		    <li>
+			<a href="{% url 'run-info' %}">Runs</a>
+		    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+
+    <header class="running-pic">
+        <div class="header-content">
+            <div class="header-content-inner">
+                <h1 id="homeHeading">Welcome to the Boldmere Bullets</h1>
+                <hr>
+		<div class="container">
+	 		{% if messages %}
+				{% for message in messages %}
+					{% if forloop.first %}
+					<div class="row">
+				 		<div class="col-lg-10 text-center">
+ <div class="alert{% if message.tags %} alert-{{ message.tags }}{% endif %}">
+                	   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                           {{ message }}
+                     </div>
+						</div>	
+					</div>
+					{% endif %}
+				{% endfor %}
+			<div class="clearfix">&nbsp;</div>
+
+			{% endif %}
+
+			<div class="row">
+{% if cycling_first %}
+<div class="col-md-4 text-center introbox introboxlink" id="ridebox">
+   {% include 'bullets/snippets/cycling-box.html' %}
+</div>
+<div class="col-md-4 col-md-offset-2 text-center introbox introboxlink" id="runbox">
+   {% include 'bullets/snippets/running-box.html' %}
+</div>
+{% else %}
+<div class="col-md-4 text-center introbox introboxlink" id="runbox">
+   {% include 'bullets/snippets/running-box.html' %}
+</div>
+<div class="col-md-4 col-md-offset-2 text-center introbox introboxlink" id="ridebox">
+   {% include 'bullets/snippets/cycling-box.html' %}
+</div>
+{% endif %}
+
+			</div>
+
+			<div class="clearfix">&nbsp;</div>
+
+			<div class="row">
+				 <div class="col-md-6 col-md-offset-2 text-center introbox">
+					<h4>Latest Bullets News</h4>
+					<ul class="fa-ul text-left">
+					{% if news %}
+					{% for story in news %}
+						<li><i class="fa-li fa fa-newspaper-o"></i><a href="{% url 'news-item' story.slug %}"><strong>{{story.title}}</strong></a>{% if story.extra_title %} - {{ story.extra_title }}{%endif%}</li>
+					{% endfor %}
+					{% else %}
+						<li><i class="fa-li fa fa-newspaper-o"></i><strong>No News?!</strong> - something is amiss!</li>
+					
+					{% endif %}
+					<li><i class="fa-li fa fa-newspaper-o"></i><a href="{% url 'news' %}">Other news</li>
+	
+					</ul>
+	
+			 	</div>	
+			</div>
+			<div class="clearfix">&nbsp;</div>
+			<div class="row">
+				 <div class="col-lg-6 col-lg-offset-2 text-center">
+					<a href="#about" class="btn btn-primary btn-xl page-scroll hidden-xs">Who are the Boldmere Bullets?</a>
+					<a href="#about" class="btn btn-primary btn-xl page-scroll visible-xs-inline">Learn More</a>
+			 	</div>	
+			</div>
+
+		</div>
+            </div>
+        </div>
+    </header>
+
+
+    <section class="bg-primary" id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 text-center">
+                    <h2 class="section-heading">Welcome to the Boldmere Bullets</h2>
+                    <hr class="light">
+                    <p class="text-faded">
+			The Boldmere Bullets are a cycling and running collective from Sutton Coldfield. Formed in autumn 2013, the Bullets has become one of the West Midlands' largest free sporting communities, bringing together hundreds of people to make new friends, and share each others' interest in our sports.
+		    </p>
+<p class="text-faded">
+The spirit of the collective is friendship and a love of cycling, walking, running and socialising. You pay nothing to join us, just bring your enthusiasm and commitment. Our values are 'free', 'fun', and 'flexible' - we want everyone who joins one of our activities to have a great time with us. <a href="{% url 'history' %}">Learn about the history of the Boldmere Bullets.</a>
+</p>
+                    <a href="#involved" class="page-scroll btn btn-default btn-xl sr-button">Get Involved!</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="involved" class="runpic">
+        <div class="container getinvolved-header">
+            <div class="row">
+                <div class="col-lg-12 text-center service-box-content">
+                    <h2 class="section-heading">Get involved in the Boldmere Bullets</h2>
+                    <hr class="primary">
+		    <p>We use <a href="https://www.strava.com/">Strava</a> to keep track of our cycling and running events, and <a href="https://www.facebook.com">Facebook</a> and <a href="https://twitter.com/BBulletsRunning" class="twitter-follow-button" data-show-count="false">Follow @BBulletsRunning</a> / <a href="https://twitter.com/BoldmereBullets" class="twitter-follow-button" data-show-count="false">Follow @BoldmereBullets</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script> for almost everything else...</p>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+	   <div class="row">
+                <div class="col-lg-6 text-center">
+			<div class="service-box boxes">
+				<i class="fa fa-4x fa-bicycle text-primary sr-icons"></i>
+				<h4>We have {{ strava_cyclists }} members in our <a href="https://www.strava.com/clubs/BoldmereBulletsCyclingCollective">Strava cycling club!</a></h4>
+				<p>In the last seven days we've ridden <strong>{{ week_ride_miles }}</strong> miles in {{ week_rides }} rides.</p>
+				<p>That's <strong>{{ year_ride_miles }}</strong> miles and {{ year_rides }} rides in {{ year }}!</p>
+			</div>
+		</div>
+		<div class="col-lg-6 text-center">
+			<div class="service-box boxes">
+				<i class="fa fa-4x fa-child text-primary sr-icons"></i>
+
+				<h4>We have {{ strava_runners }} members in our <a href="https://www.strava.com/clubs/BoldmereBulletsRunningCollective">Strava running club!</a></h4>
+				<p>In the last seven days we've run <strong>{{ week_run_miles }}</strong> miles in {{ week_runs }} runs.</p>
+				<p>That's <strong>{{ year_run_miles }}</strong> miles and {{ year_runs }} runs in {{ year }}!</p>
+			</div>
+		</div>
+	   </div>
+
+            <div class="row">
+                <div class="col-lg-6 text-center">
+                    <div class="service-box boxes">
+                        <div class="fb-page" data-href="https://www.facebook.com/BoldmereBulletsCyclingCollective/" data-width="400" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"></div>
+		
+                    </div>
+                </div>
+			
+                <div class="col-lg-6 text-center">
+                    <div class="service-box boxes">
+                      		<div class="fb-page" data-href="https://www.facebook.com/BoldmereBulletsRunningCollective/" data-width="400" data-tabs="timeline" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"></div>
+			
+
+                    </div>
+                </div>
+	  </div>
+    </section>
+
+    <aside class="bg-dark" id="register">
+        <div class="container text-center">
+            <div class="call-to-action">
+                <h2>Register</h2>
+		<p>Before you join us on a run or a ride, we ask that you register as a member of the Boldmere Bullets collective. There is no cost to participate in the vast majority of our events.</p>                   
+		<a href="{% url 'register' %}" class="btn btn-primary btn-xl">Register now!</a>
+
+            </div>
+        </div>
+    </aside>
+
+    <section class="bg-primary" id="events">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 text-center">
+                    <h2 class="section-heading">Events</h2>
+                    <hr class="light">
+                    <p class="text-faded">As well as our regular cycling and running, the Boldmere Bullets also have many special events and social evenings throughout the year.</p>
+                    <a href="{% url 'events' %}" class="page-scroll btn btn-default btn-xl sr-button">Find out more...</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="shop">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Want some Bullets kit?</h2>
+                    <hr class="primary">
+		    <p>We have a great selection of club kit available to purchase in our online shop! </p>
+		    <a href="{% url 'home' %}" class="page-scroll btn btn-primary btn-xl"><i class="fa fa-2x fa-shopping-basket"></i> Visit our shop</a>
+                </div>
+            </div>
+	</div>
+    </section>
+
+    <aside id="charity" class="bg-dark">
+        <div class="container text-center">
+            <div class="call-to-action">
+                <h2>Boldmere Bullets and Charity</h2>
+		<p>The Boldmere Bullets are committed to supporting our local community in Sutton Coldfield and helping out wherever we can. We have an annual charity of the year, which in 2018 is <a href="http://www.acacia.org.uk/">Acacia Family Support</a> - an amazing group providing Pre and Postnatal depression support services to families across Birmingham. All of our major events this year will be raising money to support this very worthy cause.</p>
+<p>We have raised nearly <strong>&pound;75,000</strong> for charities since we were founded in 2013!</p>
+<p>In 2017 we raised <strong>&pound;31,200</strong> for <a href="http://www.lisieuxtrust.org.uk/">The Lisieux Trust</a>. In 2016 we raised <strong>&pound;33,400</strong> for <a href="http://www.breastfriends.org.uk/">Breast Friends</a>, and in 2015 we raised over <strong>&pound;10,000</strong> for the <a href="http://www.suttoncancersupport.org/">Sutton Coldfield Cancer Support Centre</a>!</p>
+   
+            
+            </div>
+        </div>
+    </aside>
+
+    <section id="contact" class="bg-primary">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 text-center">
+                    <h2 class="section-heading">Find out more</h2>
+                    <hr class="primary">
+                    <p>Want to chat to someone about the Bullets? Got a good idea? Have questions? Get in touch...</p>
+                </div>
+	    </div>
+ 	    <div class="row">
+		<div class="col-lg-4 col-lg-offset-2 text-center">
+                    <i class="fa fa-commenting-o fa-3x sr-contact"></i>
+                    <p><a href="{% url 'contact' %}">Send us a message</a></p>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <i class="fa fa-envelope-o fa-3x sr-contact"></i>
+                    <p><a href="mailto:info@boldmerebullets.com">info@boldmerebullets.com</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+ <section id="sponsors">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 text-center">
+                    <h2 class="section-heading">Our Sponsors</h2>
+ 		  <p>The Boldmere Bullets are extremely grateful to our generous sponsors for their continued support!</p>
+                </div>
+	    </div>
+	    <div class="row">
+                <div class="col-lg-2 col-lg-offset-2 text-center">
+				<img src="{% static 'images/bowden.png' %}" class="center-block img-responsive" width="200">
+                 </div>
+                <div class="col-lg-2 text-center">
+				<a href="https://www.komfuel.co.uk"><img src="{% static 'images/komfuel.png' %}" class="center-block img-responsive" width="200"></a>
+                 </div>
+
+                <div class="col-lg-2 text-center">
+				<img src="{% static 'images/beowulf.png' %}" class="center-block img-responsive" width="200">
+                 </div>
+                <div class="col-lg-2 text-center">
+				<img src="{% static 'images/gomm.png' %}" class="center-block img-responsive" width="200">
+                 </div>
+            </div>
+        </div>
+    </section>
+
+
+
+{% include 'bullets/snippets/footer.html' %}
+
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>   
+
+    <!-- Plugin JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal@3.3.2/dist/scrollreveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.js"></script>
+
+    <!-- Theme JavaScript -->
+    <script src="{% static 'js/creative.js'%}"></script>
+
+    <script>
+$(".introboxlink").click(function() {
+  window.location = $(this).find("a").attr("href"); 
+  return false;
+});
+
+// FB embed
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.8&appId=1861837574051990";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+
+</script>	
+   
+</body>
+
+</html>
+
+
+
+

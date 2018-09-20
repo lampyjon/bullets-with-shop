@@ -1,0 +1,39 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - About us {%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% include 'bullets/snippets/generic_headers.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>About the Boldmere Bullets</h1>
+            <br>
+<p>The Bullets is a resource based organisation relying on the time and talents of our volunteers. Amongst other things, our volunteers lead the runs and rides, they run the Bullets social media presence and organise events. Without our 80+ regular volunteers the Bullets would not exist.</p>
+<p>The Core Team are the people who lead the running of the Bullets. They are:</p>
+<ul>
+<li>Tom Swinbourne (The Chairman and Founder)</li>
+<li>Jon Swinbourne (The Captain and Vice Chairman – runs the Cycling Collective and right-hand man for Tom)</li>
+<li>Jonny Allen (The Running Director – runs the Running Collective)</li>
+<li>Tara Lawrence (Goddess of Stuff – backbone of the Collective)</li>
+<li>Andrew Doogan (The Banker – stops us from spending our money on silly things like drones or vuvuzelas)</li>
+<li>Lisa Wilson (Event Director – organises all major Bullets events)</li>
+<li>Sarah Wilkes (Secretary – keeps us all organised)</li>
+<li>Jon Lawrence (Cyber Squirrel - runs our technology)</li>
+<li>Honouree Core Team Members - Jag Sarmotta, Lloyd Norton, Matt Barnett, Phil Scott and Scott Nielson.</li>
+</ul>
+
+<p>If you have any questions, queries, comments or concerns, please <a href="{% url 'contact' %}">let us know</a>.</p>
+
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

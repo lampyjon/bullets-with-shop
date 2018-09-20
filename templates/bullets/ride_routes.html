@@ -1,0 +1,447 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Ride Routes{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+                {% include 'bullets/snippets/ride_headers.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Bullets Ride Routes</h1>
+            <br>
+<p>The Boldmere Bullets Cycling Collective post the ride routes out on Strava in advance of the ride. Upcoming routes can be found at <a href="https://www.strava.com/clubs/BoldmereBulletsCyclingCollective">https://www.strava.com/clubs/BoldmereBulletsCyclingCollective</a>. If you would like to try some of the previous routes used by the Bullets, here are some good ones. With the exception of a few of the shorter rides, they all start and end at either in Boldmere or at The Royal Hotel in Sutton Coldfield. Click on the distance to open details of the route on Strava.</p>
+<p>Distances are in miles. </p>
+
+<table class="table table-striped">
+<thead>
+<tr>
+<th valign="top" width="45%"><b>Name</b></th>
+<th valign="top" width="10%"><b>Shorter</b></th>
+<th valign="top" width="10%"><b>Short</b></th>
+<th valign="top" width="10%"><b>Medium</b></th>
+<th valign="top" width="10%"><b>Long</b></th>
+<th valign="top" width="10%"><b>Longer</b></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td valign="top">BB #1 Whittington</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/310136" target="_blank">25.1</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/310067" target="_blank">35.2</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/50623" target="_blank">40.9</a></p>
+</td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Le Prologue du Parc</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/252125" target="_blank">7.7</a></p>
+</td>
+<td valign="top"> </td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 1 Grand Depart</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/412378" target="_blank">25.0</a></p>
+</td>
+<td valign="top"> </td>
+<td valign="top"> </td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 3 Anglo Saxon Times</td>
+<td valign="top"></td>
+<td valign="top"> </td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/525557" target="_blank">38.4</a></p>
+</td>
+<td valign="top"> </td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 4 (individual effort) The Medieval upper green</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/412571" target="_blank">6.4</a></p>
+</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 5 - Monkeying Around</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/555207" target="_blank">40.7</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="top">TdB 2014 Stage 7 - Chasing Deer</td>
+<td valign="middle"> </td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/624133" target="_blank">28.5</a></p>
+</td>
+<td valign="top"> </td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/555212" target="_blank">43.3</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 8 (Individual effort) - Bodymore Heath (Up The Villa?)</td>
+<td valign="top">
+<p align="center"><a  href="http://www.strava.com/routes/555216" target="_blank">5.0</a></p>
+</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 9 - WW1 Meriden </td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://app.strava.com/routes/736011" target="_blank">29.0</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://app.strava.com/routes/736192" target="_blank">39.9</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://app.strava.com/routes/736151" target="_blank">45.0</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 11 - FlyBB</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/639211" target="_blank">30.4</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/733151" target="_blank">35.3</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/733178" target="_blank">45.2</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 12 - Individual effort</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/752138" target="_blank">6.2</a></p>
+</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 13 - Beeching Buster</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/624169" target="_blank">29.6</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/624312" target="_blank">36.7</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/624354" target="_blank">46.6</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="middle">TdB 2014 Stage 15 - North Warwickshire</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/857367" target="_blank">29.1</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/857374" target="_blank">34.1</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/857391" target="_blank">40.0</a></p>
+</td>
+<td valign="top">
+<p align="center"><a  href="http://www.strava.com/routes/857401" target="_blank">44.3</a></p>
+</td>
+</tr>
+<tr>
+<td valign="middle">All Hallows Day Ride</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1101398" target="_blank">27.0</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1100877" target="_blank">34.0</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1100879" target="_blank">40.8</a></p>
+</td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="middle">Whittington #1 routes (winter) ride</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1002550" target="_blank">26.9</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1002566" target="_blank">31.2</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1002458" target="_blank">42.6</a></p>
+</td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="middle">Boldmere Bullets #2 (Winter)</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1038835" target="_blank">25.5</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1035535" target="_blank">35.1</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1035468" target="_blank">42.4</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="middle">Boldmere Bullets #1 (Winter) - reversed</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1174806" target="_blank">27.9</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1174873" target="_blank">33.9</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1174889" target="_blank">44.9</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="middle">Boldmere Bullets #2 (Winter) - reversed</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1041740" target="_blank">25.8</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1041755" target="_blank">34.8</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1041727" target="_blank">42.6</a></p>
+</td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="middle">Bullets Boxing Day Ride to Market Bosworth</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1240137" target="_blank">52.0</a></p>
+</td>
+</tr>
+<tr>
+<td valign="middle">Boldmere Bullets Baddesley Bad Boy ride </td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1285496" target="_blank">29.5</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1284991" target="_blank">37.4</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1285350" target="_blank">42.8</a></p>
+</td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="bottom">Spring #1 Armitage</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2001132" target="_blank">29.4</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2000908" target="_blank">36.5</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2000741" target="_blank">43.7</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="bottom">Spring #2 Peaky Blinder</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2000349" target="_blank">30.2</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2000247" target="_blank">35.1</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2000102" target="_blank">42.8</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="bottom">Spring #3 Mancetter</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2128091" target="_blank">30.2</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2127789" target="_blank">38.5</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2127795" target="_blank">45.0</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="bottom">TdB 2015 Prologue</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2244853" target="_blank">6.2</a></p>
+</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="bottom">TdB 2015 Grand Depart (Staffie Taming)</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2134919" target="_blank">29.7</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2134904" target="_blank">38.5</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2134166" target="_blank">45.6</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="bottom"><span style="color: #323333; font-family: Arial; font-size: small;">TdB 2015 Stage 2 - Its an L of a challenge</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2244639" target="_blank">6.2</a></p>
+</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+</tr>
+<tr>
+<td valign="bottom">TdB 2015 Stage 3 - Le Lac</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2135562" target="_blank">29.1</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2528167" target="_blank">36.2</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/2135408" target="_blank">44.7</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+<tr>
+<td valign="bottom">Summer 1 - Chasetown Railway Cafe</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/1511036" target="_blank">53.5</a></p>
+</td>
+</tr>
+<tr>
+<td valign="bottom">Summer 2 - Birches Valley Cafe</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/1511043" target="_blank">52.0</a></p>
+</td>
+</tr>
+<tr>
+<td valign="bottom">Summer 5 - Rosliston Hub Cafe</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/1511045" target="_blank">56.0</a></p>
+</td>
+</tr>
+<tr>
+<td valign="bottom">Summer 7 - Polesworth 'Licenced to Grill' Cafe</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/1511056" target="_blank">58.4</a></p>
+</td>
+</tr>
+<tr>
+<td valign="bottom">Summer 10 - Sutton Cheney Canal Cafe</td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="top"></td>
+<td valign="middle">
+<p align="center"><a  href="https://www.strava.com/routes/1511062" target="_blank">57.3</a></p>
+</td>
+</tr>
+<tr>
+<td valign="bottom">Interclub Ride - Liège-Bastogne-Liège tribute</td>
+<td valign="middle"></td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1496596" target="_blank">31.3</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1496617" target="_blank">39.5</a></p>
+</td>
+<td valign="middle">
+<p align="center"><a  href="http://www.strava.com/routes/1496610" target="_blank">44.4</a></p>
+</td>
+<td valign="top"> </td>
+</tr>
+</tbody>
+</table>
+<p>
+<strong>Please note:</strong> These routes were created using Strava and their <a href="https://www.strava.com/terms">terms and conditions</a> apply. The routes were prepared for use as part of organised led rides for the particular dates ridden. The routes are provided as-is for information only and use of them for any purpose other than as part of an organised Boldmere Bullets led ride is entirely at your own risk.</p>
+
+<p>Whenever you're riding, always remember <a href="{% url 'collective-code' %}">our Collective code</a>.</p>
+
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

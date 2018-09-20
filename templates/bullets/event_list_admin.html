@@ -1,0 +1,47 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Events{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+<h1>Bullets Events Administration</h1>
+<br>
+
+<table class="table sortable">
+	<thead>
+		<tr>
+			<th data-defaultsort="asc">Date</th>
+			<th>Name</th>
+			<th>Link</th>
+			<th>Edit</th>
+			<th>Delete</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for event in object_list %}
+		<tr>
+			<td>{{event.date}}</td>
+			<td>{{event.name}}</td>
+			<td>{{event.link|default_if_none:""}}</td>
+			<td><a href="{% url 'event-update' event.pk %}">Edit</a></td>
+			<td><a href="{% url 'event-delete' event.pk %}">Delete</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+
+<a href="{% url 'event-create' %}" class="btn btn-primary btn-xl">Add a new Event</a>
+ 
+   
+
+ 
+      {% endblock %}
+
+
+

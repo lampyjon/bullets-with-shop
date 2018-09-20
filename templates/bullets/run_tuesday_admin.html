@@ -1,0 +1,68 @@
+{% extends "simple.html" %}
+{% load bootstrap_form from bootstrap4 %}
+{% load static %}
+
+{% block title %} - Tuesday Run Admin{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+
+{% block extraheader %}
+<link href="{% static 'css/bootstrap-sortable.css' %}" rel="stylesheet"> 
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+
+{% endblock %}
+
+{% block content %}
+        <h1>Bullets Tuesday Run</h1>
+	  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+	 {% bootstrap_form run_form layout="horizontal" %} 
+                       <p class="text-right">
+                		<button type="submit" class="btn btn-primary">Save</button>
+            			</p>
+        </form>
+ 
+	<table class="table sortable">
+	<thead>
+		<tr>
+			<th data-defaultsort="asc">Date</th>
+			<th>Session Type</th>
+			<th>Details</th>
+			<th>Meeting Point</th>
+			<th>Delete</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for run in runs %}
+		<tr>
+			<td>{{run.date}}</td>
+			<td>{{run.session_type}}</td>
+			<td>{{run.session_details}}</td>
+			<td>{{run.get_meeting_point_display}}</td>
+			<td><a href="{% url 'run-tuesday-admin-delete' run.pk %}">delete</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+
+ 
+      {% endblock %}
+
+
+{% block extrafooter %}
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+
+<script src="{% static 'js/bootstrap-sortable.js' %}"></script>
+    <script>
+	$('.datepicker').datepicker({dateFormat: 'dd-mm-yy'});
+</script>
+
+{% endblock %}
+

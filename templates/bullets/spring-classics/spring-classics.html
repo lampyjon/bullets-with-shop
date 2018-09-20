@@ -1,0 +1,46 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - The Spring Classics{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+
+{% block header-links %}
+                {% include 'bullets/snippets/classics_headers.html' %}
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+     <div class="col-sm-2">
+	<img src="{% static 'images/classics/spring-classics.png' %}" class="img-responsive" alt="The Spring Classics">
+    </div>
+    <div class="col-sm-8">
+            <h1>The Bullets' Spring Classics</h1>
+            <br>
+<p>Test your winter training with our season-opening Spring Classics events!</p>
+<h3>What are the Spring Classics?</h3>
+<p>The Spring Classics are the early-season proving ground for the cycling elite: eight cycle races run in the continental springtime of March and April whose distances, road conditions and undoubted bad weather allow only the strongest, meanest and psychologically fittest to survive. The headwinds of Milan-San Remo and the pitted roads of the Paris-Roubaix are nothing compared to Bosworth, and the infamous lanes around Atherstone.</p>
+
+<h3>What are the Bullets' Spring Classics?</h3>
+<p>To celebrate the original Spring Classics, the Boldmere Bullets have created our own local versions of two of the most challenging rides - the Milan-San Remo and Paris-Roubaix. We've tried to recreate the road conditions that the classics riders enjoy / endure, and hope to create two very special events in the process. These will be led rides, with up to 12 per group including leaders.</p>
+<h4>Milan-San Remo</h4>
+<p>The first ride on 12th March is based on the Milan-San Remo race. We will be having group rides aiming to complete some tough routes in the spirit of the original ride - including some epic climbs on the 100 miler. The routes will be in the region of 40, 70 and 100 miles. We will be heading out from The Royal Hotel, and meet back there later for drinks and food. We'll be asking for donations to the Bullets Charity of the Year - The Lisieux Trust - suggesting &pound;5 per rider.</p>
+<a href="{% url 'spring-milan' %}" class="btn btn-primary">Learn more about the Bullets Milan-San Remo</a>
+
+<h4>Paris-Roubaix</h4>
+<p>After conquering Milan-San Remo, we take things to another level, and on 9th April we will be recreating "The Hell of the North". Heading out from the Harvester in Boldmere, the Routemaster is working his magic to put together a route to encompass everything that makes Paris-Roubaix such an iconic event. This will not be an easy ride and definitely not one for your best bike, but it will be fun! Again, we'll be raising money for the Bullets Charity of the Year, the Lisieux Trust, with an entry fee of &pound;5 per rider. After the ride, we'll watch the pros tackling the actual ride at the Harvester along with a BBQ for family and friends.</p>
+<a href="{% url 'spring-paris' %}" class="btn btn-primary">Learn more about the Bullets Paris-Roubaix</a>
+<h3>Two special rides, one special collective!</h3>
+<p>These rides are your reason to gear up and get out during winter months! Prove to yourself that you have the same blood, sweat and tears of cycling legends. Will you be ready to channel your inner Merckx?</p>
+<p><strong>Note: you must be a registered member of the Boldmere Bullets to participate in these events.</strong> If you have not already done so, you can <a href="{% url 'register' %}">register online</a>.</p>
+	   
+<p>Why not join the dedicated <a href="https://www.facebook.com/ClassicsBB/?fref=ts" target="_blank">Facebook Group</a> for the Spring Classics ride?</p> 
+    </div>
+   </div>
+
+ 
+      {% endblock %}
+
+
+

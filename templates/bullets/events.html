@@ -1,0 +1,49 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Events{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+<li><a href="{% url 'ride-info' %}">Ride with us</a></li>
+<li><a href="{% url 'run-info' %}">Run with us</a></li>
+<li><a href="{% url 'register' %}">Become a member</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Forthcoming Bullets Events</h1>
+            <br>
+            <p>In addition to our regular weekly running and cycling events, we have a wide range of other activities planned for the year ahead:</p>
+	 
+{% regroup events by date|date:'F' as events_by_month %}
+{% for event_month in events_by_month %}
+ 	<h2>{{ event_month.grouper }}</h2>
+	
+	    <table class="table">
+		<thead>
+			<tr>
+				<th width="40%">Date</th>
+				<th width="60%">Event</th>
+			</tr>
+		</thead>
+		<tbody>
+	{% for event in event_month.list %}
+			<tr>
+				<td>{{ event.date|date:'j M' }} </td>
+				<td>{% if event.social_event %}<i class="fa fa-commenting"></i>{% endif %}{% if event.running_event %}<i class="fa fa-child"></i>{% endif %}{% if event.cycling_event %}<i class="fa fa-bicycle"></i> {% endif %}{% if event.link %}<a href="{{ event.link }}">{{ event.name}}</a>{% else %}{{event.name}}{% endif %}</td>
+			</tr>
+	{% endfor %}
+		</tbody>
+	</table>
+{% endfor %}
+
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

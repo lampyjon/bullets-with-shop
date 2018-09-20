@@ -1,0 +1,35 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - 10/10 for Acacia Mums{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+    <h1>10/10 For Acacia Mums - You are registered!</h1>
+    <p>Thank you for registering for the 10/10 For Acacia Mums event, {{rider}}! We look forward to seeing you on Sunday 16 September!</p>
+
+    <h2>Join the totaliser?</h2>
+    <p>We want to achieve over 10,000km walked, run, and ridden over our events for Acacia Family Support. To help us track how we are doing, we would like to ask you to connect us to your Strava account. You do not have to do this to take part in the event, and can update your distance after the event manually if you would prefer. We will only use this access for this event, and will only capture the distance of non-private runs or rides you make on the 16th September 2018. </p>
+
+   <a href="{{ strava_url }}"><img src="{% static 'images/connect-strava.png' %}"></a>
+
+<h2 id="fundraising">Fundraising</h2>
+<p>There's no charge to take part in these runs or rides! We are seeking to raise money for our charity of the year, Acacia Family Support, so we would encourage a donation to them via our <a href="https://www.justgiving.com/fundraising/boldmere-bullets-10-10-for-acacia-mums">JustGiving page</a> if you are able. </p>
+<p>If you are plannning to get sponsorship for this event, then we'd love you to <a href="https://www.justgiving.com/companyteams/boldmerebullets1010event">join our JustGiving team</a>, so we can see our collective progress!</p>
+
+<a href="{% url 'index' %}" class="btn btn-primary btn-xl">Back to the main site</a> 
+<br/> 
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

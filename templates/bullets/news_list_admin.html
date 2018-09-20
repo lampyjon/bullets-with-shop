@@ -1,0 +1,53 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - News{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+<h1>Bullets News Administration</h1>
+<br>
+
+<table class="table sortable">
+	<thead>
+		<tr>
+			<th data-defaultsort="asc">Date added</th>
+			<th>Title</th>
+			<th>Redirect?</th>
+			<th>Display from</th>
+			<th>Display until</th>
+			<th>Front page?</th>
+			<th>Edit</th>
+			<th>Delete</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for news in object_list %}
+		<tr>
+			<td>{{news.date_added}}</td>
+			<td>{{news}}</td>
+			<td>{{news.redirect_to|default_if_none:""}}</td>
+			<td>{{news.display_after|default_if_none:""}}</td>
+			<td>{{news.display_until|default_if_none:""}}</td>
+			<td>{{news.front_page}}</td>
+			<td><a href="{% url 'news-update' news.pk %}">Edit</a></td>
+			<td><a href="{% url 'news-delete' news.pk %}">Delete</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+
+<a href="{% url 'news-create' %}" class="btn btn-primary btn-xl">Add a new News story</a>
+ 
+   
+
+ 
+      {% endblock %}
+
+
+

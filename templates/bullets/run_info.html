@@ -1,0 +1,42 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - About Our Runs{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+                {% include 'bullets/snippets/run_headers.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Joining a Bullets Run</h1>
+            <br>
+            <p>Each week we have two main sessions - Our led <strong>Group Runs</strong> at 8am on Sundays from Boldmere Gate in Sutton Park, and our <strong>“Run Faster and Further”</strong> sessions at 7pm on a Tuesday. Anyone over the age of 18 is welcome at any Bullets activity, no matter what your pace or your fitness. You pay nothing to join us, just bring your enthusiasm.
+</p>
+
+<p>Please <a href="{% url 'register' %}">register</a> as a Boldmere Bullet before you attend a session. Make yourself known, and you will be pointed in the right direction!</p>
+
+<a href="{% url 'run-sunday' %}" class="btn btn-primary">Learn more about Sunday Runs</a>
+<a href="{% url 'run-tuesday' %}" class="btn btn-primary">Learn more about Tuesday Runs</a>
+		    
+	    <h3>What should I wear?</h3>
+	    <p>We recommend you wear comfortable clothes for exercising and to suit the weather conditions. Most people wear running tights or shorts, t-shirts or long-sleeve tops, depending on the weather. Comfortable running shoes / trainers are a must.</p>
+
+	    <h3>What should I bring?</h3>
+	    <p>You might want to bring a drink if the weather is warm, and don't forget suncream in the summer months. There are no lockers or changing facilities, so anything you don't carry with you will need to be left in a car at the start of our runs.
+	    </p>
+	    <h3>Do you cancel if the weather is bad?</h3>
+	    <p>We've only ever cancelled one run due to bad weather, this was because it was very snowy and we were worried about people driving to the start. If the conditions look bad, we will put a post onto Facebook and Strava as early as possible. On weekends where lots of our volunteer leaders have entered running events (e.g. the Sutton Coldfield Fun Run, or the Birmingham half marathon) we change from led-runs to drop-in-and-run sessions. 
+	    </p>
+   	    <h3>I'm worried I'll be too slow!</h3>
+	    <p>Please don't be! Everyone has to start somewhere, and we are not a competitive racing club - we're all doing this to get fitter, to make new friends, and have a good time. </p>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

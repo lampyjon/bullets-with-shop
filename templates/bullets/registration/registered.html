@@ -1,0 +1,30 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Registered{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+
+{% block header-links %}
+                {% include 'bullets/snippets/register_headers.html' %}
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Registered with the Boldmere Bullets</h1>
+            <br>
+            <p>Thank you for registering as a member of the Boldmere Bullets collective. </p>
+
+	    <p>We will shortly send you an email to confirm your email address.</p>
+
+	    <a href="{% url 'index' %}" class="btn btn-primary btn-xl">Back to the main site</a>          
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

@@ -1,0 +1,98 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - The Spring Classics - Milan-San Remo{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+
+{% block header-links %}
+                {% include 'bullets/snippets/classics_headers.html' %}
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+     <div class="col-sm-2">
+	<img src="{% static 'images/classics/milan.png' %}" class="img-responsive" alt="The Spring Classics">
+    </div>
+    <div class="col-sm-6">
+            <h1>Milan-San Remo</h1>
+            <br>
+	    <h3>Welcome to Spring!</h3>
+	    <p>The Boldmere Bullets Milan-San Remo Spring Classic takes place on the 12th March 2017. </p>
+	    <p>
+It's a Boldmere Bullets tribute to the first Monument of the cycling season, between Milan and San Remo, in Northwest Italy. The original Milan-San Remo is 181 miles and 2940 meters of climbing. Our routes are on rolling roads, the 100 miler consists of nearly 1600 meters of climbing. This route will climb Jiggers Bank and then a steady climb up Darby Road to the Wrekin. It's a tribute to the difficulties of the Milan San Remo route. Whilst the 70 mile route is almost 1000 meters of climbing, heading out a long the same course as the 100 mile route but turning back towards Sutton Coldfield near RAF Cosford. The 40 mile route is 500 meters of climbing heading north towards Upper Longdon before turning back south to Sutton Coldfield via Fradley Junction.</p>
+	    <h3>Route options</h3>
+	    <p>
+<ul>
+<li><a href="https://www.strava.com/routes/7399039" target="_blank">100 miles</a></li>
+<li><a href="https://www.strava.com/routes/7399080" target="_blank">70 miles</a></li>
+<li><a href="https://www.strava.com/routes/7399284" target="_blank">40 miles</a></li>
+</ul>
+All routes will depart from, and return to, the Royal Hotel, Sutton Coldfield.</p>
+
+	     <h3>Entry Fee</h3>
+	<p>There is no entry fee for the Bullets Milan-San Remo ride, but to raise money for our Charity of the Year - The Lisieux Trust - we are suggesting riders make a &pound;5 donation each. If you would like to donate on the day, or would prefer not to donate, use the voucher code of "NO-DONATION" when registering, and your entry will be free.</p>
+
+	 	
+	<h3>Important Information</h3>
+	<p><strong>You must be a registered member of the Boldmere Bullets to participate in this event.</strong> If you have not already done so, you can <a href="{% url 'register' %}">register online</a>.</p>
+	<p>Participants on this event agree to adhere to the <a href="{% url 'collective-code' %}">collective code</a>.</p>
+	<p>This is an unsupported ride, although all groups will be led by Boldmere Bullets leaders in the usual fashion.</p>
+
+	<h3>Start / End Map</h3>
+
+	<iframe
+  width="600"
+  height="400"
+  frameborder="0" style="border:0"
+  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCcZLY_Ta7vINUXG6DPh-JUWX_a5DGyg9Y&q=52.5663681,-1.8238558&zoom=16" allowfullscreen>
+</iframe>
+
+
+	    
+    </div>
+    <div class="col-sm-4 introbox">
+	<h2>Key Details:</h2>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Date:</strong></div>
+		<div class="col-sm-8">12 March 2017</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Start:</strong></div>
+		<div class="col-sm-8">08:00</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Depart:</strong></div>
+		<div class="col-sm-8">The Royal Hotel</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Routes:</strong></div>
+		<div class="col-sm-8">
+<ul class="list-unstyled">
+<li><a href="https://www.strava.com/routes/7399039" target="_blank">100 miles</a></li>
+<li><a href="https://www.strava.com/routes/7399080" target="_blank">70 miles</a></li>
+<li><a href="https://www.strava.com/routes/7399284" target="_blank">40 miles</a></li>
+</ul>
+
+</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Cost:</strong></div>
+		<div class="col-sm-8">Optional &pound;5.00 donation</div>
+	</div>
+
+<p class="text-center">
+ <a href="/bullets-shop/products/bullets-milan-san-remo-charity-ride-2/" class="btn btn-primary btn-lg">Sign Up Now</a>
+</p>
+	
+    </div>
+    </div>
+   </div>
+
+ 
+      {% endblock %}
+
+
+
+

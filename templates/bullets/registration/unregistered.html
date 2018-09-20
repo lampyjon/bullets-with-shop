@@ -1,0 +1,27 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Unregistered{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+
+{% block header-links %}
+                {% include 'bullets/snippets/register_headers.html' %}
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Unregistered with the Boldmere Bullets</h1>
+            <br>
+            <p>Your unregistration request has been successfully received. We will remove your details as soon as possible. We're sorry to see you leave the Boldmere Bullets collective!</p>
+	    <a href="{% url 'index' %}" class="btn btn-primary btn-xl">Back to the main site</a>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

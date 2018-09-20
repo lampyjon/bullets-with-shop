@@ -1,0 +1,60 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - Fred Whittington Challenge{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+    <h1>Bullets Fred Whittingon Challenge</h1>
+    <p>Welcome to the Boldmere Bullets Cycling Challenge for the summer of 2018 - the <b>Fred Whittington Challenge</b>!</p>
+    <h2>Isn't it the Fred Whitton Challenge?</h2>
+    <p>Well...there is the <a href="https://www.fredwhittonchallenge.co.uk/">Fred Whitton challenge</a> if you want a 112 mile ride around the Lake District. But we're a bit of a long way from the lakes, and we have Whittington on our doorstep, so... we've decided to create our own.</p>
+    <h2>Intriguing, tell me more!</h2>
+    <p>The concept is simple. Go and do a ride, and ensure it goes through <a href="https://www.google.co.uk/maps/@52.6729074,-1.7609891,15z">Whittington</a>. Click on the button below to get your ride details from Strava, and see where you end up in our leaderboards.</p>
+    <h2>How does this work then?</h2>
+    <p>Your ride needs to pass through one of the following four Strava segments:</p>
+<ul>
+<li><a href="https://www.strava.com/segments/18298511">Whittington Church Street</a></li>
+<li><a href="https://www.strava.com/segments/1277267">Whittington school to barracks climb</a></li>
+<li><a href="https://www.strava.com/segments/6862687">Fisherwick to Flyer</a></li>
+<li><a href="https://www.strava.com/segments/7224903">Bridge to Bridge</a></li>
+</ul>
+<p>Basically - you need to start at the crossroads by The Dog Inn, and head off in any of the routes out of Whittington.</p>
+<p>When you connect to Strava using the button below, we grab all of your rides that have gone through any of these segments, and then work out where you feature on the leaderboards.</p>
+<p>We look at all rides since the 1st of July 2018.</p>
+    <h2>So is it a race?</h2>
+    <p>No, this is the beauty of our challenge. It's not about how fast you can go, but about how smart you can ride. There are two challenges - the 'long and low', and the 'short and spikey'. The basic gist is the same - go and do a ride through Whittington, but your overall ride will be judged in two ways.</p>
+    <p><b>Long and Low</b> rewards canny riders who can do a ride longer than 40 miles with the lowest elevation per mile. So, if you can find a very flat bit of road and keep riding along it, that's a good way to get a winning 'feet per mile' score.</p>
+    <p><b>Short and Spikey</b> is pretty much the opposite - in this case your ride needs to be less than 40 miles, but the maximum overall elevation wins. The challenge here is surely to get as close to 40 miles as possible whilst maximising your hill-climbing approach.</p>
+{% if rider_id %}
+<h2>How am I doing?</h2>
+<p>Click on the button below to get your latest rides from Strava and check on your position in the leaderboard!</p>
+<a href="{% url 'fred-refresh' %}" class="btn btn-primary btn-xl">Leaderboard</a>
+{% else %}
+
+<h2>How do I take part?</h2>
+<p>All you need to do is connect to Strava using the button below. We'll then grab your relevant rides and add you to the leaderboards. If you do any new rides, just click the button again and we'll recalculate your position!</p>
+   
+    <a href="{{ strava_url }}"><img src="{% static 'images/connect-strava.png' %}"></a>
+
+{% endif %}
+<br/>
+<br/>
+<p>There are currently <b>{{ count }}</b> Bullets taking part in the Fred Whittington challenge!</p>
+
+<br/>
+<a href="{% url 'index' %}" class="btn btn-primary btn-xl">Back to the main site</a>  
+    </div>
+</div>
+
+<br/> 
+      {% endblock %}
+
+
+

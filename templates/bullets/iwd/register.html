@@ -1,0 +1,92 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap3 %}
+
+{% block title %} - International Women's Day{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+<li><a href="#evans">Bike Maintenance Event</a></li>
+<li><a href="#ride">Women's Interclub Ride</a></li>
+<li><a href="#register">Register</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+    <h1>Women's Events</h1>
+    <p>This year the Boldmere Bullets are aiming to increase the participation of women in cycling, and so we are organising some specific events to target this.</p>
+<p>Our overall aim is to encourage women to get out on their bikes and enjoy riding them whatever their ability level or experience, and help them to gain enough confidence to join in with any mixed rides too.</p>
+<h2 id="evans">Cycle Maintenance Evening</h2>
+<p>
+On the evening of Thursday 8th March (International Women's Day), we are organising a special session, kindly hosted by Evans Cycles Sutton Coldfield. The team at Evans are planning to deliver a bike familiarisation and basic mechanical session. We also will be inviting a few women speakers who are prominent in the world of cycling for a variety of reason (eg. competitively, recreationally or working in the industry) to hopefully come and talk to us.
+ </p>
+<h3>Key Information</h3>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Date:</strong></div>
+		<div class="col-sm-8">Thu 8 Mar 2018</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Start:</strong></div>
+		<div class="col-sm-8">19:00</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Location:</strong></div>
+		<div class="col-sm-8"><a href="https://www.evanscycles.com/store/sutton-coldfield">Evans Cycles</a></div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Duration:</strong></div>
+		<div class="col-sm-8">2.5 hours</div>
+	</div>
+<p class="text-center">
+ <a href="#register" class="btn btn-primary">Register</a>
+</p>
+	
+
+<h2 id="ride">Women's Interclub Ride</h2>
+<p>On Saturday 10th March we will be hosting a female Interclub ride, catering for a wide variety of ride speeds and cyclist experience. Rides will take approximately an hour and a half. After the ride there will be the opportunity to join the rest of the Boldmere Bullets cycling collective in the Harvester for coffee, food, and chat!</p>
+
+<h3>Key Information</h3>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Date:</strong></div>
+		<div class="col-sm-8">Sat 10 Mar 2018</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Start:</strong></div>
+		<div class="col-sm-8">Registration from 07:00, ride starts at 08:00</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Location:</strong></div>
+		<div class="col-sm-8">The Harvester</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Duration:</strong></div>
+		<div class="col-sm-8">approx. 90 minutes</div>
+	</div>
+ 	<div class="row">
+      		<div class="col-sm-4"><strong>Ride Distance:</strong></div>
+		<div class="col-sm-8">Varies depending on group speed.</div>
+	</div>
+
+<p class="text-center">
+ <a href="#register" class="btn btn-primary">Register</a>
+</p>
+
+<h2 id="register">Register to take part</h2>
+    </p>
+        <form method="post" class="form-horizontal" onsubmit="mySubmit.disabled = true; return true;">
+            {% csrf_token %}
+            {% bootstrap_form form layout="horizontal" %}
+ 	    <p>By clicking on 'register' you are agreeing to the <a href="{% url 'collective-code' %}">Collective Code</a>.</p>
+            <p class="text-right">
+                <button name="mySubmit" type="submit" class="btn btn-primary">Sign up now...</button>
+            </p>
+        </form>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

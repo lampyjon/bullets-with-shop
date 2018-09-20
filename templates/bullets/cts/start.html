@@ -1,0 +1,32 @@
+{% extends 'mainsite/cts/base.html' %}
+
+{% block content%}
+<div class="container">
+
+     <h2>Chase the Sun Supporters</h2>
+     <p>Welcome to the Boldmere Bullets CTS Mobile Page.</p>
+     <p>Please select your vehicle:</p>
+
+ 
+    <form method="POST" action="{% url 'cts-mobile' %}">
+	{% csrf_token %}
+	<div class="form-group">	
+		<label for="select-car" class="control-label">Vehicle:</label>
+			<select class="form-control" name="select-car" id="select-car">
+					{% for car in vehicles %}
+					<option value="{{car.number}}">Car {{car.number}} ({{car.name}})</option>
+					{% endfor %}		
+			</select>
+	</div>
+	<div class="form-group">
+    				<button class="btn btn-default" type="submit" id="page-1-go">Let's go!</button>
+	</div>
+    </form>
+</div>
+
+{% endblock %}
+
+
+
+
+

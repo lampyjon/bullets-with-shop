@@ -1,0 +1,33 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - Contact Us{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+{% block extraheader %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}
+
+{% block header-links %}               
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+        <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+            <h1><i class="fa fa-envelope-open-o" aria-hidden="true"></i> Contact the Boldmere Bullets</h1>
+	    <p>If you have any questions or comments about the Boldmere Bullets, our events and activities, or just generally want to get in-touch, please fill in the form below, and we'll get back to you as quickly as we can. </p>
+            <br>
+            {% bootstrap_form contact_form layout="horizontal" %}
+            <p class="text-right">
+                <button type="submit" class="btn btn-primary">Send your message</button>
+            </p>
+        </form>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

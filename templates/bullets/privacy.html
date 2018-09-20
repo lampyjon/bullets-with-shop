@@ -1,0 +1,58 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Our Privacy Policy{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% include 'bullets/snippets/generic_headers.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Keeping your information safe</h1>
+            <br>
+<p>Our approach to keeping your personal data protected is simple - we try our best to avoid collecting it in the first place, and when we do need it, we'll be open about why we need it, what we're doing with it, and when we'll get rid of it. This page gives some extra details about this, as well as how you can get in touch with us if you have any questions, wish to see a copy of any of your data which we might hold, or if you'd like us to remove your information from our systems.</p>
+
+<h2>What information do we collect?</h2>
+<p>The main information we collect is when you register as a Boldmere Bullet, which we ask that you do before taking part in any of our running or cycling events. We ask for your name, email address, a contact number, to confirm you are over 18 years old, and the first part of your postcode (e.g. B75). Only members of the <a href="{% url 'core' %}">core team</a> will have access to this information.</p<p>We will not sell, lease, or otherwise give others access to this information without your permission, unless required to do so by law, or in the event of an insurance claim. We will use the contact details you provide only to reach you as an individual (for example if we have found some of your property following an event), and will respect your wishes regarding whether you wish to receive emails or not. We will use the first part of your postcode to help us build a picture of where Bullets come from, and may share aggregated anonymous information (such as '100 bullets live in B74') with third parties or the public. 
+</p>
+<p>We will keep your information for as long as you remain a member of the Boldmere Bullets. If you do decide to leave the collective, you can do so <a href="{% url 'unregister' %}">online</a> or by <a href="{% url 'contact' %}">contacting us</a>. When you do so, we will remove your registration information from our system immediately. </p>
+
+<h3>Bullets Emails</h3>
+<p>If you do opt-in to receive occassional emails from us regarding Boldmere Bullets events, we will share your email address with our email list management partner <a href="https://mailchimp.com/">MailChimp</a>. You will receive an email confirming this, and can opt out from these at any time by clicking the 'unsubscribe' link in the emails, or by <a href="{% url 'contact' %}">contacting us</a>.</p>
+
+<h3>The Bullets Shop</h3>
+<p>If you buy something through our online shop, you will need to provide some information to us to enable us to process and deliver your order - your name, email address, a billing and delivery address, and a contact number. Only members of our <a href="{% url 'core' %}">core team</a> involved in running the shop will have access to this information. We will not sell, lease, or otherwise give others access to this information without your permission, unless required to do so by law. If you have requested postal delivery, we will share your delivery details with a courier or postal service. </p>
+<p>We will keep details of the orders you make in our online shop until you delete your account, or we decide that we no longer require them.</p>
+<p>If you pay online then we use <a href="https://www.paypal.com/en/webapps/mpp/ua/privacy-full">Paypal</a> as a payment partner. We do not automatically provide any information to PayPal beyond the amount to pay; they inform us whether the transaction has been successful. If you pay offline with a credit card then we use <a href="https://www.izettle.com/gb">iZettle</a> to handle credit card transactions for us; we never have access to your credit card information.</p>
+
+<h3>Special Events</h3>
+<p>We sometimes run special events, such as being Domestiques for the Birmingham Velo, which require us to capture and share information with third parties to enable us to run these events. When we are gathering information for this purpose from our website, or in-person, we will let you know what will happen to it and why, before you provide it.</p>
+<p>We will delete any personal information we have captured about a special event as soon as possible after the event has finished.</p>
+
+<h3>Use of Strava</h3>
+<p>We are keen users of <a href="https://www.strava.com/">Strava</a>, and organise many of our running and cycling events through their tools. We will never share your information with them without your prior permission. </p>
+<p>Some of our Bullets challenges and special events gather publicly-available data automatically from Strava, such as to provide customised leaderboards on the Bullets website. If you wish to participate in these public challenges you will need to have a Strava account, and have your privacy policy set accordingly.</p>
+
+<h3>Use of Facebook and Twitter</h3>
+<p>We use Facebook and Twitter to share news about Boldmere Bullets events, to provide information regarding local cycling and running-related activities, to help promote the image of sport in our community, and to help with our charitable fundraising activities. Whilst we would encourage you to follow us on social media to enable us to stay in-touch more easily, we will never share your personal information with Facebook or Twitter without your prior permission.</p>
+<p>We sometimes use Facebook Groups or WhatsApp chat to coordinate Bullets activities. Again, we will not share your personal information with Facebook or any third-party not listed here without your prior permission.</p>
+
+<h3>Our data processors</h3>
+<p>Our website, which is where the information above is stored runs in the EU region of <a href="https://devcenter.heroku.com/articles/regions#data-residency">Heroku</a>. Email messages from our website are delivered using <a href="https://aws.amazon.com/compliance/data-privacy-faq/">Amazon Web Services</a>. We use <a href="https://www.one.com/en/">One</a> to process and store any emails sent to addresses ending in @boldmerebullets.com. 
+</p>
+
+<h2>If you have questions...</h2>
+<p>If you have any questions or concerns about the way in which we capture and process information about you, if wish to see a copy of the information we hold about you, or would like us to remove any information we have about you, then please <a href="{% url 'contact' %}">contact us online</a>, or speak to a member of the <a href="{% url 'core' %}">core team</a> at a Bullets event.
+</p>
+
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

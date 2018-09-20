@@ -1,0 +1,76 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - Chase The Sun {%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+<li><a href="{% url 'contact' %}">Contact Us</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Chase The Sun</h1>
+            <br>
+	
+<img src="{% static 'images/lisieux.jpg' %}" class="pull-right img-responsive">
+<p>On  the 17th June 2017, twenty intrepid Boldmere Bullets cyclists will be trying to beat the Earth’s rotation, and cycle 200+ miles in just 17 hours, chasing the sun, all in the aid of our charity of the year, The Lisieux Trust.</p>
+<h3>About the event</h3>
+<p>Inspired by fellow Bullet and noted local blogger <a href="https://twitter.com/brumbrekkieclub">Simon Steggles</a> who completed the ride on his own in 2016, 19 other brave Bullets have signed up and are now preparing for what looks set to be an epic day of cycling, raising funds for The Lisieux Trust along the way.</p>
+
+<blockquote>
+<p>“Chase the Sun began in 2008, when three average cyclists set off on an adventure to find out how far they could ride in one day . . . choosing the longest day, and beginning at the first rays of sunrise, Olly &amp; friends departed from the east coast of the UK to ‘Chase the Sun’. . .   Since then, the event continues to grow as more and more people take on the challenge each year” (from <a href="http://chasethesun.wixsite.com/chasethesun/copy-of-news">Chase The Sun</a>).</p>
+</blockquote>
+<br>
+<img src="{% static 'images/cts-map.jpg' %}" class="center-block img-responsive">
+<br>
+<p>With departure from Minster-on-Sea on the Isle of Sheppey at first rays (around 4:35am) the Bullets have until sunset (around 9:30pm) to make the 209 mile route across the UK to the seafront at Burnham-on-Sea.</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/nGUS671sx1U" frameborder="0" allowfullscreen></iframe>
+<br>
+<h3>Sponsorship Opportunities</h3>
+<p>Although the ride is taken on as a personal challenge (and, allegedly, for fun!) the logistics of transporting 20+ people, 30+ bikes, and all of the supporting kit, food, and energy gels to the start line, then provide a fleet of support vehicles, first aid kits, spare tyres, and spare parts along the route is a costly and complex exercise. We have already been generously supported by <a href="https://outinbrum.com/" target="_blank">Out In Brum</a> who are kindly providing us a support vehicle. We are also seeking any help from businesses, local or national, that may wish to take up sponsorship opportunities, or who may want to donate essentials to this great cause.</p>
+
+<p>If you would like your business’ logo to appear on any of the kit being produced, you have the opportunity to sponsor items for the event. Your logo will not only be seen by the many riders taking part, but also on the media coverage prior to, during, and after the event, and in the Boldmere Bullets various social media activities as well.</p>
+
+<div class="row">
+	<div class="col-sm-4"><img src="{% static 'images/cts-cap.jpg' %}" class="img-responsive"></div>
+	<div class="col-sm-8"><ul>
+<li><strong>&pound;200</strong> gets exclusive sponsorship of the riders' caps (partial sponsorship may also be available)</li>
+<li><strong>&pound;600</strong> gets exclusive sponsorship of the riders' jerseys (partial sponsorship may also be available)</li>
+<li><strong>&pound;80</strong> gets exclusive sponsorship of the support team t-shirts (partial sponsorship may also be available)</li>
+<li><strong>&pound;700</strong> gets exclusive sponsorship of the riders' shorts (partial sponsorship may also be available)</li>
+</ul>
+	</div>
+</div>
+
+<p>
+We are also hoping to source some of the essentials required throughout the day to maximise our charitable donation. The sort of items the team will require include:
+</p>
+<ul>
+<li>Gels</li>
+<li>Energy bars</li>
+<li>Electrolyte tablets</li>
+<li>Bananas</li>
+<li>Flapjack type things</li>
+<li>Bottles of water</li>
+<li>Porridge pots</li>
+<li>Nuts</li>
+<li>Inner tubes</li>
+<li>Salt Tablets</li>
+<li>Chamois cream</li>
+<li>Water bottles</li>
+<li>First aid kits</li>
+</ul>
+<p>
+If as a local or national business you would like to sign-up for any of the sponsorship opportunities, or if you could help with donations of any of the above supplies, please either email <a href="mailto:info@boldmerebullets.com">info@boldmerebullets.com</a> or via our <a href="{% url 'contact'%}">contact form</a> to discuss requirements and options as there is a deadline for any kit to be manufactured.</p>
+	
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

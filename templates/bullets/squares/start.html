@@ -1,0 +1,27 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap3 %}
+
+{% block title %} - Squares{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+    <h1>Bullets Squares Challenge</h1>
+      
+    <a href="{{ strava_url }}"><img src="{% static 'images/connect-strava.png' %}"></a>
+
+<br><br>
+<a href="{% url 'index' %}" class="btn btn-primary btn-xl">Back to the main site</a>  
+    </div>
+</div>
+
+<br/> 
+      {% endblock %}
+
+
+

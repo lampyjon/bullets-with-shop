@@ -1,0 +1,65 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - About Our Rides{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+                {% include 'bullets/snippets/ride_headers.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Joining a Bullets Ride</h1>
+            <br>
+            <p>We have a wide range of regular and special bike rides to suit all abilities and interests. We are always excited to welcome new members along to one of our events. Anyone over the age of 18 is welcome at any Bullets activity, no matter what your pace or your fitness. You pay nothing to join us, just bring your enthusiasm.</p>
+
+	    <h3>When are our rides?</h3>
+	    <p>Our main Saturday rides start at 7am from the car park at the rear of The Lounge @ Boldmere (formerly known as Dubella), in Boldmere.</p>
+	    
+<iframe
+  width="600"
+  height="400"
+  frameborder="0" style="border:0"
+  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCcZLY_Ta7vINUXG6DPh-JUWX_a5DGyg9Y&q=Dubella,Boldmere&zoom=16" allowfullscreen>
+</iframe>
+<p>We also have various mid-week rides, and Sunday sessions, organised by individual Bullets and varying depending on the season and conditions. Details of this can be found on Facebook and Strava.</p>
+	    <h3>What happens on our rides?</h3>
+		<p>For our main Saturday rides, we split up into different speed groups before we leave. Each group will have a maximum of 12 riders, including two ride leaders. Our leaders will help organise each group, sort out navigation, control the group's pace, and do their best to ensure everyone has a good ride.</p>
+		<p>Our ride leaders will always identify themselves before the groups leave, and do a quick run-through of the plan for the ride. On a Saturday ride we aim to ride for around two and a half hours, arriving back at the Harvester in Boldmere for 9:30am for coffee and breakfast, although obviously there are lots of factors (punctures, mainly!) which can cause delays!</p>
+
+<p>Please <a href="{% url 'register' %}">register</a> as a Boldmere Bullet before you attend a ride. Make yourself known, and you will be pointed in the right direction!</p>
+
+
+	    <h3>What should I bring on a ride?</h3>
+	    <p><strong>A helmet</strong> - this is a mandatory part of our bike rides. No helmet means no ride, unfortunately.</p>
+	    <p><strong>Working front and rear bike lights</strong> - for all rides that start or end in the dark / gloom of winter.</p>
+	    <p><strong>A bike!</strong> Road bikes in good condition are recommended, but we've had people join us all sorts of bikes. If you are new to road cycling, we recommend you have it serviced and adjusted to fit you by a professional.</p>
+	    <p><strong>A spare inner tube</strong> and the means to inflate it (a hand pump or CO2 canister). Don't worry if you're not confident at changing your inner tube after a puncture - our leaders and other bullets are always keen to demonstrate their speed at fixing punctures! </p>
+	    <p><strong>A drink</strong> to suit the conditions - rides in the heat of summer will naturally require more hydration than those on a cold winter morning!</p>
+	    <p><strong>ID</strong> just in case. We recommend setting up an <a href="http://www.wikihow.com/Add-ICE-to-Your-Cell-Phone" target="_blank">"ICE" contact</a> in your mobile phone.</p>
+	    
+ 
+ 	    <h3>How far and fast do you ride?</h3>
+<p>On our main Saturday rides we cover a wide range of speeds, and try to have groups to cater for all abilities. Our <strong>Super Social</strong> group will generally average around 12mph, and cover between 20 to 30 miles. Our <strong>social</strong> groups complete around 30 miles at 13-15mph, the mid-range groups average 15-17mph, and cover approximately 35 miles, and our faster groups (18mph+) will cover a route of around 45miles. </p>
+
+<p>We operate a <strong>no drop</strong> policy in all of our groups. If you are finding it tough going, please let one of our leaders know, and we'll adjust the group's pace to suit. We want everyone to enjoy their ride, and know what it's like to have a tough day in the saddle!</p>
+ 
+<p>Particular events posted on our Strava page will include details of our expected pace(s), and some may have an expected minimum speed.</p> 
+
+	     <h3>What about the weather?</h3>
+	 <p>Bullets aren't afraid of the wet!</p>
+	<p>You should always come on a ride prepared for the likely conditions, with suitable clothing. If the group has to stop mid-ride to sort out a puncture, then you can quickly go from warm to very cold! In the summer, don't forget to apply suncream before a ride.</p>
+	<p>We cancel our organised rides in the winter if the predicted temperature overnight is set to drop below 3 degrees, and will announce this cancellation as soon as we can on Strava and Facebook.</p>
+
+	   <h3>What are the routes?</h3>
+	<p>We try and vary our routes as much as we can to keep things interesting, and help members get some ideas for rides of their own. We post all of the weekly routes to Strava, and keep a <a href="{% url 'ride-routes' %}">list of them</a> too.</p>	
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

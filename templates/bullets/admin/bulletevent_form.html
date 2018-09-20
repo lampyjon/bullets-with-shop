@@ -1,0 +1,54 @@
+{% extends "simple.html" %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% load static %}
+
+{% block title %} - Edit Event{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block extraheader %}
+<!-- include libraries(jQuery, bootstrap) -->
+<link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script> 
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script> 
+
+<!-- include summernote css/js-->
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
+
+
+{% endblock %}
+
+{% block content %}
+<h1>Create Event</h1>
+
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+	 {% bootstrap_form form layout="horizontal" %} 
+                       <p class="text-right">
+                		<button type="submit" class="btn btn-primary">Save</button>
+            		</p>
+        </form>
+
+
+ 
+      {% endblock %}
+
+
+{% block extrafooter %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+
+<script src="{% static 'js/bootstrap-sortable.js' %}"></script>
+    <script>
+	$('.datepicker').datepicker({dateFormat: 'dd-mm-yy'});
+</script>
+
+{% endblock %}
+

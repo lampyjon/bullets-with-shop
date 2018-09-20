@@ -1,0 +1,31 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - News{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+<li><a href="{% url 'news' %}">All news items</a></li>
+<li><a href="{% url 'ride-info' %}">Ride with us</a></li>
+<li><a href="{% url 'run-info' %}">Run with us</a></li>
+<li><a href="{% url 'register' %}">Become a member</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>{{story.title }} </h1>
+            <br>
+	    <p>{{story.story|safe }} </p>
+	    <br>
+	    <p><small>This news item was added to the site on {{ story.date_added }}.</small></p>
+        </div>
+
+	
+</div>
+
+ 
+      {% endblock %}
+
+
+

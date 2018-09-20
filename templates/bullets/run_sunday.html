@@ -1,0 +1,46 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - About Our Runs{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+                {% include 'bullets/snippets/run_headers.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Sunday Group Runs</h1>
+            <br>
+            <p>Every Sunday we meet at Boldmere Gate in Sutton Park for our regular led group runs. We have a warm-up session before the run. This begins at 07:40, and the run groups then leave at 8am. Anyone over the age of 18 is welcome at any Bullets activity, no matter what your pace or your fitness. You pay nothing to join us, just bring your enthusiasm.</p>
+<p>
+Our Sunday group runs cater for sub 8 minute milers through to walk-runners trying to build up to their first 5k. The groups are based on average pace over the 5k  or 10k route. We have groups for 8 minute miles, 9 minute miles, 10 minute miles, 11 minute miles, the social group (around 12 minute miles) and the c25k groups (walking with some running, and running with some walking). After the run we head to the Harvester in Boldmere for a coffee and breakfast.</p>
+
+<p>Details of the weekly events are posted on our <a href="https://www.facebook.com/BoldmereBulletsRunningCollective/">Facebook page</a>. The routes for the Sunday group runs are posted on our <a href="https://www.strava.com/clubs/BoldmereBulletsRunningCollective">Strava page</a>.</p>
+
+<p>Please <a href="{% url 'register' %}">register</a> as a Boldmere Bullet before you attend a session. Make yourself known, and you will be pointed in the right direction!</p>
+
+<h3>Where do you meet?</h3>
+
+<h4>Boldmere Gate</h4>
+
+<iframe
+  width="600"
+  height="400"
+  frameborder="0" style="border:0"
+  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCcZLY_Ta7vINUXG6DPh-JUWX_a5DGyg9Y&q=52.557318,-1.845662&zoom=16" allowfullscreen>
+</iframe>
+
+
+<h3>What are the routes?</h3>
+	<p>We try and vary our routes as much as we can to keep things interesting, and help members get some ideas for runs of their own. We post all of the weekly routes to Strava, and keep a <a href="{% url 'run-routes' %}">list of them</a> too.</p>	
+	  
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

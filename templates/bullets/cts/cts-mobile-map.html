@@ -1,0 +1,216 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>Chase the Sun Mobile</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
+
+	<style>
+		#two, #map-canvas { width: 100%; height: 100%; padding: 0; }
+	</style>
+
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaZlqptFZDfHjxl2sh2u6ivczcVjgG88o"></script>
+</head> 
+<body>
+
+!-- Start of first page: #one -->
+<div data-role="page" id="one">
+
+	<div data-role="header">
+		<h1>Chase the Sun</h1>
+	</div><!-- /header -->
+
+	<div data-role="content" >	
+	
+	<h3>Welcome {{ name }}</h3>
+	
+		<ul data-role="listview">
+			<li data-role="list-divider">Support Vehicles</li>
+			<li><a href="#main-map-page">Map View</a></li>
+			<li><a href="">List View</a></li>
+			<li data-role="list-divider">Rider Info</li>
+			<li><a href="">Latest Positions</a></li>
+			<li data-role="list-divider">My Supporting!</li>
+			<li><a href="">Support Stop Here!</a></li>
+			<li><a href="">Where to now?</a></li>
+			<li><a href="">Logout</a></li>
+		</ul>
+
+	</div><!-- /content -->
+	
+	<div data-role="footer" data-theme="d">
+		<h4>Made by Cyber Squirrels</h4>
+	</div><!-- /footer -->
+</div><!-- /page one -->
+
+
+<!-- Start of second page: #two -->
+<div data-role="page" id="two" data-theme="a">
+
+	<div data-role="header">
+		<h1>Two</h1>
+	</div><!-- /header -->
+
+    	<div role="main" class="ui-content" id="map-canvas">
+        	<!-- map loads here... -->
+   	 </div>
+	
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page two -->
+
+
+<!-- Start of third page: #popup -->
+<div data-role="page" id="popup">
+
+	<div data-role="header" data-theme="e">
+		<h1>Dialog</h1>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="d">	
+		<h2>Popup</h2>
+		<p>I have an id of "popup" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
+		<p><a href="#one" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "one"</a></p>	
+	</div><!-- /content -->
+	
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page popup -->
+
+
+
+
+
+ 
+
+</body>
+
+<script>
+
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');   
+
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+/*
+ * Google Maps documentation: http://code.google.com/apis/maps/documentation/javascript/basics.html
+ * Geolocation documentation: http://dev.w3.org/geo/api/spec-source.html
+ */
+
+var myMap;
+var myPos;
+var watchID;
+var geoLoc;
+
+var myVehicleID = "{{vehicle.number}}";
+
+$( document ).on( "pageinit", "#two, function() {
+
+    console.log("here?");
+
+    var defaultLatLng = new google.maps.LatLng(52.4449844,-1.6700628);  // Default to Meriden when no geolocation support
+
+    drawMap(defaultLatLng);
+
+    if ( navigator.geolocation ) {
+         function success(pos) {
+            	// Location found, show map with these coordinates
+            	updateMap(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+
+		var myLoc = {'vehicleID':myVehicleID, 'lat':pos.coords.latitude, 'lon': pos.coords.longitude, 'timestamp': Date.now()};
+		console.log(myLoc);
+
+		$.ajax({		// send data to server, and get other endpoints 
+			type: "POST",
+        		url: "{% url 'cts-vehicle-position-ajax' %}",
+        		data: JSON.stringify(myLoc),
+		//	data: myLoc,
+        		dataType: 'json',
+        		success: function (data) {
+				console.log(data);
+				
+          		}
+        		
+      		});
+
+         }
+
+         function fail(error) {
+         	updateMap(defaultLatLng);  // Failed to find location, show default map
+         }
+
+         var options = {maximumAge: 60000, enableHighAccuracy:true, timeout: 6000};	// subject to debate
+         geoLoc = navigator.geolocation;
+         watchID = geoLoc.watchPosition(success, fail, options);
+
+    } else {
+        updateMap(defaultLatLng);  // No geolocation support, show default map
+    }
+
+
+
+
+
+
+
+
+    function updateMap(latlng) {		
+  	myPos.setPosition(latlng);
+    	myMap.panTo(latlng);
+    }
+
+    function drawMap(latlng) {
+        var myOptions = {
+            zoom: 10,
+            center: latlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        myMap = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+
+        // Add an overlay to the map of current lat/lng
+        myPos = new google.maps.Marker({
+            position: latlng,
+            map: myMap,
+	    label: myVehicleID,
+            title: "Car " + myVehicleID,
+        });
+
+    }
+});
+
+ 
+        
+</script>
+</html>

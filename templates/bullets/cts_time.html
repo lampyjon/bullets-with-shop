@@ -1,0 +1,52 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - CTS times{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+{% block extraheader %}
+{% endblock %}
+
+{% block header-links %}               
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+        <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+            <h1>CTS time calculator</h1>
+{% if results %}
+		<h2>Results:</h2>
+		<p>Riders left from {{ results.stop }} at {{ results.time }} That's an average speed of {{ results.speed }}mph. </p>
+		<table class="table table-condensed">
+			<thead>
+				<tr><th>Miles</th><th>Stop</th><th class="text-right">{{ results.slower_speed}}mph</th><th class="text-right info"><b>{{results.speed}}mph</b></th><th class="text-right">{{results.faster_speed}}mph</th></tr>
+			</thead>
+			<tbody>
+				{% for distance, row in results.rows.items %}
+				<tr>
+					<td class="text-right">{{ distance }}</td>
+					<td>{{ row.stop }}</td>
+					<td class="text-right">{{ row.slower }}</td>
+					<td class="info text-right">{{ row.continue }}</td>
+					<td class="text-right">{{ row.faster }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		<p><i>Remember: these estimates don't include time off of the bike</i></p>	
+{% endif%}
+            <br>
+            {% bootstrap_form cts_form layout="horizontal" %}
+            <p class="text-right">
+                <button type="submit" class="btn btn-primary">Calculate</button>
+            </p>
+        </form>
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

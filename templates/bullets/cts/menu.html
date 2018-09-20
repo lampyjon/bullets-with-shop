@@ -1,0 +1,29 @@
+{% extends 'mainsite/cts/base.html' %}
+
+{% block content%}
+<div class="container">
+
+
+     <h2>Main Menu</h2>
+     <p>Welcome {{ vehicle.name }}!</p>
+
+	<div class="list-group">
+		<div class="list-group-item active">Support Vehicles</div>
+		<a href="{% url 'cts-mobile-map' %}" class="list-group-item">Map view</a>
+		<a href="{% url 'cts-mobile-vehicle-list' %}" class="list-group-item">List view</a>
+		<div class="list-group-item active">Rider Info</div>
+		<a href="{% url 'cts-mobile-rider-positions' %}" class="list-group-item">Latest positions</a>
+		<div class="list-group-item active">My supporting!</div>
+		<a href="{% url 'cts-mobile-support-stop' %}" class="list-group-item">Support stop here!</a>
+		<a href="{% url 'cts-mobile-logout' %}" class="list-group-item">Logout</a>
+	</div>
+
+</div>
+
+
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,52 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap3 %}
+
+{% block title %} - International Women's Day{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+
+{% block header-links %}
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+            <h1>Unregister from the Women's event</h1>
+            <br>
+	{% if iwd.evans %}
+	    <p>Please confirm that you no longer wish to participate in the cycle maintenace event on March 8th at Evans.</p>
+	           <p class="text-right"><form method="post" class="form-horizontal" >
+            		{% csrf_token %}
+                	<button type="submit" class="btn btn-primary">Unregister Cycle Maintenance</button>
+            		</p>
+        	</form>
+        {% endif %}
+
+	{% if iwd.doing_ride %}
+	    <p>Please confirm that you no longer wish to participate in the Women's Interclub Ride on March 10th.</p>
+	           <p class="text-right"><form method="post" class="form-horizontal" >
+            		{% csrf_token %}
+                	<button type="submit" class="btn btn-primary">Unregister from Interclub Ride</button>
+            		</p>
+        	</form>
+        {% endif %}
+
+	{% if iwd.evans and iwd.doing_ride %}
+	    <p>If you would like to cancel your registration for both events, please click this button.</p>
+	           <p class="text-right"><form method="post" class="form-horizontal" action="{% url 'iwd-unregister' 'both' iwd.email_check_ref %}">
+            		{% csrf_token %}
+                	<button type="submit" class="btn btn-primary">Unregister from both events</button>
+            		</p>
+        	</form>
+        {% endif %}
+
+    </div>
+</div>
+
+ 
+      {% endblock %}
+
+
+

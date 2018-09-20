@@ -1,0 +1,61 @@
+{% extends "simple.html" %}
+{% load bootstrap_form from bootstrap4 %}
+{% load static %}
+
+{% block title %} - The Bullets Core Team!{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+
+{% block extraheader %}
+<link href="{% static 'css/bootstrap-sortable.css' %}" rel="stylesheet"> 
+
+{% endblock %}
+
+{% block content %}
+<h1>Bullets Administration</h1>
+
+<div class="clearfix">&nbsp;</div>
+
+<div class="row">
+	<div class="col-md-4 col-md-offset-1  text-center introbox introboxlink">
+					<h2>Total Bullets: {{ bullets }}</h2>
+					<p>
+					<div>This week: {{ bullets_week }}</div>
+					<div>This month: {{ bullets_month }}</div></p>				
+	</div>
+        <div class="col-md-4 col-md-offset-1 text-center introbox introboxlink">
+       		<h2>10/10 For Acacia Mums</h2>
+        	<p><div>Bullets signed up: <a href="{% url 'big-bullets-ride-admin' %}">{{ big_bullets_riders}}</a>.</div></p>
+	</div>
+</div>
+   
+{% if can_edit %}
+<h2>Edit things on the site</h2>
+
+<div class="row">
+    <div class="col-sm-3">   
+	    <a href="{% url 'run-tuesday-admin' %}" class="btn btn-block btn-primary btn-xl">Tuesday Run Schedule</a>
+    </div>
+    <div class="col-sm-3 col-sm-offset-1">
+	    <a href="{% url 'news-list-admin' %}" class="btn btn-block btn-primary btn-xl">News Items</a>
+    </div>
+    <div class="col-sm-3 col-sm-offset-1">
+	    <a href="{% url 'event-list-admin' %}" class="btn btn-block btn-primary btn-xl">Bullets Events</a>
+    </div>
+
+</div>
+{% endif %}
+
+<br/>
+ 
+      {% endblock %}
+
+
+{% block extrafooter %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+<script src="{% static 'js/bootstrap-sortable.js' %}"></script>
+{% endblock %}
+

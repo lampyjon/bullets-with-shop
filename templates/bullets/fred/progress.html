@@ -1,0 +1,126 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - Fred Whittington Challenge{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+{% endblock %}
+
+{% block content %}
+    <h1>Fred Whittington Challenge</h1>
+<p>Let's track your progress on the Boldmere Bullets Fred Whittington Challenge, {{rider.name}}. We currently have all of your rides up to {{rider.checked_upto_date}} If you have new rides click this button to get your latest rides.</p>
+<a href="{% url 'fred-refresh' %}" class="btn btn-primary">Get new rides from Strava</a> 
+
+
+    <h2>Competition 1 : Long and Low</h2>
+    <p>Ride must be over 40 miles; lowest overall elevation per mile wins!</p>
+
+<div class="row">
+<div class="col-sm-8">
+<h3>Overall leaderboard</h3>
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Rider</th>
+      <th>Distance</th>
+      <th>Elevation</th>
+      <th>feet / mile</th>
+   </tr>
+  </thead>
+  <tbody>
+   {% for entry in overall_low_board %}
+     <tr {% if entry.rider.id == rider.id %}class="info"{%endif%} >
+       <td>{{forloop.counter }}</td>
+       <td>{{entry.rider.name }}</td>
+       <td><a href="https://www.strava.com/activities/{{entry.strava_activity_id}}">{{entry.distance}}</a></td>
+       <td>{{entry.elevation|floatformat:0}}</td>
+       <td>{{entry.ratio|floatformat:1}}</td>
+     </tr>
+    {% endfor %}
+   </tbody>
+</table>
+</div>
+<div class="col-sm-4">
+<h3>Your results</h3>
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>Distance</th>
+      <th>Elevation</th>
+      <th>feet / mile</th>
+   </tr>
+  </thead>
+  <tbody>
+   {% for entry in my_low_board %}
+     <tr>
+       <td><a href="https://www.strava.com/activities/{{entry.strava_activity_id}}">{{entry.distance}}</a></td>
+       <td>{{entry.elevation|floatformat:0}}</td>
+       <td>{{entry.ratio|floatformat:1}}</td>
+     </tr>
+    {% endfor %}
+   </tbody>
+</table>
+</div>
+</div>
+
+
+<h2>Competition 2: Short and Spikey</h2>
+<p>Ride must be 40 miles or below; highest overall elevation wins!</p>
+
+<div class="row">
+<div class="col-sm-8">
+<h3>Overall leaderboard</h3>
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Rider</th>
+      <th>Distance</th>
+      <th>Elevation</th>
+   </tr>
+  </thead>
+  <tbody>
+   {% for entry in overall_high_board %}
+     <tr {% if entry.rider.id == rider.id %}class="info"{%endif%} >
+       <td>{{forloop.counter }}</td>
+       <td>{{entry.rider.name }}</td>
+       <td><a href="https://www.strava.com/activities/{{entry.strava_activity_id}}">{{entry.distance}}</a></td>
+       <td>{{entry.elevation|floatformat:0}}</td>
+     </tr>
+    {% endfor %}
+   </tbody>
+</table>
+</div>
+<div class="col-sm-4">
+<h3>Your results</h3>
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>Distance</th>
+      <th>Elevation</th>
+   </tr>
+  </thead>
+  <tbody>
+   {% for entry in my_high_board %}
+     <tr>
+       <td><a href="https://www.strava.com/activities/{{entry.strava_activity_id}}">{{entry.distance}}</a></td>
+       <td>{{entry.elevation|floatformat:0}}</td>
+     </tr>
+    {% endfor %}
+   </tbody>
+</table>
+</div>
+</div>
+<br/>
+
+
+<a href="{% url 'index' %}" class="btn btn-primary btn-xl">Back to the main site</a>  
+<br/>
+<br/> 
+      {% endblock %}
+
+
+

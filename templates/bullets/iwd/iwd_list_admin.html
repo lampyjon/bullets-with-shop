@@ -1,0 +1,50 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %} - IWD{%endblock %}
+{% block topurl %}{% url 'index' %}{% endblock %}
+
+{% block header-links %}
+<li><a href="{% url 'core-team-admin' %}">Core Team</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+<h1>International Women's Day Event</h1>
+<br>
+
+<table class="table sortable">
+	<thead>
+		<tr>
+			<th data-defaultsort="asc">Date added</th>
+			<th>Name</th>
+			<th>Email</th>
+			<th>Club</th>
+			<th>Evans?</th>
+			<th>Ride?</th>
+                        <th>Speed</th>
+  			<th>Edit</th>
+			<th>Delete</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for rider in object_list %}
+		<tr>
+			<td>{{rider.date_added}}</td>
+			<td>{{rider.name}}</td>
+			<td>{{rider.email}}</td>
+			<td>{{rider.club}}</td>
+			<td>{{rider.evans|yesno|capfirst}}</td>
+			<td>{{rider.doing_ride|yesno|capfirst}}</td>
+                        <td>{% if rider.doing_ride %}{{rider.get_speed_display }}{% endif %}</td>
+			<td><a href="{% url 'iwd-update' rider.pk %}">Edit</a></td>
+			<td><a href="{% url 'iwd-delete' rider.pk %}">Delete</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+ 
+      {% endblock %}
+
+
+

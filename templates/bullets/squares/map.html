@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <title>Squares</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+{% block headerscript %}
+{% endblock %}
+
+  </head>
+  <body>
+   <!-- Fixed navbar -->
+	<style>
+html { height: 100% }
+body { height: 100%;
+padding-bottom: 30px; }
+#map-canvas { width: 100%; height: 100%; padding: 0; }
+	</style>
+
+
+    	<div id="map-canvas">
+        	<!-- map loads here... -->
+   	</div>
+
+
+
+<nav class="navbar navbar-default navbar-fixed-bottom">
+  <div class="container">         
+	<div id="info">Info</div>
+  </div>
+</nav>
+
+
+
+
+
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+
+ <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBiHfkxaG9C0vFJXDuqKgCaPOY2gH3wPOI&libraries=geometry"></script>
+
+
+ <script>
+var defaultLatLng = new google.maps.LatLng(52.5711529,-1.8624528);  	// centre of park
+var myMap;								// holds google map
+var rides = {};    							// holds all the rides we've loaded from the server
+var squares = {};
+var rideBounds = new google.maps.LatLngBounds();
+var stravaDone = false;
+var ajaxLoaded = 0;
+var ajaxToLoad = 0;
+
+$( document ).ready(function () {
+	initMap();
+	google.maps.event.addListenerOnce(myMap, 'idle', function(){
+    		// do something only the first time the map is loaded
+		{% for ride in rides %}
+                    drawRide({{ ride.id }}, {{ ride.encoded_polyline|safe }}, "{{ ride.name }}");
+		{% endfor %}
+		getServerStatus();
+	});
+	
+});
+
+function drawRide(id, polyline, name) {
+	console.log("Drawing " + name);
+	resp = {'id':id, 'name':name, 'polyline':polyline}
+	processRide(resp);
+	try_draw_squares();
+}
+
+function loadRide(url) {
+    $.get(url, {}, function(resp) {
+        ajaxLoaded++;
+	console.log("Got ride " + ajaxLoaded + " / " + ajaxToLoad + " from server " + resp.ride);
+	processRide(resp);
+    	try_draw_squares();
+	});
+}
+
+
+function processRide(resp) {
+	var decodedPath = google.maps.geometry.encoding.decodePath(resp.polyline);
+	
+	if (resp.id in rides) {
+		console.log("Ride already known");
+	} else {
+		$("#info").text("Drawing ride " + resp.ride);
+
+		rides[resp.id] = new google.maps.Polyline({
+  			path: decodedPath,
+    			geodesic: true,
+    			strokeColor: '#FF0000',
+    			strokeOpacity: 1.0,
+    			strokeWeight: 2
+  			});
+
+		rides[resp.id].setMap(myMap);
+ 		
+		decodedPath.forEach(function(LatLng) {
+   			rideBounds.extend(LatLng);
+		});
+		myMap.fitBounds(rideBounds);
+	}
+
+       
+}
+
+
+
+function initMap() {
+	console.log("initMap()");
+
+	if (myMap) {
+		return;
+	}
+
+        var myOptions = {
+            zoom: 13,
+            center: defaultLatLng,
+	    streetViewControl: false,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        myMap = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+
+	// work out how many squares we should put onto the visible map
+	
+}
+
+
+
+var overall_tries = 0;
+
+function getServerStatus() {	
+	ajax_url = "{{ url }}";
+
+	console.log("Ajax URL = " + ajax_url );
+
+	$.get(ajax_url, {}, function(resp) {
+		console.log(resp);
+		if (resp.state == "PENDING") {
+			txt = "Waiting for Strava...";
+			refresh = 1000;
+		} else if (resp.state == "SUCCESS") {
+			console.log("Finished!");
+			txt = "Finished!";
+			refresh = 0;
+  		} else if (resp.state == "FAILURE") {
+			console.log("Whoops");
+			txt = "Problem!";
+			refresh = 0;
+		} else if (resp.state == "PROGRESS") {
+			processRide(resp);
+			refresh = 250;
+		}
+
+  		$("#info").text(txt);
+
+		if (refresh != 0) {
+                	setTimeout(getServerStatus, refresh);
+		} else {
+			// draw the squares!
+			stravaDone = true;
+			try_draw_squares();
+		}
+	});
+}
+
+
+function try_draw_squares() {
+  	if ((stravaDone) && (ajaxLoaded == ajaxToLoad)) {
+		squares_url = "{{ squares_url }}";
+		console.log("Squares URL = " + ajax_url );
+
+		$.get(squares_url, {}, function(resp) {
+		console.log("Loaded squares!"); 
+
+		for (i in resp.squares) {
+			square = resp.squares[i];
+			nw = square[0];
+			se = square[1];
+                        colour = square[2];
+				 
+			var rectangle = new google.maps.Rectangle({
+    				strokeColor: colour,
+    				strokeOpacity: 0.3,
+    				strokeWeight: 2,
+    				fillColor: colour,
+    				fillOpacity: 0.1,
+    				map: myMap,
+    				bounds: {
+      					north: nw[0],
+      					south: se[0],
+      					east: se[1],
+      					west: nw[1],
+    					}
+  				});
+
+			}
+
+		var vbp = new google.maps.LatLngBounds();
+		console.log("Got this as bounding box" + resp.bb);
+  		bb = resp.bb;
+		nw = bb[0];
+		se = bb[1];
+		vbp.extend({lat:nw[0], lng:nw[1]});
+     		vbp.extend({lat:se[0], lng:se[1]});
+
+		var rectangle = new google.maps.Rectangle({
+    				strokeColor: "#000000",
+    				strokeOpacity: 1.0,
+    				strokeWeight: 3,
+    				fillColor: "#000000",
+    				fillOpacity: 0.00,
+    				map: myMap,
+    				bounds: {
+      					north: nw[0],
+      					south: se[0],
+      					east: se[1],
+      					west: nw[1],
+    					}
+  				});
+
+
+		myMap.fitBounds(vbp);
+
+		$("#info").text("Max square size = " + resp.max);
+		});
+	}
+}
+
+
+ </script>
+

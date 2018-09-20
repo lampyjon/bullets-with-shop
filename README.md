@@ -1,2 +1,3 @@
 # bullets-with-shop
-Bullets website code
+
+Checking that the initial checkin worked - think it did

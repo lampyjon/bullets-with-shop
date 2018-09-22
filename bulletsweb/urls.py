@@ -115,10 +115,10 @@ urlpatterns = [
     url(r'^who-are-the-bullets-2/', RedirectView.as_view(pattern_name='history', permanent=True)),
 
 
-    url(r'^bullets-shop/', RedirectView.as_view(pattern_name='index', permanent=False), name='home'),
+#    url(r'^bullets-shop/', RedirectView.as_view(pattern_name='index', permanent=False), name='home'),
 
     # Summernote
-    url(r'^magic_editor/', include('django_summernote.urls')), 
+#    url(r'^magic_editor/', include('django_summernote.urls')), 
 
     # Other apps
 #    url(r'^bullets-shop/', include('saleor.urls')),

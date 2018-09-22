@@ -46,9 +46,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
 
 <script src="{% static 'js/bootstrap-sortable.js' %}"></script>
-    <script>
-	$('.datepicker').datepicker({dateFormat: 'dd-mm-yy'});
+
+<script>
+    $(document).ready(function() {
+        	$('.datepicker').datepicker({dateFormat: 'dd-mm-yy'});
+    });
+
 </script>
 
 {% endblock %}
+
 

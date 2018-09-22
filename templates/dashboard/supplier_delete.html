@@ -1,0 +1,32 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Delete Product Supplier - {{ object }}</h1>
+          </div>
+<div>
+
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+	 	<p>Are you sure you want to delete supplier "{{ object }}"?</p>
+ {% if object.products.count > 0 %} 
+<p><strong>The following products will also be deleted!</strong></p>
+ <ul>
+{% for product in object.products.all %}
+<li>{{ product }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+                       <p class="text-right">	
+				<a class="btn btn-outline-primary" href="{% url 'dashboard:suppliers' %}" role="button">cancel</a>			
+                		<button type="submit" class="btn btn-danger">Delete</button>
+            		</p>
+        </form>
+
+
+
+</div>
+ {% endblock %} 

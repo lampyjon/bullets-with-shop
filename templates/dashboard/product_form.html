@@ -1,0 +1,49 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block extraheader %}
+<!-- include summernote css/js-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote-bs4.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote-bs4.js"></script>
+
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+{% endblock %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">{% if product %}Edit{% else %}Add{% endif %} Product</h1>
+          </div>
+<div>
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+	 {% bootstrap_form product_form layout="horizontal" %}
+                       <p class="text-right">
+				<a class="btn btn-outline-primary" href="{% if product %}{% url 'dashboard:product-view' product.pk %}{%else%}{% url 'dashboard:products' %}{%endif%}" role="button">Cancel</a>			
+                		<button type="submit" class="btn btn-primary">Save</button>
+            		</p>
+        </form>
+</div>
+ {% endblock %}
+
+
+
+{% block footer_scripts %}
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+
+<script src="{% static 'js/bootstrap-sortable.js' %}"></script>
+    <script>
+	$('.datepicker').datepicker({dateFormat: 'dd-mm-yy'});
+//        $('.datepicker').datepicker('option', 'dateFormat', 'dd-mm-yy');
+</script>
+
+{% endblock %} 

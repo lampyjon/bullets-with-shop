@@ -1,0 +1,84 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">{{ product }}</h1>
+          </div>
+
+<div class="row">
+ <div class="col-8">
+   {{ product.description|safe }}
+ </div>
+ <div class="col">
+
+	<div class="card">
+  		<div class="card-header">About</div>
+	        <div class="card-body">
+			<div class="row">
+				<div class="col"><strong>Price</strong></div>
+				<div class="col">{{ product.display_price }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Supplier</strong></div>
+				<div class="col"><a href="{% url 'dashboard:supplier-view' product.supplier.pk %}">{{ product.supplier }}</a></div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Hidden</strong></div>
+				<div class="col">{{ product.hidden|yesno }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Available from</strong></div>
+				<div class="col">{{ product.available_from }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Available until</strong></div>
+				<div class="col">{{ product.available_until|default_if_none:"forever" }}</div>
+			</div>
+
+			<div class="row">
+				<div class="col"><strong>Categories</strong></div>
+				<div class="col"><dl>{% for category in product.category.all %}<dd>{{ category }}</dd>{%endfor%}</dl></div>
+			</div>
+
+    			<a href="{% url 'dashboard:product-edit' product.pk %}" class="btn btn-primary btn-block">Edit product</a>
+  		</div>
+	</div>
+ </div>
+</div>
+
+	<div class="card">
+  		<div class="card-header">Stock and Orders <a href="{% url 'dashboard:product-edit-items' product.pk %}" class="float-right btn btn-outline-primary btn-sm">add / edit</a></div>
+	        <div class="card-body">
+			<table class="table">
+				<thead>
+					<tr>
+						{% if product.no_options != True %}<th>Item</th>{% endif %}
+						<th class="text-right">Stock</th>
+						<th class="text-right">Allocated</th>
+						<th class="text-right">To Order</th>
+						<th class="text-right">On Order</th>
+						<th class="text-right">Allocated In Order</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for item in product.items.all %}
+					<tr>
+						{% if product.no_options != True %}<td>{{ item.extra_text }}</td>{% endif %}
+						<td class="text-right">{{ item.quantity_in_stock }}</td>
+						<td class="text-right">{{ item.quantity_allocated }}</td>
+						<td class="text-right">{{ item.quantity_to_order }}</td>
+						<td class="text-right">{{ item.quantity_on_order }}</td>
+						<td class="text-right">{{ item.quantity_allocated_on_order }}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+      		</div>
+	</div>
+ {% endblock %}
+
+
+

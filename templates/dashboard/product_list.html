@@ -1,0 +1,34 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Products</h1>
+          </div>
+<div>
+
+<table class="table">
+  <thead>
+	<tr>
+		<th>Name</th>
+		<th class="text-right">Items</th>
+		<th class="text-right">Price</th>
+		<th class="text-right">Visible?</th>
+	</tr>
+  </thead>
+  <tbody>
+	{% for product in object_list %}
+	<tr>
+		<td><a href="{% url 'dashboard:product-view' product.pk %}">{{ product.name }}</a></td>
+		<td class="text-right">{% if product.no_options %}-{%else%}{{ product.items.count }}{% endif %}</td>
+		<td class="text-right">{{ product.display_price }}</td>
+		<td class="text-right">{{ product.is_visible }}</td>
+	</tr>
+	{% endfor %}
+   </tbody>
+</table>
+
+<a class="btn btn-outline-primary float-right" href="{% url 'dashboard:product-add' %}" role="button">Add new</a>	
+</div>
+ {% endblock %} 

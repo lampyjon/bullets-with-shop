@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'captcha',
     'django_summernote',
     'bulletsweb',
+    'bulletsshop',
 ]
 
 MIDDLEWARE = [
@@ -115,6 +116,8 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
 ENABLE_SSL = get_bool_from_env('ENABLE_SSL', False)
 
+SUMMERNOTE_THEME = 'bs4'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -182,4 +185,7 @@ MAILCHIMP_WEBHOOK_APIKEY = os.environ.get('MAILCHIMP_WEBHOOK_APIKEY')
 #            'endpoint': 'https://api.paypal.com',
 #            'capture': True}),       
 #        }
+
+
+
 

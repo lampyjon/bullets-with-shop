@@ -1,0 +1,40 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Delivery from {{ supplier }}</h1>
+          </div>
+       <form method="post" id="form-product">
+            {% csrf_token %}
+
+            <table class="table">
+              <thead>
+                <tr>
+		  <th>Item</th>
+		  <th>Quantity on order</th>
+		  <th>Quantity received</th>
+		</tr>
+	      </thead>
+	      <tbody>
+	        {% for item in items %}
+		<tr>
+		  <td>{{item}}</td>
+		  <td>{{item.quantity_on_order }}</td>
+		  <td><input name="product_qty_{{ item.pk }}" id="product_qty_{{ item.pk }}"  type="number" name="qty" value="{{ item.quantity_on_order }}">
+</td>
+		</tr>
+		{% endfor %}
+	      </tbody>
+	    </table>
+    
+                       <p class="text-right">
+				<a class="btn btn-outline-primary" href="{% url 'dashboard:supplier-view' supplier.pk %}" role="button">cancel</a>				
+                		<button type="submit" class="btn btn-primary">Store</button>
+            		</p>
+    </form>
+ {% endblock %}
+
+
+

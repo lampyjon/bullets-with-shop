@@ -1,0 +1,31 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Product Suppliers</h1>
+          </div>
+<div>
+<table class="table">
+  <thead>
+	<tr>
+		<th>Name</th>
+		<th>Number of Products</th>
+		<th>Add a product</th>
+	</tr>
+  </thead>
+  <tbody>
+	{% for supplier in object_list %}
+	<tr>
+		<td><a href="{% url 'dashboard:supplier-update' supplier.pk %}">{{ supplier.name }}</a></td>
+		<td><a href="{% url 'dashboard:supplier-view' supplier.pk %}">{{ supplier.products.count }}</a></td>
+		<td><a href="{% url 'dashboard:product-add-supplier' supplier.pk %}"><i data-feather="plus-circle"></i></a></td>
+	</tr>
+	{% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-outline-primary" href="{% url 'dashboard:supplier-add' %}" role="button">Add new</a>
+
+</div>
+ {% endblock %} 

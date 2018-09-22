@@ -1,0 +1,54 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">{{ supplier }}</h1>
+          </div>
+<div class="row">
+  <div class="col"><h2 class="h2">Items for supplier:</h2></div>
+  <div class="col"><a class="btn btn-outline-primary float-right" href="{% url 'dashboard:product-add-supplier' supplier.pk %}" role="button">Add new</a></div>
+</div>
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Product</th>
+						<th>Item</th>
+						<th class="text-right">Stock</th>
+						<th class="text-right">Allocated</th>
+						<th class="text-right">To Order</th>
+						<th class="text-right">On Order</th>
+						<th class="text-right">Spare In Order</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for product in supplier.products.all %}
+				  {% for item in product.items.all %}
+					<tr>
+						<td>{% if forloop.first %}<a href="{% url 'dashboard:product-view' product.pk %}">{{ product }}</a>{% endif %}</td>
+						<td>{{ item.extra_text|default_if_none:"-" }}</td>
+						<td class="text-right">{{ item.quantity_in_stock }}</td>
+						<td class="text-right">{{ item.quantity_allocated }}</td>
+						<td class="text-right">{{ item.quantity_to_order }}</td>
+						<td class="text-right">{{ item.quantity_on_order }}</td>
+						<td class="text-right">{{ item.spare_in_order }}</td>
+					</tr>
+ 				   {% endfor %}
+				{% endfor %}
+				</tbody>
+			</table>
+   
+<div class="row">
+ <div class="col">
+  <a class="btn btn-block btn-outline-secondary" href="{% url 'dashboard:supplier-delivery' supplier.pk %}" role="button">receive delivery</a>
+ </div>
+ <div class="col">
+  <a class="btn btn-block btn-outline-primary" href="{% url 'dashboard:supplier-order' supplier.pk %}" role="button">create order</a>
+ </div>
+</div>
+ {% endblock %}
+
+
+

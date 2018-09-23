@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'storages',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,11 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+
     'bootstrap4',
     'captcha',
     'django_summernote',
     'bulletsweb',
     'bulletsshop',
+    'versatileimagefield',
 ]
 
 MIDDLEWARE = [
@@ -146,8 +150,8 @@ if AWS_STORAGE_BUCKET_NAME:
     S3_URL = 'https://%s.s3.amazonaws.com/assets/' % AWS_STORAGE_BUCKET_NAME   # BULLETS: added this
 
 # TODO: fix this 
-#if AWS_MEDIA_BUCKET_NAME:
-#    DEFAULT_FILE_STORAGE = 'saleor.core.storages.S3MediaStorage'
+if AWS_MEDIA_BUCKET_NAME:
+    DEFAULT_FILE_STORAGE = 'bullets.storage_backends.MediaStorage' 
 #    THUMBNAIL_DEFAULT_STORAGE = DEFAULT_FILE_STORAGE
 
 ## STRAVA SETTINGS

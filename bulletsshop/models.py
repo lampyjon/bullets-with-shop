@@ -3,6 +3,7 @@ from autoslug import AutoSlugField
 from datetime import date
 from django.core.validators import MinValueValidator
 from decimal import Decimal
+from versatileimagefield.fields import VersatileImageField
 
 ### All the models we need for the Bullets Shop ###
 
@@ -115,9 +116,12 @@ class ProductItem(models.Model):
 
 
 # Pictures of products - associated with product-level things
-#class ProductPictures(models.Model):
-# TODO
-
+class ProductPicture(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='pictures')
+    image = VersatileImageField(
+        'Product Image',
+        upload_to='product_images/'
+    )
 
 
 ################################################ ORDER RELATED MODELS ################################################

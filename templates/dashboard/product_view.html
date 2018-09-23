@@ -5,54 +5,20 @@
 
 {% block content %} 
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h1">{{ product }}</h1>
+            <h1 class="h1">{{ product }}</h1><a href="{{ product.slug }}" class="float-right btn btn-outline-primary btn-sm">view in shop</a>
           </div>
 
 <div class="row">
  <div class="col-8">
-   {{ product.description|safe }}
- </div>
- <div class="col">
-
-	<div class="card">
-  		<div class="card-header">About</div>
-	        <div class="card-body">
-			<div class="row">
-				<div class="col"><strong>Price</strong></div>
-				<div class="col">{{ product.display_price }}</div>
-			</div>
-			<div class="row">
-				<div class="col"><strong>Supplier</strong></div>
-				<div class="col"><a href="{% url 'dashboard:supplier-view' product.supplier.pk %}">{{ product.supplier }}</a></div>
-			</div>
-			<div class="row">
-				<div class="col"><strong>Hidden</strong></div>
-				<div class="col">{{ product.hidden|yesno }}</div>
-			</div>
-			<div class="row">
-				<div class="col"><strong>Available from</strong></div>
-				<div class="col">{{ product.available_from }}</div>
-			</div>
-			<div class="row">
-				<div class="col"><strong>Available until</strong></div>
-				<div class="col">{{ product.available_until|default_if_none:"forever" }}</div>
-			</div>
-
-			<div class="row">
-				<div class="col"><strong>Categories</strong></div>
-				<div class="col"><dl>{% for category in product.category.all %}<dd>{{ category }}</dd>{%endfor%}</dl></div>
-			</div>
-
-    			<a href="{% url 'dashboard:product-edit' product.pk %}" class="btn btn-primary btn-block">Edit product</a>
-  		</div>
+	<div class="card mb-3">
+  		<div class="card-header">Description</div>
+	        <div class="card-body">{{ product.description|safe }}</div>
 	</div>
- </div>
-</div>
 
-	<div class="card">
+	<div class="card mb-3">
   		<div class="card-header">Stock and Orders <a href="{% url 'dashboard:product-edit-items' product.pk %}" class="float-right btn btn-outline-primary btn-sm">add / edit</a></div>
 	        <div class="card-body">
-			<table class="table">
+			<table class="table table-sm">
 				<thead>
 					<tr>
 						{% if product.no_options != True %}<th>Item</th>{% endif %}
@@ -78,6 +44,89 @@
 			</table>
       		</div>
 	</div>
+
+
+ </div>
+ <div class="col">
+	<div class="card mb-3">
+  		<div class="card-header">About</div>
+	        <div class="card-body">
+			<div class="row">
+				<div class="col"><strong>Price</strong></div>
+				<div class="col">{{ product.display_price }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Supplier</strong></div>
+				<div class="col"><a href="{% url 'dashboard:supplier-view' product.supplier.pk %}">{{ product.supplier }}</a></div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Order if not in stock?</strong></div>
+				<div class="col">{{ product.allow_supplier_orders|yesno }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Hidden?</strong></div>
+				<div class="col">{{ product.hidden|yesno }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Available from</strong></div>
+				<div class="col">{{ product.available_from }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Available until</strong></div>
+				<div class="col">{{ product.available_until|default_if_none:"forever" }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Visible now?</strong></div>
+				<div class="col">{{ product.is_visible|yesno }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Postage?</strong></div>
+				<div class="col">{{ product.postage_required|yesno }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Categories</strong></div>
+				<div class="col"><dl>{% for category in product.category.all %}<dd>{{ category }}</dd>{%endfor%}</dl></div>
+			</div>
+
+    			<a href="{% url 'dashboard:product-edit' product.pk %}" class="btn btn-primary btn-block">Edit product</a>
+
+  		</div>
+	</div>
+	<div class="card mb-3">
+  		<div class="card-header">Pictures</div>
+	        <div class="card-body">
+			{% if product.pictures.count > 0 %}
+			<div id="carouselExampleIndicators" class="carousel slide mb-3" data-ride="carousel">
+  				<ol class="carousel-indicators">
+				   {% for pic in product.pictures.all %}
+    					<li data-target="#carouselExampleIndicators" data-slide-to="{{ forloop.counter }}" {% if forloop.first %}class="active">{% endif %}</li>
+				   {% endfor %}
+     				</ol>
+  				<div class="carousel-inner">
+				    {% for pic in product.pictures.all %}
+    					<div class="carousel-item {% if forloop.first %}active{% endif %}">
+      						<img class="d-block w-100" src="{{ pic.image.thumbnail.150x150 }}" alt="Picture">
+    					</div>
+  				    {% endfor %}
+				</div>
+  				<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+    					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    					<span class="sr-only">Previous</span>
+  				</a>
+  				<a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+    					<span class="carousel-control-next-icon" aria-hidden="true"></span>
+    					<span class="sr-only">Next</span>
+  				</a>
+			</div>
+			{% endif %}
+
+			<a href="{% url 'dashboard:product-picture-add' product.pk %}" class="btn btn-primary btn-block">Add picture</a>
+  		</div>
+	</div>
+
+ </div>
+</div>
+
  {% endblock %}
 
 

@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, ProductItem 
+from .models import Product, ProductItem, ProductPicture
 from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 from captcha.fields import ReCaptchaField
 import datetime
@@ -40,3 +40,7 @@ class ItemForm(ModelForm):
         fields = ['extra_text', 'quantity_in_stock']
  
 
+class ProductPictureForm(ModelForm):
+    class Meta:
+        model = ProductPicture
+        fields = ['image']

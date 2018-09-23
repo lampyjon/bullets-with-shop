@@ -39,8 +39,8 @@ def dashboard(request):
     return render(request, "dashboard/index.html", {})
 
 
-from .models import Product, ProductCategory, Supplier, ProductItem
-from .forms import ProductForm, ItemForm
+from .models import Product, ProductCategory, Supplier, ProductItem, ProductPicture
+from .forms import ProductForm, ItemForm, ProductPictureForm
 from django.forms import formset_factory
 from django.forms import inlineformset_factory
 
@@ -93,6 +93,26 @@ def product_view(request, product_pk=None):
     product = get_object_or_404(Product, pk=product_pk)
 
     return render(request, "dashboard/product_view.html", {'product':product})
+
+
+## Product Image views
+
+def product_picture_create(request, product_pk):
+    product = get_object_or_404(Product, pk=product_pk)
+    if request.method == 'POST':
+        form = ProductPictureForm(request.POST, request.FILES)
+        if form.is_valid():
+            pp = form.save(commit=False)
+            pp.product = product
+            pp.save()
+
+            return redirect(reverse('dashboard:product-view', args=[product.pk]))
+    else:
+        form = ProductPictureForm()
+
+    print(str(form))
+    return render(request, 'dashboard/productpicture_form.html', {'form': form, 'product':product})
+
 
 
 
@@ -222,19 +242,11 @@ def supplier_order(request, supplier_pk):
     for item in items_qs:
         items[item.pk] = (item, item.quantity_to_order)
 
-
-
     if request.method == 'POST':
         mode = request.POST.get("save", "preview")
         saving = (mode == "save")
         preview = (mode == "preview")
-        cancel = (mode == "cancel")
- 
-        print("Are we saving? " + str(saving))
-        print("Are we preview? " + str(preview))
-        print("Are we cancel? " + str(cancel))
-
-
+        cancel = (mode == "cancel") 
 
 	# validate the order & update stock levels
         items_count = 0

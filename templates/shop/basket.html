@@ -1,0 +1,49 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+
+{% block content %} 
+   <h1>Your Shopping Basket</h1>
+   <table class="table">
+    <thead>
+     <tr>
+       <th>Item</th>
+       <th class="text-center" colspan="3">Quantity</th>
+       <th class="text-right">Price</th>
+       <th class="text-right">Total</th>
+       <th class="text-right">Delete</th>
+     </tr>
+    </thead>
+    <tbody>
+      {% for item in basket.items.all %}
+      	<form method="post" action="{% url 'shop:basket-update' %}">
+        {% csrf_token %}
+	<input type="hidden" name="item_pk" value="{{ item.pk }}">
+       <tr>
+        <td><a href="{% url 'shop:product' item.item.product.pk item.item.product.slug %}">{{item.item}}</a></td>
+        <td class="text-right"><button type="submit" name="action" value="up"><i data-feather="plus"></i></button></td>
+        <td class="text-center">{{item.quantity}}</td>
+	<td class="text-left"><button type="submit" name="action" value="down"><i data-feather="minus"></i></button></td>
+
+        <td class="text-right">&pound;{{item.price}}</td>
+        <td class="text-right">&pound;{{item.total}}</td>
+ 	<td class="text-right"><button type="submit" name="action" value="delete"><i data-feather="trash-2"></i></button></td>
+       </tr>
+	</form>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="5" class="text-right">Total (not including postage)</th>
+	<th class="text-right">&pound;{{basket.basket_total}}</th>
+        <th></th>
+      </tr>
+    </tfoot>
+  </table>
+  <a class="btn btn-primary btn-block mb-3" href="#">Go to checkout</a>
+
+ {% endblock %}
+
+
+

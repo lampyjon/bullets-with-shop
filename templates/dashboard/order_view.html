@@ -1,0 +1,213 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_field bootstrap_button from bootstrap4 %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">{{ order }}</h1>
+          </div>
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Order</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Items to despatch</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Items on order</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="contact-tab" data-toggle="tab" href="#bbb" role="tab" aria-controls="contact" aria-selected="false">Items despatched</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="contact-tab" data-toggle="tab" href="#bbb" role="tab" aria-controls="contact" aria-selected="false">Items refunded</a>
+  </li>
+
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+<div class="row">
+ <div class="col-8">
+	<div class="card mb-3">
+
+	<div class="card-header">Items</div>
+	        <div class="card-body">
+			<table class="table table-sm">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>Status</th>
+						<th class="text-right">Price</th>
+						<th class="text-right">Qty.</th>
+						<th class="text-right">Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in order.items.all %}
+					<tr>
+						<td>{{item.item_name}}</td>
+						<td>{{item.get_status_display}}</td>
+						<td class="text-right">&pound;{{item.item_price}}</td>
+						<td class="text-right">{{item.quantity_ordered}}</td>
+						<td class="text-right">&pound;{{item.line_price}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+				<tfoot>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="text-right">Postage</td>
+						<td class="text-right">&pound;{{order.postage_amount}}</td>
+					</tr>
+					<tr>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th class="text-right">Grand total</th>
+						<th class="text-right">&pound;{{order.total}}</th>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+
+	<div class="card mb-3">
+  		<div class="card-header">Notes and history</div>
+	        <div class="card-body">
+			<table class="table table-sm">
+				<thead>
+  				   <tr>
+					<th>Date</th>
+					<th>From</th>
+					<th>Note</th>
+				   </tr>
+				</thead>
+				<tbody>
+				    <tr>
+					<td>12-9-18</td>
+					<td>Jon</td>
+					<td>Order created</td>
+				    </tr>
+				    <tr>
+					<td>12-9-18</td>
+					<td>Jon</td>
+					<td>Order paid in full</td>
+				    </tr>
+ 				    <tr>
+					<td>13-9-18</td>
+					<td>Tara</td>
+					<td>Comment: "Swapped for a yellow t-shirt"</td>
+				    </tr>
+				</tbody>
+				<tfoot>
+				    <tr>
+					<td></td>
+					<td></td>
+					<td>
+						<form class="form-inline">
+							<div class="input-group mb-3">
+  								<input type="text" class="form-control" placeholder="comment" size="40" aria-label="comment" aria-describedby="comment">
+  								<div class="input-group-append">
+    									<button class="btn btn-outline-secondary" type="button">save</button>
+  								</div>
+							</div>
+						</form>
+					</td>
+				    </tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+
+
+
+ </div>
+ <div class="col">
+ 	<div class="card mb-3">
+  		<div class="card-header">Customer</div>
+	        <div class="card-body">
+			<address><strong>{{ order.name }}</strong><br/>
+			{{ order.address }}<br/>
+			{{ order.postcode }}
+			</address>
+			<address><a href="mailto:{{ order.email }}">{{order.email}}</a></address>
+		</div>
+	</div>
+ 	<div class="card mb-3">
+  		<div class="card-header">Payment</div>
+	        <div class="card-body">
+
+		</div>
+	</div>
+
+
+ </div>
+</div>
+
+
+</div>
+
+
+  <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+
+	<table class="table table-sm">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>Status</th>
+						<th class="text-right">Price</th>
+						<th class="text-right">Qty.</th>
+						<th class="text-right">Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in order.items.all %}
+					<tr>
+						<td>{{item.item_name}}</td>
+						<td>{{item.get_status_display}}</td>
+						<td class="text-right">&pound;{{item.item_price}}</td>
+						<td class="text-right">{{item.quantity_ordered}}</td>
+						<td class="text-right">&pound;{{item.line_price}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+				<tfoot>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="text-right">Postage</td>
+						<td class="text-right">&pound;{{order.postage_amount}}</td>
+					</tr>
+					<tr>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th class="text-right">Grand total</th>
+						<th class="text-right">&pound;{{order.total}}</th>
+					</tr>
+				</tfoot>
+			</table>
+
+
+  </div>
+  <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+
+
+  </div>
+  <div class="tab-pane fade" id="bbb" role="tabpanel" aria-labelledby="contact-tab">
+
+
+  </div>
+
+</div>
+  	
+
+ {% endblock %}
+
+
+

@@ -18,6 +18,9 @@ from django.urls import reverse_lazy, reverse
 
 from django.contrib.sites.models import Site
 
+from django.forms import formset_factory
+from django.forms import inlineformset_factory
+
 # Python imports 
 #from datetime import timedelta
 import datetime
@@ -25,9 +28,115 @@ import uuid
 import random
 import os
 
+from .models import Product, ProductCategory, Supplier, ProductItem, ProductPicture, Order, OrderItem, Basket, BasketItem
+from .forms import ProductForm, ItemForm, ProductPictureForm, OrderHistoryItemForm, ShopProductForm
+
+
+########## SHOP VIEWS #####################
+
+
+# Get into the request and return the basket (or create a new one)
+def get_basket(request):
+    basket_id = request.session.get('basket', None)
+    basket = None
+    if basket_id:
+        if Basket.objects.filter(id=basket_id).exists():
+            basket = Basket.objects.get(pk=basket_id)
+
+    if basket == None:
+        basket = Basket()
+
+    request.session['basket'] = basket.id
+
+    return basket
+
+
+
 
 def index(request):
     return render(request, "shop/index.html", {})
+
+# TODO: add basket as extra context to these views
+## Product views
+class ShopProductList(ListView):
+    model = Product
+    template_name="shop/product_list.html"
+    context_object_name = 'products'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['basket'] = get_basket(self.request)
+        return context
+
+
+
+# Main view for looking at a product
+def ShopProduct(request, product_pk, slug):
+    product = get_object_or_404(Product, pk=product_pk, slug=slug)
+    basket = get_basket(request)              
+
+    if request.POST:
+        product_form = ShopProductForm(request.POST, product=product)
+        if product_form.is_valid():
+            # add to basket
+            item = product_form.cleaned_data['item']
+            qty = product_form.cleaned_data['quantity']
+            # TODO: so much stuff to do here to keep things sane!
+            basket_item, created = BasketItem.objects.get_or_create(basket=basket, item=item, defaults={'quantity':qty})
+            if created:
+                messages.success(request, str(item) + " was added to your basket")
+            else:
+                basket_item.quantity = basket_item.quantity + qty
+                basket_item.save()
+                messages.success(request, str(item) + " - quantity updated in basket")
+            
+    # reset product form - might need to reload product here? TODO: check! or should we just redirect to the basket?
+    product_form = ShopProductForm(product=product)
+ 
+    return render(request, "shop/product_view.html", {'product_form':product_form, 'product':product, 'basket':basket})
+
+
+def ShopBasketUpdate(request):
+    basket = get_basket(request)
+
+    if request.POST:
+        item_pk = request.POST.get("item_pk", None)
+        action = request.POST.get("action", None)
+
+        if basket.items.filter(pk=item_pk).exists():
+            item = basket.items.get(pk=item_pk)
+            # ok to edit
+            if action == "delete":
+                messages.success(request, str(item.item) + " has been removed from your basket")
+                item.delete()
+            elif action == "up":
+                # TODO: stock level check
+                item.quantity = item.quantity + 1
+                item.save()
+                messages.success(request, "Added 1 x " + str(item.item) + " to your basket")
+            elif action == "down":
+                messages.success(request, "Removed 1 x " + str(item.item) + " from your basket")
+                if item.quantity > 1:
+                    item.quantity = item.quantity - 1
+                    item.save()
+                else:
+                    item.delete()
+    return redirect(reverse('shop:basket'))
+ 
+
+
+def ShopBasket(request):
+    basket = get_basket(request)
+
+    if basket == None:
+       return redirect('shop:home')
+
+
+
+
+    return render(request, "shop/basket.html", {'basket':basket})
 
 
 
@@ -38,11 +147,6 @@ def index(request):
 def dashboard(request):
     return render(request, "dashboard/index.html", {})
 
-
-from .models import Product, ProductCategory, Supplier, ProductItem, ProductPicture
-from .forms import ProductForm, ItemForm, ProductPictureForm
-from django.forms import formset_factory
-from django.forms import inlineformset_factory
 
 ## Product views
 class ProductList(ListView):
@@ -283,3 +387,39 @@ def supplier_order(request, supplier_pk):
     return render(request, 'dashboard/supplier_order_preview.html', {'supplier': supplier, 'items': items, 'visible_boxes': True})
 
 
+
+## Order Views
+class OrderList(ListView):
+    model = Order
+    template_name="dashboard/order_list.html"
+    context_object_name = 'orders'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['order_status'] = "All"
+        return context
+
+
+class PaidOrderList(ListView):
+    queryset = Order.objects.filter(status=Order.STATUS_PAID)
+    template_name="dashboard/order_list.html"
+    context_object_name = 'orders'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['order_status'] = "Fully Paid"
+        return context
+
+
+
+class OrderDetail(DetailView):
+    model = Order
+    template_name="dashboard/order_view.html"
+    context_object_name = 'order'
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderDetail, self).get_context_data(**kwargs)
+        context['form'] = OrderHistoryItemForm()
+        return context

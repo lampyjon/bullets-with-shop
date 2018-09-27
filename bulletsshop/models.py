@@ -4,6 +4,8 @@ from datetime import date
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 from versatileimagefield.fields import VersatileImageField
+import uuid
+from django.db.models import Sum
 
 ### All the models we need for the Bullets Shop ###
 
@@ -42,7 +44,7 @@ class Product(models.Model):
     allow_supplier_orders = models.BooleanField("Allow orders even when no stock?", default=False)	# allow ordering when not in stock
     postage_required = models.BooleanField("Must be posted to buyer?", default=False) 			# must pay for postage
     only_buy_one = models.BooleanField("Limit to single purchases?", default=False)			# can only put one in the basket + order
-    slug = AutoSlugField(populate_from='name', editable=False)						# For nice URLs
+    slug = AutoSlugField(populate_from='name', unique=True, editable=False)						# For nice URLs
 
 
     @property
@@ -126,41 +128,148 @@ class ProductPicture(models.Model):
 
 ################################################ ORDER RELATED MODELS ################################################
 
-#class Order(models.Model)
-#name
-#email
-#address
-#status
-#postage_required
-#notes
-#datetime created
-#guid for linking in emails etc
+class Order(models.Model):
+    STATUS_UNPAID = "U"
+    STATUS_PAID = "P"
+    STATUS_COMPLETE = "C"
+    STATUS_CANCELLED = "X"
+    STATUS_REFUNDED = "R"
+   
+    ORDER_STATUS_CHOICES = (
+        (STATUS_UNPAID, "Not paid"),
+        (STATUS_PAID, "Paid"),
+        (STATUS_COMPLETE, "Complete"),
+        (STATUS_CANCELLED, "Cancelled"),
+        (STATUS_REFUNDED, "Refunded"),
+        )
+
+    name = models.CharField("Name", max_length=500)						# name of person buying
+    address = models.TextField("Address", blank=True)						# optional address of purchaser
+    email = models.EmailField("Email")								# required email address
+    postcode = models.CharField("PostCode", max_length=8)					# required postcode
+ 
+    postage_amount = models.DecimalField("Postage", max_digits=5, decimal_places=2)		# amount paid for postage
+
+     
+    customer_notes = models.TextField("Notes", blank=True)					# any note from the customer
+
+    created = models.DateTimeField("Order created", auto_now_add=True)				# When created
+    updated = models.DateTimeField("Order last updated", auto_now=True)				# When changed
+
+    unique_ref =  models.UUIDField("random uuid for email links", default=uuid.uuid4, editable=False) # random for emails
+
+    status = models.CharField("Status", max_length=1, choices=ORDER_STATUS_CHOICES, default=STATUS_UNPAID)
+
+    def __str__(self):
+        return "Order #" + str(self.pk) + " for " + str(self.name)
+
+    @property
+    def total(self):
+        total = Decimal(0)
+        for item in self.items.all():
+            total = total + item.line_price
+        return total
 
 
-#class OrderItems(models.Model)
-#link to productitem
-#copy of name
-#copy of price
-#quantity
-#status - has it been given out or not?
+    @property
+    def items_in_order(self):
+        x = self.items.aggregate(Sum('quantity_ordered'))
+        return x['quantity_ordered__sum'] + self.postage_amount
+
+    @property
+    def postage_required(self):
+        return self.items.filter(item_postage_requred=True).exists()
+
+    
+
+
+
+class OrderItem(models.Model):
+    STATUS_WAITING_FOR_STOCK = "W"
+    STATUS_READY_TO_DESPATCH = "G"
+    STATUS_DESPATCHED = "D"
+    STATUS_CANCELLED = "X"
+    STATUS_RETURNED_REFUNDED = "R"
+
+    ORDERITEM_STATUS_CHOICES = (
+        (STATUS_WAITING_FOR_STOCK, "Waiting for stock"),
+        (STATUS_READY_TO_DESPATCH, "Ready to despatch"),
+        (STATUS_DESPATCHED, "Despatched"),
+        (STATUS_CANCELLED, "Cancelled"),
+        (STATUS_RETURNED_REFUNDED, "Returned / Refunded"),
+    )
+
+    item = models.ForeignKey(ProductItem, on_delete=models.SET_NULL, blank=True, null=True, related_name='ordered_items')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+
+    status = models.CharField("Status", max_length=1, choices=ORDERITEM_STATUS_CHOICES, default=STATUS_READY_TO_DESPATCH)
+
+    # These fields are copied when we create the order
+    item_name = models.CharField("Name", max_length=1000)
+    item_price = models.DecimalField("Price", max_digits=5, decimal_places=2)
+    item_postage_required = models.BooleanField("Must be posted to buyer?", default=False) 		# must pay for postage  
+
+    quantity_ordered = models.IntegerField(
+        validators=[MinValueValidator(0)], default=Decimal(0))					# what was ordered originally
+    quantity_allocated= models.IntegerField(
+        validators=[MinValueValidator(0)], default=Decimal(0))					# what is allocated, but not yet delivered
+    quantity_delivered = models.IntegerField(
+        validators=[MinValueValidator(0)], default=Decimal(0))					# what was supplied
+ 
+    def __str__(self):
+        return "Order #" + str(self.order.pk) + " " + str(self.quantity_ordered) + " x " + str(self.item_name)
+
+    @property
+    def line_price(self):
+        return (self.item_price * self.quantity_ordered)
+
 
 
 #class OrderHistory
 #history_entry
-
+# maybe create automatically based on post_save signal?
 
 
 ################################################ BASKET RELATED MODELS ################################################
-#class Basket
-#created datetime (to allow purging once a day)
+
+class Basket(models.Model):
+    created = models.DateTimeField("Basket created", auto_now_add=True)
+
+    @property
+    def has_items(self):
+        return self.items.exists()
+
+    @property
+    def item_count(self):
+        x = self.items.aggregate(Sum('quantity'))
+        if x['quantity__sum']:
+            return x['quantity__sum']
+        else:
+            return 0
+
+    @property
+    def basket_total(self):
+        total = 0
+        for item in self.items.all():
+            total = total + item.total
+        return total
+# TODO: utility methods here to figure out total costs etc
 
 
-#class BasketItems
-#item
-#quantity
+class BasketItem(models.Model):
+    basket = models.ForeignKey(Basket, on_delete=models.CASCADE, related_name='items')
+    item = models.ForeignKey(ProductItem, on_delete=models.CASCADE, related_name='basket_items')
+    quantity = models.IntegerField(
+        validators=[MinValueValidator(0)], default=Decimal(0))			
+    
+    @property
+    def price(self):
+        return self.item.product.price
 
 
-
+    @property
+    def total(self):
+        return self.price * self.quantity
 
 
 ################################################ DISCOUNT CODE RELATED MODELS ################################################

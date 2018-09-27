@@ -5,7 +5,7 @@
 
 {% block content %} 
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h1">{{ product }}</h1><a href="{{ product.slug }}" class="float-right btn btn-outline-primary btn-sm">view in shop</a>
+            <h1 class="h1">{{ product }}</h1><a href="{% url 'shop:product' product.pk product.slug %}" class="float-right btn btn-outline-primary btn-sm">view in shop</a>
           </div>
 
 <div class="row">

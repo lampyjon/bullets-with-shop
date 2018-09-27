@@ -1,0 +1,54 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+
+{% block content %} 
+    <div class="row">
+      <div class="col">
+	{% if product.pictures.count > 0 %}
+			<div id="carouselExampleIndicators" class="carousel slide mb-3" data-ride="carousel">
+  				<ol class="carousel-indicators">
+				   {% for pic in product.pictures.all %}
+    					<li data-target="#carouselExampleIndicators" data-slide-to="{{ forloop.counter }}" {% if forloop.first %}class="active">{% endif %}</li>
+				   {% endfor %}
+     				</ol>
+  				<div class="carousel-inner">
+				    {% for pic in product.pictures.all %}
+    					<div class="carousel-item {% if forloop.first %}active{% endif %}">
+      						<img class="d-block img-fluid" src="{{ pic.image.url }}" alt="Picture">
+    					</div>
+  				    {% endfor %}
+				</div>
+  				<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+    					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    					<span class="sr-only">Previous</span>
+  				</a>
+  				<a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+    					<span class="carousel-control-next-icon" aria-hidden="true"></span>
+    					<span class="sr-only">Next</span>
+  				</a>
+			</div>
+		 	{% else %}
+			!!no picture!!
+			{% endif %}
+      </div>
+      <div class="col">
+		<h2>{{ product.name }}</h2>
+		<p class="lead">{{product.display_price}}</p>
+  		<form method="post" class="form-horizontal" >
+            		{% csrf_token %}
+	 			{% bootstrap_form product_form layout="horizontal" %} 
+			<button type="submit" class="btn btn-primary btn-block mb-3">Add to basket</button>
+		</form> 
+		<h5 class="text-uppercase border-bottom">Description</h5>
+		<p>{{ product.description|safe }}</p>
+      </div>
+    </div>
+
+
+
+ {% endblock %}
+
+
+

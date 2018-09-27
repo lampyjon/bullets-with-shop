@@ -54,7 +54,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{% url 'dashboard:orders' %}">
                   <span data-feather="file"></span>
                   Orders
                 </a>
@@ -103,6 +103,12 @@
 
    <script>
   feather.replace()
+
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
 </script>
     </body>
 </html>

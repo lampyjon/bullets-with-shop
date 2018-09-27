@@ -1,0 +1,17 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Products</h1>
+          </div>
+<div>
+	<ul>
+	{% for product in products %}
+	<li><a href="{% url 'shop:product' product.pk product.slug %}">{{ product.name }}</a></li>
+	{% endfor %}
+	</ul>
+
+</div>
+ {% endblock %} 

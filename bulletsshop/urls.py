@@ -8,6 +8,13 @@ from django.urls import path, include
 
 shop_patterns = ([
     path('', views.index, name='home'),
+
+    path('products', views.ShopProductList.as_view(), name='products'),
+    path('product/<int:product_pk>/<slug:slug>', views.ShopProduct, name='product'),
+
+    path('basket', views.ShopBasket, name='basket'),
+    path('basket/update', views.ShopBasketUpdate, name='basket-update'),
+
 ], 'shop')
 
 
@@ -26,6 +33,11 @@ dashboard_patterns = ([
 
     path('products/<int:product_pk>/items/edit', views.product_edit_items, name='product-edit-items'),
     path('products/<int:product_pk>/pictures/add', views.product_picture_create, name='product-picture-add'),
+
+
+    path('orders', views.OrderList.as_view(), name='orders'),
+    path('orders/paid', views.PaidOrderList.as_view(), name='orders-paid'),
+    path('orders/<int:pk>/view', views.OrderDetail.as_view(), name='order'),
 
 
     path('categories', views.CategoryList.as_view(), name='categories'),

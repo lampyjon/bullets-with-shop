@@ -44,3 +44,20 @@ class ProductPictureForm(ModelForm):
     class Meta:
         model = ProductPicture
         fields = ['image']
+
+
+class OrderHistoryItemForm(forms.Form):
+    message = forms.CharField()
+
+
+
+
+
+class ShopProductForm(forms.Form):
+   quantity = forms.IntegerField(min_value=0, max_value=50, initial=1)
+   item = forms.ModelChoiceField(queryset=None, empty_label=None)
+
+   def __init__(self, *args, **kwargs):
+       product = kwargs.pop("product")
+       super(ShopProductForm, self).__init__(*args, **kwargs)
+       self.fields["item"].queryset = product.items

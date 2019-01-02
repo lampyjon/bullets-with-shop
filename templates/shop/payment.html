@@ -1,0 +1,17 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Payment</h1>
+          </div>
+
+<form action="{{ form.action }}" method="{{ form.method }}">
+                		{% csrf_token %}
+	 			{% bootstrap_form form layout="horizontal" %} 
+			<button type="submit" class="btn btn-primary btn-block mb-3">Pay</button>
+		</form> 
+
+ {% endblock %} 

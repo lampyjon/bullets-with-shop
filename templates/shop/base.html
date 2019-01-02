@@ -14,23 +14,22 @@
 
 
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-<script src="https://unpkg.com/feather-icons"></script>
+   <link rel="stylesheet" href="{% static 'css/bullets-shop-bootstrap.css' %}">
+   <script src="https://unpkg.com/feather-icons"></script>
 
-	{% block extraheader %}{% endblock %}
+   {% block extraheader %}{% endblock %}
 
 </head>
 
 <body id="page-top">
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-      <h5 class="my-0 mr-md-auto font-weight-normal">Boldmere Bullets Online Shop</h5>
+      <h5 class="my-0 mr-md-auto font-weight-normal"><a href="{% url 'shop:home' %}">Boldmere Bullets Online Shop</a></h5>
       <nav class="my-2 my-md-0 mr-md-3">
-        <a class="p-2 text-dark" href="#">Cycling</a>
-        <a class="p-2 text-dark" href="#">Running</a>
-        <a class="p-2 text-dark" href="#">Casual</a>
-        <a class="p-2 text-dark" href="#">Events</a>
+	{% for category in categories %}
+    	    <a class="p-2 text-dark" href="{% url 'shop:product-category' category.pk %}">{{ category }}</a>
+	{% endfor %}
       </nav>
-      <a class="btn btn-outline-primary" href="{% url 'shop:basket' %}"><i data-feather="shopping-bag"></i> shopping basket {% if basket.has_items %}<span class="badge badge-light ml-1">{{ basket.item_count }}</span>{% endif %}</a>
+      <a class="btn btn-outline-primary d-flex align-items-center" href="{% url 'shop:basket' %}"><i data-feather="shopping-bag" class="mr-1"></i> shopping basket {% if basket.has_items %}<span class="badge badge-primary ml-1">{{ basket.item_count }}</span>{% endif %}</a>
     </div>
 {% bootstrap_messages %}
     <main role="main" class="container">
@@ -41,14 +40,12 @@
   
       <footer class="pt-4 p-3 px-md-4 mb-3 bg-white border-top">
         <div class="row">
-	  <div class="col"><small class="text-muted">Boldmere Bullets</small></div>
-	  <div class="col text-center"><small>Postage and Delivery Information</small></div>
-	  <div class="col text-right"><small class="text-muted">Privacy stuff</small></div>     
+	  <div class="col"><small class="text-muted"><a href="{% url 'index' %}">Boldmere Bullets</a></small></div>
+	  <div class="col text-center"><small><a href="{% url 'delivery-times' %}">Postage and Delivery Information</a></small></div>
+	  <div class="col text-right"><small class="text-muted"><a href="{% url 'privacy' %}">Privacy information</a></small></div>     
         </div>
       </footer>
 
-
-  	 
 
         {% block footer %}
         {% endblock %}

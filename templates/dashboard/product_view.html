@@ -26,7 +26,7 @@
 						<th class="text-right">Allocated</th>
 						<th class="text-right">To Order</th>
 						<th class="text-right">On Order</th>
-						<th class="text-right">Allocated In Order</th>
+						<th class="text-right">Spare In Order</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -37,7 +37,7 @@
 						<td class="text-right">{{ item.quantity_allocated }}</td>
 						<td class="text-right">{{ item.quantity_to_order }}</td>
 						<td class="text-right">{{ item.quantity_on_order }}</td>
-						<td class="text-right">{{ item.quantity_allocated_on_order }}</td>
+						<td class="text-right">{{ item.spare_in_order }}</td>
 					</tr>
 				{% endfor %}
 				</tbody>
@@ -81,7 +81,11 @@
 			</div>
 			<div class="row">
 				<div class="col"><strong>Postage?</strong></div>
-				<div class="col">{{ product.postage_required|yesno }}</div>
+				<div class="col">{{ product.get_postage_option_display }}</div>
+			</div>
+			<div class="row">
+				<div class="col"><strong>Postage price</strong></div>
+				<div class="col">&pound;{{ product.postage_price }}</div>
 			</div>
 			<div class="row">
 				<div class="col"><strong>Categories</strong></div>

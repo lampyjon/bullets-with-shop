@@ -1,0 +1,105 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% load bootstrap_field bootstrap_form from bootstrap4 %}
+
+
+{% block content %} 
+   <h1>Checkout : final review</h1>
+   <div class="row mb-3">
+    <div class="col">
+	<div class="card h-100">
+		<div class="card-header">Billing Address
+       		 <a href="{% url 'shop:checkout-billing' %}" class="btn btn-outline-primary btn-sm float-right">edit</a>
+</div>
+	        <div class="card-body">
+		  <address  class="mb-0"><strong>{{ basket.billing_name }}</strong> ({{basket.email}})<br/>
+			{{ basket.billing_address }}<br/>
+			{{ basket.billing_postcode }}
+		  </address>
+		  <address></address>   
+		</div>
+	 </div>
+     </div>
+     {% if basket.postage_amount != 0 %}
+
+     <div class="col">
+	<div class="card h-100">
+  		<div class="card-header">Delivery Address
+<a href="{% url 'shop:checkout-delivery' %}" class="btn btn-outline-primary btn-sm float-right">edit</a>
+</div>
+	        <div class="card-body">
+		<address class="mb-0"><strong>{{ basket.delivery_name }}</strong><br/>
+			{{ basket.delivery_address }}<br/>
+			{{ basket.delivery_postcode }}
+		</address>
+		</div>
+	</div>
+      </div>
+     {% endif %}	
+  </div>
+  
+
+   <div class="row mb-3">
+    <div class="col">
+	<div class="card h-100">
+		<div class="card-header">Items being ordered</div>
+	        <div class="card-body">
+
+   <table class="table table-sm">
+    <thead>
+     <tr>
+       <th>Item</th>
+       <th class="text-right">Quantity</th>
+       <th class="text-right">Price</th>
+       <th class="text-right">Total</th>
+     </tr>
+    </thead>
+    <tbody>
+      {% for item in basket.items.all %}
+       <tr>
+        <td><a href="{% url 'shop:product' item.item.product.pk item.item.product.slug %}">{{item.item}}</a></td>
+        <td class="text-right">{{item.quantity}}</td>
+        <td class="text-right">&pound;{{item.price}}</td>
+        <td class="text-right">&pound;{{item.total}}</td>
+       </tr>
+	</form>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="3" class="text-right">Subtotal</th>
+	<th class="text-right">&pound;{{basket.basket_total}}</th>
+      </tr>
+      <tr>
+        <th colspan="3" class="text-right">Postage (<a href="{% url 'shop:checkout' %}">edit</a>)</th>
+        <th class="text-right">&pound;{{basket.postage_amount}}</th>
+       </tr>
+       <tr>
+        <th colspan="3" class="text-right">Total</th>
+        <th class="text-right">&pound;{{basket.grand_total}}</th>
+       </tr>
+     
+    </tfoot>
+ 	 </table>
+		</div>
+   
+	</div>
+     </div>
+    <div class="col">
+	<div class="card h-100">
+		<div class="card-header">Notes</div>
+	        <div class="card-body">
+			<p>You are about to place your order. If you would like to leave a note on the order - for example if an item can be customised with a printed name - leave it here. You will then be taken to the payment page.</p>
+			 <form method="post" class="form-horizontal" >
+            		{% csrf_token %}
+				{% bootstrap_field form.comment show_label=False layout="horizontal" placeholder="Note"%} 
+			<button type="submit" class="btn btn-primary btn-block mb-3">Payment</button>
+			</form> 
+		</div>
+	 </div>
+     </div>
+  </div>
+{% endblock %}
+
+
+

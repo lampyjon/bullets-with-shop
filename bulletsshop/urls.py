@@ -10,11 +10,21 @@ shop_patterns = ([
     path('', views.index, name='home'),
 
     path('products', views.ShopProductList.as_view(), name='products'),
+    path('products/category/<int:category_pk>', views.ShopProductCategoryList.as_view(), name='product-category'),
     path('product/<int:product_pk>/<slug:slug>', views.ShopProduct, name='product'),
 
     path('basket', views.ShopBasket, name='basket'),
     path('basket/update', views.ShopBasketUpdate, name='basket-update'),
 
+    path('checkout/start', views.CheckoutViewBasket, name='checkout'),
+    path('checkout/billing', views.CheckoutBillingAddress, name='checkout-billing'),
+    path('checkout/delivery', views.CheckoutDeliveryAddress, name='checkout-delivery'),
+    path('checkout/summary', views.CheckoutSummary, name='checkout-summary'),
+   
+    path('checkout/pay/<int:payment_id>', views.payment_details, name='pay'),
+    path('checkout/pay/success/<uuid:uuid>', views.payment_success, name='payment-success'),
+
+    path('payments', include('payments.urls'))
 ], 'shop')
 
 
@@ -35,9 +45,15 @@ dashboard_patterns = ([
     path('products/<int:product_pk>/pictures/add', views.product_picture_create, name='product-picture-add'),
 
 
-    path('orders', views.OrderList.as_view(), name='orders'),
-    path('orders/paid', views.PaidOrderList.as_view(), name='orders-paid'),
+    path('orders', views.order_list, {'status':'all'}, name='orders'),
+    path('orders/paid', views.order_list, {'status':'paid'}, name='orders-paid'),
+    path('orders/paid/outstanding', views.order_list, {'status':'outstanding'}, name='orders-paid-outstanding'),
+    path('orders/unpaid', views.order_list, {'status':'unpaid'}, name='orders-unpaid'),
+
     path('orders/<int:pk>/view', views.OrderDetail.as_view(), name='order'),
+    path('orders/<int:pk>/items-despatch', views.order_items_despatch, name='order-items-despatch'),
+    path('orders/<int:pk>/add-comment', views.order_comment, name='order-comment'),
+    path('orders/<int:pk>/cash-payment', views.order_cash_payment, name='order-pay-cash'),
 
 
     path('categories', views.CategoryList.as_view(), name='categories'),
@@ -53,7 +69,21 @@ dashboard_patterns = ([
     path('suppliers/<int:pk>', views.SupplierDetail.as_view(), name='supplier-view'),
     path('suppliers/<int:supplier_pk>/delivery', views.supplier_delivery, name='supplier-delivery'),
     path('suppliers/<int:supplier_pk>/order', views.supplier_order, name='supplier-order'),
-#    path('suppliers/<int:supplier_pk>/order/save', views.supplier_order_save, name='supplier-order-save'),
+#   path('suppliers/<int:supplier_pk>/order/save', views.supplier_order_save, name='supplier-order-save'),
+
+    path('postage', views.PostageList.as_view(), name='postage'),
+    path('postage/add', views.PostageCreate.as_view(), name='postage-add'),
+    path('postage/<int:pk>/edit', views.PostageUpdate.as_view(), name='postage-update'),
+    path('postage/<int:pk>/delete', views.PostageDelete.as_view(), name='postage-delete'),
+
+    path('allocations/name', views.allocations, {'order_by': 'name'}, name='allocations'),
+    path('allocations/date', views.allocations, {'order_by': 'date'}, name='allocations-date'),
+    path('allocations/order', views.allocations, {'order_by': 'order'}, name='allocations-order'),
+    path('allocations/item', views.allocations, {'order_by': 'item'}, name='allocations-item'),
+    path('allocations/item/<int:item_pk>', views.allocations, name='allocations-specific-item'),
+
+
+
 
 ], 'dashboard')
 

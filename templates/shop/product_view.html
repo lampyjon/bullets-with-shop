@@ -6,7 +6,7 @@
 {% block content %} 
     <div class="row">
       <div class="col">
-	{% if product.pictures.count > 0 %}
+	{% if product.pictures.count > 1 %}
 			<div id="carouselExampleIndicators" class="carousel slide mb-3" data-ride="carousel">
   				<ol class="carousel-indicators">
 				   {% for pic in product.pictures.all %}
@@ -29,9 +29,9 @@
     					<span class="sr-only">Next</span>
   				</a>
 			</div>
-		 	{% else %}
-			!!no picture!!
-			{% endif %}
+	{% elif product.pictures.count == 1 %}
+		<img class="d-block img-fluid" src="{{ product.picture_url }}" alt="Picture of {{ product }}">
+	{% endif %}
       </div>
       <div class="col">
 		<h2>{{ product.name }}</h2>

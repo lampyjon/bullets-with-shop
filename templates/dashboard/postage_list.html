@@ -1,0 +1,29 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Product Postage</h1>
+          </div>
+<div>
+<table class="table">
+  <thead>
+	<tr>
+		<th>Name</th>
+		<th class="text-right">Amount</th>
+	</tr>
+  </thead>
+  <tbody>
+	{% for postage in postage_list %}
+	<tr>
+		<td><a href="{% url 'dashboard:postage-update' postage.pk %}">{{ postage.name }}</a></td>
+		<td class="text-right">&pound;{{ postage.price}}</td>
+	</tr>
+	{% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-outline-primary" href="{% url 'dashboard:postage-add' %}" role="button">Add new</a>
+
+</div>
+ {% endblock %} 

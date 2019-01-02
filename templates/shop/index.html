@@ -1,0 +1,42 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block content %} 
+    <div class="row">
+      <div class="col">
+	<h1><div class="d-none d-lg-inline">Welcome to the </div>Boldmere Bullets Online Shop</h1>
+	<p>We sell a range of Boldmere Bullets-branded kit, casualwear, and other items to improve both your performance and your style when out and about on a run or ride! Please note that our <a href="{% url 'delivery-times' %}">delivery times vary throughout the year</a>.  
+      </div>
+   </div>
+
+<div class="card-deck mb-3 text-center">
+  <a class="card" href="{% url 'shop:product-category' 1 %}">
+      <img class="card-img-top" src="{% static 'images/shop-cycling.png' %}" alt="Cycling kit">
+      <div class="card-body">
+         <h5 class="card-title">Cycling</h5>
+      </div>
+  </a>
+  <a class="card" href="{% url 'shop:product-category' 2 %}">
+    <img class="card-img-top" src="{% static 'images/shop-running.png' %}" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">Running</h5>
+    </div>
+  </a>
+  <a class="card" href="{% url 'shop:product-category' 3 %}">
+    <img class="card-img-top" src="{% static 'images/shop-casual.png' %}" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">Casual</h5>
+    </div>
+  </a>
+  <a class="card" href="{% url 'shop:product-category' 4 %}">
+    <img class="card-img-top" src="{% static 'images/shop-events.png' %}" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">Events</h5>
+    </div>
+  </a>
+
+</div>
+
+{% endblock %}
+ 

@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Bullet, ActivityCache, News, RunningEvent, BulletEvent
+from .models import Bullet, ActivityCache, News, RunningEvent, BulletEvent, SiteSettings
 from django_summernote.admin import SummernoteModelAdmin
 
 
+admin.site.register(SiteSettings)
 admin.site.register(ActivityCache)
 #admin.site.register(OldBullet)
 admin.site.register(Bullet)

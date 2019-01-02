@@ -7,25 +7,27 @@
             <h1 class="h1">{{ order }}</h1>
           </div>
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
+<ul class="nav nav-tabs mb-2" id="myTab" role="tablist">
   <li class="nav-item">
     <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Order</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Items to despatch</a>
+    <a class="nav-link" id="despatch-tab" data-toggle="tab" href="#despatch" role="tab" aria-controls="profile" aria-selected="false">Items to despatch  <span class="badge badge-primary">{{ order.despatch_items.count }}</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Items on order</a>
+    <a class="nav-link" id="order-tab" data-toggle="tab" href="#order" role="tab" aria-controls="contact" aria-selected="false">Items waiting for stock <span class="badge badge-primary">{{ order.on_order_items.count }}</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="contact-tab" data-toggle="tab" href="#bbb" role="tab" aria-controls="contact" aria-selected="false">Items despatched</a>
+    <a class="nav-link" id="despatched-tab" data-toggle="tab" href="#despatched" role="tab" aria-controls="contact" aria-selected="false">Items despatched</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="contact-tab" data-toggle="tab" href="#bbb" role="tab" aria-controls="contact" aria-selected="false">Items refunded</a>
+    <a class="nav-link" id="refund-tab" data-toggle="tab" href="#refund" role="tab" aria-controls="contact" aria-selected="false">Items refunded</a>
   </li>
 
 </ul>
 <div class="tab-content" id="myTabContent">
+
+
   <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
 <div class="row">
@@ -48,7 +50,7 @@
 					{% for item in order.items.all %}
 					<tr>
 						<td>{{item.item_name}}</td>
-						<td>{{item.get_status_display}}</td>
+						<td>{{item.status}}</td>
 						<td class="text-right">&pound;{{item.item_price}}</td>
 						<td class="text-right">{{item.quantity_ordered}}</td>
 						<td class="text-right">&pound;{{item.line_price}}</td>
@@ -68,7 +70,7 @@
 						<th></th>
 						<th></th>
 						<th class="text-right">Grand total</th>
-						<th class="text-right">&pound;{{order.total}}</th>
+						<th class="text-right">&pound;{{order.grand_total}}</th>
 					</tr>
 				</tfoot>
 			</table>
@@ -87,32 +89,25 @@
 				   </tr>
 				</thead>
 				<tbody>
+					{% for history in order.comments.all %}
 				    <tr>
-					<td>12-9-18</td>
-					<td>Jon</td>
-					<td>Order created</td>
+					<td>{{ history.created|date:"H:m d/m/y" }}</td>
+					<td>???</td>
+					<td>{{ history.comment }}</td>
 				    </tr>
-				    <tr>
-					<td>12-9-18</td>
-					<td>Jon</td>
-					<td>Order paid in full</td>
-				    </tr>
- 				    <tr>
-					<td>13-9-18</td>
-					<td>Tara</td>
-					<td>Comment: "Swapped for a yellow t-shirt"</td>
-				    </tr>
+					{% endfor %}
 				</tbody>
 				<tfoot>
 				    <tr>
 					<td></td>
 					<td></td>
 					<td>
-						<form class="form-inline">
+						<form class="form-inline" method="POST" action="{% url 'dashboard:order-comment' order.pk %}">
+						{% csrf_token %}
 							<div class="input-group mb-3">
-  								<input type="text" class="form-control" placeholder="comment" size="40" aria-label="comment" aria-describedby="comment">
+  								<input type="text" class="form-control" placeholder="comment" size="40" aria-label="comment" aria-describedby="comment" name="comment" id="comment">
   								<div class="input-group-append">
-    									<button class="btn btn-outline-secondary" type="button">save</button>
+    									<button class="btn btn-outline-secondary" type="submit">save</button>
   								</div>
 							</div>
 						</form>
@@ -128,19 +123,36 @@
  </div>
  <div class="col">
  	<div class="card mb-3">
-  		<div class="card-header">Customer</div>
+  		<div class="card-header">Billing</div>
 	        <div class="card-body">
-			<address><strong>{{ order.name }}</strong><br/>
-			{{ order.address }}<br/>
-			{{ order.postcode }}
+			<address><strong>{{ order.billing_name }}</strong><br/>
+			{{ order.billing_address }}<br/>
+			{{ order.billing_postcode }}
 			</address>
-			<address><a href="mailto:{{ order.email }}">{{order.email}}</a></address>
+			<address><a href="mailto:{{ order.billing_email }}">{{order.billing_email}}</a></address>
 		</div>
 	</div>
  	<div class="card mb-3">
-  		<div class="card-header">Payment</div>
+  		<div class="card-header">Payment {% if order.fully_paid %}<div class="float-right">Fully Paid</div>{% else %}<a href="{% url 'dashboard:order-pay-cash' order.pk %}" class="float-right btn btn-outline-primary btn-sm">Cash Payment</a>{% endif %}</div>
 	        <div class="card-body">
-
+		<table class="table table-sm">
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Status</th>
+					<th class="text-right">Amount</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for payment in order.payments.all %}
+				<tr>
+					<td>{{payment.modified|date:"d/m/y"}}</td>
+					<td>{{payment.get_status_display}}</td>
+					<td class="text-right">&pound;{{payment.captured_amount}}</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
 		</div>
 	</div>
 
@@ -152,57 +164,100 @@
 </div>
 
 
-  <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+  <div class="tab-pane fade" id="despatch" role="tabpanel" aria-labelledby="despatch-tab">
+		<form method="post" class="form-horizontal" action="{% url 'dashboard:order-items-despatch' order.pk %}">
+            		{% csrf_token %}
 
-	<table class="table table-sm">
+			<table class="table">
 				<thead>
 					<tr>
 						<th>Item</th>
 						<th>Status</th>
-						<th class="text-right">Price</th>
-						<th class="text-right">Qty.</th>
-						<th class="text-right">Total</th>
+						<th class="text-right">Qty. ordered</th>
+						<th class="text-right">Qty. ready to despatch</th>
+						<th class="text-right">Qty. despatched</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for item in order.items.all %}
+					{% for item in order.despatch_items.all %}
 					<tr>
-						<td>{{item.item_name}}</td>
-						<td>{{item.get_status_display}}</td>
-						<td class="text-right">&pound;{{item.item_price}}</td>
-						<td class="text-right">{{item.quantity_ordered}}</td>
-						<td class="text-right">&pound;{{item.line_price}}</td>
+						<td class="align-middle">{{item.item_name}}</td>
+						<td class="align-middle">{{item.status}}</td>
+						<td class="align-middle text-right">{{item.quantity_ordered}}</td>
+						<td class="align-middle text-right">{{item.quantity_allocated}}</td>
+						<td class="align-middle"><input name="id-{{item.pk}}" class="form-control form-control-sm" type="number" value="{{item.quantity_allocated}}" min="0" max="{{item.quantity_allocated}}"></td>
 					</tr>
 					{% endfor %}
 				</tbody>
-				<tfoot>
+			</table>
+
+			<button type="submit" class="btn btn-primary btn-block mb-3">Despatch Items!</button>
+
+		</form>
+
+  </div>
+
+  <div class="tab-pane fade" id="order" role="tabpanel" aria-labelledby="order-tab">
+
+	<table class="table">
+				<thead>
 					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td class="text-right">Postage</td>
-						<td class="text-right">&pound;{{order.postage_amount}}</td>
+						<th>Item</th>
+						<th>Status</th>
+						<th class="text-right">Qty. ordered</th>
+						<th class="text-right">Qty. delivered</th>
+						<th class="text-right">Qty. on order</th>
+						<th class="text-right">Qty. to order</th>
 					</tr>
+				</thead>
+				<tbody>
+					{% for item in order.on_order_items.all %}
 					<tr>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th class="text-right">Grand total</th>
-						<th class="text-right">&pound;{{order.total}}</th>
+						<td class="align-middle">{{item.item_name}}</td>
+						<td class="align-middle">{{item.status}}</td>
+						<td class="align-middle text-right">{{item.quantity_ordered}}</td>
+						<td class="align-middle text-right">{{item.quantity_delivered}}</td>
+						<td class="align-middle text-right">{{item.item.quantity_on_order}}</td>
+						<td class="align-middle text-right">{{item.item.quantity_to_order}}</td>
+
 					</tr>
-				</tfoot>
+					{% endfor %}
+				</tbody>
 			</table>
 
 
   </div>
-  <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
 
+  <div class="tab-pane fade" id="despatched" role="tabpanel" aria-labelledby="despatched-tab">
+
+	<table class="table">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>Status</th>
+						<th class="text-right">Qty. ordered</th>
+						<th class="text-right">Qty. delivered</th>
+						<th class="text-right">Qty. on order</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in order.despatched_items.all %}
+					<tr>
+						<td class="align-middle">{{item.item_name}}</td>
+						<td class="align-middle">{{item.status}}</td>
+						<td class="align-middle text-right">{{item.quantity_ordered}}</td>
+						<td class="align-middle text-right">{{item.quantity_delivered}}</td>
+						<td class="align-middle text-right">{{item.item.quantity_on_order}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 
   </div>
-  <div class="tab-pane fade" id="bbb" role="tabpanel" aria-labelledby="contact-tab">
-
+ <div class="tab-pane fade" id="refund" role="tabpanel" aria-labelledby="refund-tab">
 
   </div>
+
 
 </div>
   	

@@ -1,0 +1,22 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Cash Payment - {{ order }}</h1>
+          </div>
+<div>
+
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+	 	<p>Make a cash payment for order {{ order }}? Payment amount is &pound;{{order.amount_owing}}</p>
+                       <p class="text-right">	
+				<a class="btn btn-outline-primary" href="{% url 'dashboard:order' order.pk %}" role="button">cancel</a>			
+                		<button type="submit" class="btn btn-primary">Pay</button>
+            		</p>
+        </form>
+
+
+</div>
+ {% endblock %} 

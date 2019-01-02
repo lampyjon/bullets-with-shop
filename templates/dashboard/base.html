@@ -13,7 +13,7 @@
 
 
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/bullets-shop-bootstrap.css' %}">
 <script src="https://unpkg.com/feather-icons"></script>
 
 	{% block extraheader %}{% endblock %}
@@ -54,7 +54,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:orders' %}">
+                <a class="nav-link" href="{% url 'dashboard:orders-paid-outstanding' %}">
                   <span data-feather="file"></span>
                   Orders
                 </a>
@@ -63,6 +63,18 @@
                 <a class="nav-link" href="{% url 'dashboard:suppliers' %}">
                   <span data-feather="users"></span>
                   Suppliers
+                </a>
+              </li>
+               <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard:postage' %}">
+                  <span data-feather="truck"></span>
+                  Postage
+                </a>
+              </li>
+               <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard:allocations' %}">
+                  <span data-feather="layers"></span>
+                  Allocations
                 </a>
               </li>
             </ul>

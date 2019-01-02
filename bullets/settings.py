@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'bulletsweb',
     'bulletsshop',
     'versatileimagefield',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -142,6 +143,7 @@ AWS_QUERYSTRING_AUTH = get_bool_from_env('AWS_QUERYSTRING_AUTH', False)
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_STATIC_CUSTOM_DOMAIN')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_DEFAULT_ACL = "public-read"
 
 S3_URL = STATIC_URL 		# BULLETS: need this to make the various bits of AWS S3 code for custom storages work
 
@@ -167,20 +169,20 @@ MAILCHIMP_LISTID = os.environ.get('MAILCHIMP_LISTID')
 MAILCHIMP_WEBHOOK_APIKEY = os.environ.get('MAILCHIMP_WEBHOOK_APIKEY')
 
 #
-# For later for payments
+# Payments
 #
-#def get_host():
-#    from django.contrib.sites.models import Site
-#    return Site.objects.get_current().domain
+def get_host():
+    from django.contrib.sites.models import Site
+    return Site.objects.get_current().domain
+
+PAYMENT_HOST = get_host
 #
+PAYMENT_MODEL = 'bulletsshop.Payment'
 #
-#PAYMENT_HOST = get_host
-#
-#PAYMENT_MODEL = 'order.Payment'
-#
-#if DEBUG:
-#    PAYMENT_VARIANTS = {
-#        'default': ('payments.dummy.DummyProvider', {})}
+# if DEBUG:
+PAYMENT_VARIANTS = {
+    'default': ('payments.dummy.DummyProvider', {})
+    }
 #else:
 #    PAYMENT_VARIANTS = {
 #        'paypal': ('payments.paypal.PaypalProvider', {
@@ -192,4 +194,4 @@ MAILCHIMP_WEBHOOK_APIKEY = os.environ.get('MAILCHIMP_WEBHOOK_APIKEY')
 
 
 
-
+LOGIN_REDIRECT_URL = 'core-team-admin'

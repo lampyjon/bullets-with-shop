@@ -359,7 +359,7 @@ def CheckoutSummary(request):
                 order=order,
                 variant='default',  # this is the variant from PAYMENT_VARIANTS
                 description='Boldmere Bullet Shop Purchase',
-                total=order.total,
+                total=order.grand_total,
                 tax=Decimal(0),
                 currency='GBP',
                 delivery=order.postage_amount,

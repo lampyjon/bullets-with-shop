@@ -285,19 +285,18 @@ class Order(models.Model):
     def amount_owing(self):
         return self.grand_total - self.amount_paid()
 
-    def amount_paid(self):
+    def amount_paid(self):		# How much money has been paid on this order?
         total = 0
         for payment in self.payments.filter(status=PaymentStatus.CONFIRMED):
             total = total + payment.total
 
         return total
  
-    @property
+    @property				# Is this order completely paid for?
     def fully_paid(self):
         return self.amount_paid() == self.grand_total
 
-
-    @property
+    @property				# How many items are left to give out on this order?		
     def outstanding_item_count(self):
         ordered = self.items.aggregate(Sum('quantity_ordered'))
         delivered = self.items.aggregate(Sum('quantity_delivered'))
@@ -305,8 +304,6 @@ class Order(models.Model):
         ordered_qty = ordered['quantity_ordered__sum']
         delivered_qty = delivered['quantity_delivered__sum']
         return (ordered_qty - delivered_qty)
-
-
     
 # some helper methods to return filtered querysets 
     def despatch_items(self):				# All items waiting to be given out / despatched
@@ -371,6 +368,10 @@ class OrderItem(models.Model):
             self.quantity_delivered = self.quantity_delivered + quantity
             self.quantity_allocated = self.quantity_allocated - quantity
             self.save()
+
+            m = str(quantity) + " x " + str(self) + " - despatched"
+            oh = OrderHistory(order=self.order, comment=m)
+            oh.save()
 	    # TODO: log this as a history item
 
 
@@ -471,10 +472,10 @@ class BasketItem(models.Model):
 ################################################ PAYMENT RELATED MODELS ################################################
 
 class Payment(BasePayment):
-    order =  models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
 
     def get_failure_url(self):
-        return build_absolute_uri(reverse('shop:home'))	# TODO: what to do if failed
+        return build_absolute_uri(reverse('shop:home'))			# TODO: what to do if failed
 
     def get_success_url(self):
         return build_absolute_uri(reverse('shop:payment-success', kwargs={'uuid': self.order.unique_ref}))

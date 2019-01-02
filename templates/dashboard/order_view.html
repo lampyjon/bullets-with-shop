@@ -83,23 +83,20 @@
 			<table class="table table-sm">
 				<thead>
   				   <tr>
-					<th>Date</th>
-					<th>From</th>
+					<th>When</th>
 					<th>Note</th>
 				   </tr>
 				</thead>
 				<tbody>
 					{% for history in order.comments.all %}
 				    <tr>
-					<td>{{ history.created|date:"H:m d/m/y" }}</td>
-					<td>???</td>
+					<td>{{ history.created|date:"d/m/y H:m:s" }}</td>
 					<td>{{ history.comment }}</td>
 				    </tr>
 					{% endfor %}
 				</tbody>
 				<tfoot>
 				    <tr>
-					<td></td>
 					<td></td>
 					<td>
 						<form class="form-inline" method="POST" action="{% url 'dashboard:order-comment' order.pk %}">
@@ -190,8 +187,9 @@
 					{% endfor %}
 				</tbody>
 			</table>
-
+			{% if  order.despatch_items.all.count > 0 %}
 			<button type="submit" class="btn btn-primary btn-block mb-3">Despatch Items!</button>
+			{% endif %}
 
 		</form>
 

@@ -50,6 +50,24 @@ class OrderHistoryItemForm(forms.Form):
     comment = forms.CharField(required=False)
 
 
+class ReturnItemForm(forms.Form):
+    quantity = forms.IntegerField(label="Quantity to Return", min_value=0)
+    orderitem = forms.IntegerField(widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):		# pass in an instance of an OrderItem
+        oi = kwargs.pop("orderitem")
+        super(ReturnItemForm, self).__init__(*args, **kwargs)
+        self.fields['orderitem'].initial = oi.pk
+        self.fields['quantity'].initial = oi.quantity_delivered		# got to start somewhere
+
+  
+class OfflineSaleForm(forms.Form):
+    quantity = forms.IntegerField(label="Quantity to sell", min_value=0, initial=1)
+    email = forms.EmailField(label="Email", required=False)
+    name = forms.CharField(label="Name", max_length=500, required=False)
+    address= forms.CharField(label="Address", widget=forms.Textarea(attrs={'rows':4}), required=False)
+    postcode = forms.CharField(label="Postcode", max_length=8, required=False)
+
 
 
 # Customer facing forms

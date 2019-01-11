@@ -22,8 +22,8 @@
 
 <body id="page-top">
   <nav class="navbar navbar-dark bg-dark">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Boldmere Bullets Shop</a>
-            <ul class="navbar-nav px-3">
+      <a class="navbar-brand mr-0" href="#">Boldmere Bullets Shop - Dashboard</a>
+      <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
           <a class="nav-link" href="#">Sign out</a>
         </li>
@@ -42,12 +42,6 @@
                 </a>
               </li>
              <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:categories' %}">
-                  <span data-feather="folder"></span>
-                  Categories
-                </a>
-              </li>
-             <li class="nav-item">
                 <a class="nav-link" href="{% url 'dashboard:products' %}">
                   <span data-feather="shopping-cart"></span>
                   Products
@@ -56,7 +50,19 @@
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'dashboard:orders-paid-outstanding' %}">
                   <span data-feather="file"></span>
-                  Orders
+                  Purchases 
+                </a>
+              </li>
+               <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard:allocations' %}">
+                  <span data-feather="layers"></span>
+                  Allocations
+                </a>
+              </li>
+             <li class="nav-item">
+                <a class="nav-link" href="{% url 'dashboard:categories' %}">
+                  <span data-feather="folder"></span>
+                  Categories
                 </a>
               </li>
                <li class="nav-item">
@@ -69,12 +75,6 @@
                 <a class="nav-link" href="{% url 'dashboard:postage' %}">
                   <span data-feather="truck"></span>
                   Postage
-                </a>
-              </li>
-               <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:allocations' %}">
-                  <span data-feather="layers"></span>
-                  Allocations
                 </a>
               </li>
             </ul>
@@ -114,13 +114,13 @@
 	{% endblock %}
 
    <script>
-  feather.replace()
+  	feather.replace()
 
-jQuery(document).ready(function($) {
-    $(".clickable-row").click(function() {
-        window.location = $(this).data("href");
-    });
-});
+	jQuery(document).ready(function($) {
+    		$(".clickable-row").click(function() {
+        		window.location = $(this).data("href");
+    		});
+	});
 </script>
     </body>
 </html>

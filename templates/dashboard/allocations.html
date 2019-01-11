@@ -34,7 +34,7 @@
 				{% for item in items %}
 				<div class="row">
 					<div class="col-2"><a href="{% url 'dashboard:order' item.order.pk %}">Order #{{ item.order.pk }}</a></div>
-					<div class="col-3 text-right">{{ item.order.created|date:"H:m d/m/y" }}</div>
+					<div class="col-3 text-right">{{ item.order.created|date:"d/m/y H:i:s" }}</div>
 					<div class="col-1 text-right">{{ item.quantity_allocated }}</div>
 					<div class="col">{{ item.item_name }}</div>
 					</div>

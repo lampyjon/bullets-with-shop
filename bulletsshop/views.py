@@ -28,8 +28,10 @@ import uuid
 import random
 import os
 
-from .models import Product, ProductCategory, Supplier, ProductItem, ProductPicture, Order, OrderItem, Basket, BasketItem, Postage, OrderHistory
-from .forms import ProductForm, ItemForm, ProductPictureForm, OrderHistoryItemForm, ShopProductForm, OrderFormPostage, OrderFormBillingAddress, OrderFormDeliveryAddress
+from .models import Product, ProductCategory, Supplier, ProductItem, ProductPicture, Order, OrderItem, Basket, BasketItem, Postage, OrderHistory, ProductHistory
+from .forms import ProductForm, ItemForm, ProductPictureForm, OrderHistoryItemForm, ShopProductForm, OrderFormPostage, OrderFormBillingAddress, OrderFormDeliveryAddress, ReturnItemForm, OfflineSaleForm
+
+from payments import PaymentStatus
 
 
 def get_client_ip(request):
@@ -219,37 +221,27 @@ def create_order_from_basket(basket, note):
 
     if any_problems:
         order.delete()
-        return None		# return more info on the problem?
+        return None		# TODO: return more info on the problem?
 
     for basket_item in basket.items.all():
-        (status, to_allocate_stock, to_allocate_from_order, to_order) = basket_item.item.order_or_allocate(basket_item.quantity)
-
-#        print("For item ("+ str(basket_item.quantity) + " x " + str(basket_item.item) + ") = " + str(status) + " to_alloc_from_stock=" + str(to_allocate_stock) + "  to_order=" + str(to_order) + " to_alloc_from_order=" + str(to_allocate_from_order))
-         
-        
  	# make an order Item for this basket line
         orderitem = OrderItem(item=basket_item.item, 
                               order=order,
                               item_name=str(basket_item.item),
                               item_price=basket_item.item.product.price,
                               quantity_ordered=basket_item.quantity,
-                              quantity_allocated=to_allocate_stock,
+                              quantity_allocated=0,
                               quantity_delivered=0)
+       
         orderitem.save()
-        # and also adjust the productItem's stock levels
-        orderitem.item.quantity_in_stock = orderitem.item.quantity_in_stock - to_allocate_stock
-     #   orderitem.item.quantity_allocated = orderitem.item.quantity_allocated + to_allocate_stock
-        orderitem.item.quantity_to_order = orderitem.item.quantity_to_order + to_order
-        orderitem.item.quantity_allocated_on_order = orderitem.item.quantity_allocated_on_order + to_allocate_from_order
-        orderitem.item.save()
-	# TODO: figure out if we need to track allocated_or_order on an OrderItem line?
-        # TODO: do I need to put a save in heree on the orderitem.item?
-
 
     # STEP 3
     basket.delete()
 
     return order
+
+
+
 
 # Checkout Step 1 - show a summary of the basket, and postage options (as available)
 def CheckoutViewBasket(request):
@@ -403,6 +395,8 @@ def payment_success(request, uuid):
     print("order " + str(order) + " was paid!")
     print(str(request.POST))
 
+    messages.success(request, "Your payment was received")
+
     return redirect(reverse('shop:home'))
 
 # TODO: payment_failure page
@@ -445,6 +439,9 @@ def product_create(request, category_pk=None, product_pk=None, supplier_pk=None)
                  item = ProductItem(product=product)
                  item.save()
 
+             ph = ProductHistory(item=item, quantity=0, event=ProductHistory.CREATED)
+             ph.save()
+
              return redirect(reverse('dashboard:product-view', args=[product.pk]))
     else:  # no data sent to form, prepopulate based on what we got in the URL
         initial = {}
@@ -465,6 +462,45 @@ def product_view(request, product_pk=None):
     product = get_object_or_404(Product, pk=product_pk)
     return render(request, "dashboard/product_view.html", {'product':product})
 
+
+import calendar
+
+def product_analytics(request, product_pk, year=None):
+    product = get_object_or_404(Product, pk=product_pk)
+    now = datetime.datetime.now()
+
+    if year == None:
+        year = now.year
+
+    monthTotal = {}
+    items = {}
+    grandTotal = 0
+    x = 1
+    for item in product.items.all():
+        total = 0
+        r = {}
+        for month in range(1,13):
+            month_abr = calendar.month_abbr[month]
+            month_start = datetime.datetime(year, month, 1)
+            (start_day, days_in_month) = calendar.monthrange(year, month)
+            month_end = datetime.datetime(year, month, days_in_month, 23, 59, 59)
+            print("Month " + str(month_abr) + " = " + str(month_start) + " - " + str(month_end))
+            h = ProductHistory.objects.filter(item=item, event=ProductHistory.DISPATCHED, created__gte=month_start, created__lte=month_end).aggregate(Sum('quantity'))
+            if h["quantity__sum"]:
+               x = h["quantity__sum"]
+            else:
+               x = 0
+ 
+            monthTotal[month_abr] = monthTotal.get(month_abr, 0) + x
+            r[month_abr] = x
+            total += x
+
+        r['total'] = total
+        grandTotal += total
+        items[item] = r
+    monthTotal['total'] = grandTotal
+    
+    return render(request, "dashboard/product_analytics.html", {'product':product, 'items':items, 'monthTotal':monthTotal, 'lastYear':year-1, 'nextYear':year+1, 'year':year})
 
 ## Product Image views
 
@@ -508,6 +544,74 @@ def product_edit_items(request, product_pk):			# edit/add items to an existing p
     return render(request, "dashboard/product_items_add.html", {'product':product, 'item_formset':item_formset})
 
 
+def product_sell_now(request, item_pk):				# sell an item immediately (ish)
+    item = get_object_or_404(ProductItem, pk=item_pk)
+
+    if request.method == 'POST':
+        offline_sale_form = OfflineSaleForm(request.POST)
+        if offline_sale_form.is_valid():
+            qty = offline_sale_form.cleaned_data["quantity"]
+            if qty <= item.quantity_in_stock:				# sufficient stock to make sale
+                name =  offline_sale_form.cleaned_data.get("name", "")
+                if name == "":
+                    name = "Offline Sale"
+                order = Order(billing_name = name,
+                          billing_address = offline_sale_form.cleaned_data["address"],
+                          billing_postcode = offline_sale_form.cleaned_data["postcode"],
+                          delivery_name = name,
+                          delivery_address = offline_sale_form.cleaned_data["address"],
+                          delivery_postcode = offline_sale_form.cleaned_data["postcode"],
+                          email = offline_sale_form.cleaned_data["email"],
+			  postage_amount = Decimal(0.0),
+                          customer_notes = "")
+
+                order.save()
+
+                orderitem = OrderItem(item=item, 
+                              order=order,
+                              item_name=str(item),
+                              item_price=item.product.price,
+                              quantity_ordered=qty,
+                              quantity_allocated=0,
+                              quantity_delivered=0)
+
+                orderitem.save()
+
+                oh = OrderHistory(order=order, comment="Offline sale through dashboard")
+                oh.save()
+
+                Payment = get_payment_model()
+                payment = Payment.objects.create(
+                    order=order,
+                    variant='cash',  # this is the variant from PAYMENT_VARIANTS
+                    status='confirmed', 
+                    description='Boldmere Bullet Shop Purchase',
+                    total=order.amount_owing,
+                    captured_amount=order.amount_owing,
+                    tax=Decimal(0),
+                    currency='GBP',
+                    delivery=order.postage_amount,
+                    billing_first_name=name,
+                    billing_last_name='',
+                    billing_address_1=order.billing_address,
+                    billing_address_2='',
+                    billing_city='',
+                    billing_postcode=order.billing_postcode,
+                    billing_country_code='UK',
+                    billing_country_area='',
+                    customer_ip_address=get_client_ip(request))
+
+                orderitem.dispatch(qty) 
+                messages.success(request, "Purchase was recorded")
+
+                return redirect(reverse('dashboard:product-view', args=[item.product.pk]))
+            else:
+                offline_sale_form.add_error("quantity", "Cannot sell that amount")
+
+    else:
+        offline_sale_form = OfflineSaleForm()
+
+    return render(request, "dashboard/product_sell_now.html", {'item':item, 'offline_sale_form':offline_sale_form})
 
 
 ## Product Category views
@@ -616,33 +720,9 @@ def supplier_delivery(request, supplier_pk):
                 item = ProductItem.objects.get(pk=y)
                 qty_arrived = int(value)
 
-                to_allocate = min(qty_arrived, item.quantity_allocated_on_order) 	# how many do we have to allocate?
-                spare = max(0, qty_arrived - to_allocate)				# what's left from the order after allocations?
-
-                item.quantity_on_order = max(0, item.quantity_on_order - qty_arrived)	# can't go below zero on this
-                item.quantity_allocated_on_order = item.quantity_allocated_on_order - to_allocate  # this can't be above the amount we are tracking
-
-#                item.quantity_allocated = item.quantity_allocated + to_allocate		# TODO: This line is wrong
-                item.quantity_in_stock = item.quantity_in_stock + spare
-                
-                item.save()
-
-		# We need to create a page which tells us which Order(Item)(s) we have allocated this item to
-		# Step 1: sort OrderItems by oldest to newest, filtered on this Item 
-                orderitems_for_item = item.ordered_items.order_by('order__created').filter(quantity_ordered__gt=F('quantity_delivered')+F('quantity_allocated'))
-
-                for orderitem in orderitems_for_item:
-	             # Step 2: go over each of these until we've got rid of all of the items that arrived in the order.
-                    remaining_for_item = orderitem.quantity_ordered - (orderitem.quantity_delivered + orderitem.quantity_allocated)
-                    oi_to_allocate = min(remaining_for_item, to_allocate)
-                    print("We are allocating " + str(oi_to_allocate) + " of " + str(orderitem) + " (there were " + str(remaining_for_item) + " remaining)")
-                    if oi_to_allocate > 0:
-                        orderitem.quantity_allocated = orderitem.quantity_allocated + oi_to_allocate
-                        orderitem.save()
-                 
-                        allocations.append({'orderitem':orderitem, 'just_allocated':oi_to_allocate})
-                        to_allocate = to_allocate - oi_to_allocate
-                        print(" left to allocate = " + str(to_allocate))
+                allocations = item.stock_arrived(qty_arrived)
+                ph = ProductHistory(item=item, quantity=qty_arrived, event=ProductHistory.RECEIVED)
+                ph.save()
 
                 items_count = items_count + qty_arrived
 
@@ -688,6 +768,9 @@ def supplier_order(request, supplier_pk):
                     item.quantity_on_order = item.quantity_on_order + order_quantity
                     item.save()
                     items_count = items_count + order_quantity
+
+                    ph = ProductHistory(item=item, quantity=order_quantity, event=ProductHistory.ORDERED)
+                    ph.save()
 
         if saving:
             messages.success(request, 'Added %d items to order' % (items_count,))
@@ -776,21 +859,35 @@ class OrderDetail(DetailView):
         return context
 
 
-# despatch some items
-def order_items_despatch(request, pk):
+# dispatch some items
+def order_items_dispatch(request, pk):
     order = get_object_or_404(Order, pk=pk)
     
     if request.POST:
+        override = request.POST.get("override", False)
+        if (order.fully_paid != True) and (override == False):
+            # the order isnt fully paid - show a warning page with the items on it, plus the details of what has been paid for
+            items = {}
+            for key, value in request.POST.items():
+                if key.startswith("id-"):
+                    orderitem_pk = int(key[3:])
+                    orderitem = get_object_or_404(OrderItem, pk=orderitem_pk)
+                    qty = int(value)
+                    items[orderitem.pk] = qty
+  
+            return render(request, "dashboard/order_dispatch_unpaid.html", {'items':items, 'order':order})
+
+        # Ok to continue with dispatching items (order is fully paid, or admin has said to override)
         for key, value in request.POST.items():    # get all the items that got sent back to us
-            print(str(key) + " - " + str(value))
+           # print(str(key) + " - " + str(value))
             if key.startswith("id-"):
                orderitem_pk = int(key[3:])
                orderitem = get_object_or_404(OrderItem, pk=orderitem_pk)
 
-               orderitem.despatch(int(value))	# This has got safety checks in it.
+               orderitem.dispatch(int(value))	# This has got safety checks in it.
 
     
-        messages.success(request, 'Items were despatched')
+        messages.success(request, 'Items were dispatched')
     return redirect(reverse('dashboard:order', kwargs={'pk': order.pk}))
 
 
@@ -828,7 +925,102 @@ def order_cash_payment(request, pk):
         messages.success(request, "Cash payment was added to the order")
         return redirect(reverse('dashboard:order', kwargs={'pk': order.pk}))
 
-    return render(request, "dashboard/order_cash_payment.html", {'order':order})
+    return render(request, "dashboard/order_cash_payment.html", {'order': order})
+
+
+# Full cancellation of order - all allocated items back to stock, and full refund of money paid in
+def order_cancel(request, pk):			
+    order = get_object_or_404(Order, pk=pk)
+
+    if order.can_cancel != True:
+        messages.info(request, "This order cannot be cancelled")
+        return redirect(reverse('dashboard:order', kwargs={'pk': order.pk}))
+
+    # also - looks like you have to refund individual payments (or all of them in turn I guess... what to do about cash?)
+    if request.POST:
+        for payment in order.confirmed_payments().all():
+            if payment.variant == 'cash':
+                messages.info(request, "You must refund " + str(order.name) + " £" + str(payment.total) + " cash")
+                payment.change_status(PaymentStatus.REFUNDED)		# Have to do this manually as there's no cash variant in reality
+		# TODO: change captured amount to zero?
+            else:
+                payment.refund()
+ 
+        any_problems = False
+        for orderitem in order.items.all():			# cancel all of the items we have waiting
+            y = orderitem.cancel()
+            if y:
+                any_problems = True				
+
+        order.cancelled = True
+        order.save()
+
+        oh = OrderHistory(order=order, comment="Order cancelled")
+        oh.save()
+      
+        if any_problems:
+            messages.info(request, "Some items are already on order from a supplier!")
+        else:
+            messages.success(request, "Order was cancelled")
+
+        return redirect(reverse('dashboard:order', kwargs={'pk': order.pk}))
+
+
+    return render(request, "dashboard/order_cancel_confirm.html", {'order': order})
+
+
+def order_item_return(request, pk):		# Return an item from an order
+    orderitem = get_object_or_404(OrderItem, pk=pk)
+    
+    if request.POST:	
+        rif = ReturnItemForm(request.POST, orderitem=orderitem)
+        if rif.is_valid():
+		# process the return
+            amount = rif.cleaned_data["quantity"]
+            if amount > 0 and amount <= orderitem.quantity_delivered:
+                refund_amount = (orderitem.item_price * amount)
+                print("Need to refund " + str(refund_amount))
+                orderitem.refund(amount)		# return the items to stock
+		
+		# refund the requsite sum (refund_amount) - refund successful payments until we've paid back what we owe
+                refunded_amount = Decimal(0.00)
+                for payment in orderitem.order.confirmed_payments().all():
+                    if refunded_amount >= refund_amount:
+                        print("Have refunded enough!")
+                        break; # we have refunded enough!
+
+                    x = payment.captured_amount
+                    print("Found a payment of " + str(x))
+                    left_to_refund = refund_amount - refunded_amount
+                    print("there is " + str(left_to_refund) + " left to refund")
+                    if left_to_refund < x:
+                        x = left_to_refund
+
+                    if payment.variant == 'cash':
+                        messages.info(request, "You must refund " + str(orderitem.order.name) + " £" + str(x) + " cash")
+                        payment.change_status(PaymentStatus.REFUNDED)		# Have to do this manually as there's no cash variant in reality
+                    else:
+                        payment.refund(amount=x)		# do genuine refund via Paypal etc.
+                        messages.success(request, "£" + str(x) + " was refunded")
+
+                    refunded_amount += x
+                    print("Have now refunded " + str(refunded_amount))
+
+                m = str(amount) + " x " + str(orderitem.item_name) + " was successfully returned"
+                messages.success(request, m)
+
+                return redirect(reverse('dashboard:order', kwargs={'pk': orderitem.order.pk}))
+            else:
+                messages.warning(request, "Cannot return " + str(amount) + " of " + str(orderitem.item_name) + " - must be between 1 and " + str(orderitem.quantity_delivered))
+    else:
+        rif = ReturnItemForm(orderitem=orderitem)
+
+    cash = False
+    for payment in orderitem.order.confirmed_payments().all():
+        if payment.variant == 'cash':
+            cash = True						# BUG: UI vs code inconsistency
+    return render(request, "dashboard/order_return_item.html", {'orderitem': orderitem, 'form':rif, 'cash':cash})
+
 
 
 # Product allocations

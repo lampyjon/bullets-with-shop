@@ -1,0 +1,25 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Offline Sale</h1>
+          </div>
+<div>
+
+  <p>Sell up to {{ item.quantity_in_stock }} of <strong>{{ item }}</strong>. Name, address and email are optional.</p>
+
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+	 {% bootstrap_form offline_sale_form layout="horizontal" %} 
+                       <p class="text-right">
+			        <a class="btn btn-outline-primary" href="{% url 'dashboard:product-view' item.product.pk %}" role="button">Cancel</a>			
+                		<button type="submit" class="btn btn-primary">Create purchase</button>
+            		</p>
+        </form>
+
+
+
+</div>
+ {% endblock %} 

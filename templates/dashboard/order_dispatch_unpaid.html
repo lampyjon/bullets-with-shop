@@ -1,0 +1,48 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Dispatching items - {{ order }}</h1>
+          </div>
+<div>
+
+
+<form method="post" class="form-horizontal" action="{% url 'dashboard:order-items-dispatch' order.pk %}">
+            {% csrf_token %}
+	 	<p>You selected items to dispatch for {{ order }}, but there is still money outstanding on this order (&pound;{{order.amount_owing}}).</p>
+            		{% csrf_token %}
+			<input type="hidden" name="override" value="True">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>Status</th>
+						<th class="text-right">Qty. ordered</th>
+						<th class="text-right">Qty. ready to dispatch</th>
+						<th class="text-right">Qty. dispatched</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in order.dispatch_items.all %}
+					<tr>
+						<td class="align-middle">{{item.item_name}}</td>
+						<td class="align-middle">{{item.status}}</td>
+						<td class="align-middle text-right">{{item.quantity_ordered}}</td>
+						<td class="align-middle text-right">{{item.quantity_allocated}}</td>
+						<td class="align-middle"><input name="id-{{item.pk}}" class="form-control form-control-sm" type="number" value="{{item.quantity_allocated}}" min="0" max="{{item.quantity_allocated}}"></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+				<a class="btn btn-outline-primary btn-block mb-3" href="{% url 'dashboard:order' order.pk %}" role="button">cancel</a>	
+			{% if  order.dispatch_items.all.count > 0 %}
+				<button type="submit" class="btn btn-primary btn-block mb-3">Dispatch Items!</button>
+			{% endif %}
+
+		</form>
+
+
+</div>
+ {% endblock %} 

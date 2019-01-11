@@ -23,8 +23,6 @@ shop_patterns = ([
    
     path('checkout/pay/<int:payment_id>', views.payment_details, name='pay'),
     path('checkout/pay/success/<uuid:uuid>', views.payment_success, name='payment-success'),
-
-    path('payments', include('payments.urls'))
 ], 'shop')
 
 
@@ -38,11 +36,15 @@ dashboard_patterns = ([
     path('products/add/supplier/<int:supplier_pk>', views.product_create, name='product-add-supplier'),
 
     path('products/edit/<int:product_pk>', views.product_create, name='product-edit'),
-  
     path('products/view/<int:product_pk>', views.product_view, name='product-view'),
+    path('products/sell-now/<int:item_pk>', views.product_sell_now, name='product-sell-now'),
 
     path('products/<int:product_pk>/items/edit', views.product_edit_items, name='product-edit-items'),
     path('products/<int:product_pk>/pictures/add', views.product_picture_create, name='product-picture-add'),
+
+    path('products/<int:product_pk>/analytics', views.product_analytics, name='product-analytics'),
+    path('products/<int:product_pk>/<int:year>/analytics', views.product_analytics, name='product-analytics'),
+
 
 
     path('orders', views.order_list, {'status':'all'}, name='orders'),
@@ -51,9 +53,11 @@ dashboard_patterns = ([
     path('orders/unpaid', views.order_list, {'status':'unpaid'}, name='orders-unpaid'),
 
     path('orders/<int:pk>/view', views.OrderDetail.as_view(), name='order'),
-    path('orders/<int:pk>/items-despatch', views.order_items_despatch, name='order-items-despatch'),
+    path('orders/<int:pk>/items-dispatch', views.order_items_dispatch, name='order-items-dispatch'),
     path('orders/<int:pk>/add-comment', views.order_comment, name='order-comment'),
     path('orders/<int:pk>/cash-payment', views.order_cash_payment, name='order-pay-cash'),
+    path('orders/<int:pk>/cancel', views.order_cancel, name='order-cancel'),
+    path('orders/item/<int:pk>/return', views.order_item_return, name='order-item-return'),
 
 
     path('categories', views.CategoryList.as_view(), name='categories'),
@@ -92,6 +96,7 @@ dashboard_patterns = ([
 urlpatterns = [
     path("", include(shop_patterns)),
     path("dashboard/", include(dashboard_patterns)),
+    path('payments', include('payments.urls')),
 ]
 
  

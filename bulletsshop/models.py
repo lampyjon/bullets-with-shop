@@ -121,11 +121,11 @@ class Product(models.Model):
         else:
             return x.image.url
 
-   
-
     def __str__(self):
         return self.name
 
+    def get_history(self): 	# TODO: date range filter?
+        return ProductHistory.objects.filter(item__product=self)
 
 
 
@@ -134,7 +134,7 @@ class ProductItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='items')
     extra_text = models.CharField("Item Name", max_length=500, blank=True, null=True)	# this is where sizes, colours, variations on the main Product go
 
-#   TODO: display_order
+#   TODO: display_order??
 
     quantity_in_stock = models.IntegerField(
         validators=[MinValueValidator(0)], default=Decimal(1))		# amount we physically have available to sell
@@ -149,8 +149,6 @@ class ProductItem(models.Model):
 
     # TODO - allow deep linking to just a productitem (eg. to just large t-shirts) - slug/id maybe? or slug/slug ???
 
-
-
     OK_TO_BUY_NOW = 1
     OK_TO_BUY_OR_ORDER = 2
     CANNOT_BUY = 3
@@ -163,12 +161,12 @@ class ProductItem(models.Model):
         # to_order = amount we need to put in a future order
 
     def order_or_allocate(self, quantity):
-        if quantity <= self.quantity_in_stock:			# we can just allocate this many items - Easy!
+        if quantity <= self.quantity_in_stock:				# we can just allocate this many items - Easy!
             return (self.OK_TO_BUY_NOW, quantity, 0, 0)
         
         if quantity <= (self.quantity_in_stock + self.spare_in_order):   # we can allocate from a mixture of on order and spare items
-            from_stock = self.quantity_in_stock		# allocate all of the stock first
-            from_order = (quantity - from_stock)        # what's left comes from the on-order stuff
+            from_stock = self.quantity_in_stock				 # allocate all of the stock first
+            from_order = (quantity - from_stock)        		 # what's left comes from the on-order stuff
             return (self.OK_TO_BUY_OR_ORDER, from_stock, from_order, 0)
 
         # if we get here, we have to make up the rest of the order by ordering more from a supplier
@@ -185,12 +183,10 @@ class ProductItem(models.Model):
     def quantity_allocated(self):
         # sum all of the qty allocated for all orderitems for this item
         x = self.ordered_items.aggregate(Sum('quantity_allocated'))
-        print(str(x))
         if x['quantity_allocated__sum']:
             return x['quantity_allocated__sum']
         else:
             return 0
-
 
     @property
     def spare_in_order(self):
@@ -203,6 +199,87 @@ class ProductItem(models.Model):
             return str(self.product) + " - " + str(self.extra_text)
 
 
+    def stock_returned(self, quantity_ordered, quantity_allocated):	# an order is being cancelled, and this many items have just been freed up.
+	# returns how many items have been ordered from the supplier that will be problematic now
+	# quantity_ordered = how many items were in the original order
+	# quantity_allocated = how much stock we'd assigned to this order (difference between two = stuff that is potentially on order from supplier)
+	# can only change quantity_to_order (as order has not yet been made with supplier) 
+	#  and quantity_allocated_on_order (to show fewer items allocated in the order). 
+	# Do quantity_to_order first, then deducted any left from quantity_allocated_on_order (and return this difference as a problem)
+
+        # qto = 1, qao = 0, qbo = 1      qto -> 0, qao = 0, problem = 0    			nqto = 0, rqoo = 0
+        # qto = 1, qao = 1, qbo = 1      qto -> 0, qao = 1, problem = 0				nqto = 0, rqoo = 0
+        # qto = 2, qao = 0, qbo = 1      qto -> 1, qao = 0, problem = 0				nqto = 1, rqoo = 0
+        # qto = 1, qao = 0, qbo = 2      qto -> 0, qao = 0, problem = 1   (can't happen???)	nqto = 0, rqoo = 1
+        # qto = 0, qao = 1, qbo = 1      qto = 0, qao -> 0, problem = 1				
+        # qto = 0, qao = 2, qbo = 1      qto = 0, qao -> 1, problem = 1
+        # qto = 1, qao = 1, qbo = 2      qto -> 0, qao -> 0, problem = 1  ('problem' is whatever qao should change by)
+        # qto = 3, qao = 5, qbo = 4      qto -> 0, qao -> 4, problem = 1			nqto = 0, rqoo = 1
+
+        self.quantity_in_stock += quantity_allocated
+
+        quantity_being_ordered = quantity_ordered - quantity_allocated			# what must be on order (or to go on order) from a supplier
+
+        new_quantity_to_order = max(0, self.quantity_to_order - quantity_being_ordered)	# take stuff off of future orders first
+        reduce_quantity_on_order_by = max(0, quantity_being_ordered - self.quantity_to_order)
+        new_quantity_allocated_on_order = max(0, self.quantity_allocated_on_order - reduce_quantity_on_order_by)
+
+        self.quantity_allocated_on_order = new_quantity_allocated_on_order
+        self.quantity_to_order = new_quantity_to_order
+        self.save()
+
+	# now distribute stock to existing orders
+        self.allocate_stock_to_orders()
+        return reduce_quantity_on_order_by
+
+
+
+    def stock_arrived(self, qty_arrived):
+        # add stock into the inventory and then try and distribute to existing orders
+
+        to_allocate = min(qty_arrived, self.quantity_allocated_on_order) 			# how many do we have to allocate?
+        spare = max(0, qty_arrived - to_allocate)						# what's left from the order after allocations?
+
+        self.quantity_on_order = max(0, self.quantity_on_order - qty_arrived)			# can't go below zero on this
+        self.quantity_allocated_on_order = self.quantity_allocated_on_order - to_allocate  	# this can't be above the amount we are tracking
+        self.quantity_in_stock = self.quantity_in_stock + qty_arrived				# Push stock up by the amount that just arrived
+                
+        self.save()		
+	
+	# Now distribute stock to existing orders
+        return self.allocate_stock_to_orders()
+
+
+
+    def allocate_stock_to_orders(self):		# When stock arrives, try to allocate as much as possible to orders, oldest first
+        allocations = [] 
+       	# Step 1: sort OrderItems by oldest to newest, filtered on this Item 
+        orderitems_for_item = self.ordered_items.order_by('order__created').filter(quantity_ordered__gt=F('quantity_delivered')+F('quantity_allocated')+F('quantity_refunded'))
+
+	# TODO: I think this might allocate stock to unpaid orders. Might need sanity check in here.
+	# TODO: need to check above for refunded items confusing things.
+
+        for orderitem in orderitems_for_item:
+	    # Step 2: go over each of these until we've got rid of all of the items that arrived in the order.
+            remaining_for_item = orderitem.quantity_ordered - (orderitem.quantity_delivered + orderitem.quantity_allocated + orderitem.quantity_refunded)
+            oi_to_allocate = min(remaining_for_item, self.quantity_in_stock)
+            if oi_to_allocate > 0:
+                orderitem.quantity_allocated = orderitem.quantity_allocated + oi_to_allocate
+                orderitem.save()
+
+                oh = OrderHistory(order=orderitem.order, comment=str(oi_to_allocate) + " x " + str(orderitem.item_name) + " - allocated")
+                oh.save()
+
+                self.quantity_in_stock -= oi_to_allocate
+                self.save()
+                 
+                allocations.append({'orderitem':orderitem, 'just_allocated':oi_to_allocate})
+         
+        return allocations
+
+
+
+
 # Pictures of products - associated with product-level things
 class ProductPicture(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='pictures')
@@ -212,23 +289,49 @@ class ProductPicture(models.Model):
     )
 
 
+# track the history of sales and stock on particular products
+class ProductHistory(models.Model):
+    created = models.DateTimeField("Date Time", auto_now_add=True)
+    item = models.ForeignKey(ProductItem, on_delete=models.CASCADE, related_name='history')
+    
+    CREATED = 'c'
+    DISPATCHED = 'd'
+    ORDERED = 'o'
+    RECEIVED = 'r'
+    REFUNDED = 'x'
+
+    EVENT_CHOICES = (
+        (CREATED, "Created"),
+        (DISPATCHED, "Dispatched to customer"),
+        (ORDERED, "Ordered from supplier"),
+        (RECEIVED, "Received from supplier"), 
+        (REFUNDED, "Refunded"),
+        )
+
+    event = models.CharField("Event",
+        max_length=1,
+        choices=EVENT_CHOICES,
+        default=CREATED,
+        )
+    quantity = models.IntegerField(default=0)
+	
+    	# what events could occur? 
+   	# 	Product created (with x in stock)
+	#	Product given to customer (x to customer)
+	# 	Product ordered from supplier (x ordered)
+	# 	Product received from supplier (x received)
+	#	Product returned (x returned)
+    
+    class Meta:
+        ordering = ['-created']
+
+    def __str__(self):
+        return str(self.item) + " " + self.get_event_display() + " (" + str(self.quantity) + ")"
+
+
 ################################################ ORDER RELATED MODELS ################################################
 
 class Order(models.Model):
-    STATUS_UNPAID = "U"
-    STATUS_PAID = "P"
-    STATUS_COMPLETE = "C"
-    STATUS_CANCELLED = "X"
-    STATUS_REFUNDED = "R"
-   
-    ORDER_STATUS_CHOICES = (
-        (STATUS_UNPAID, "Not paid"),
-        (STATUS_PAID, "Paid"),
-        (STATUS_COMPLETE, "Complete"),
-        (STATUS_CANCELLED, "Cancelled"),
-        (STATUS_REFUNDED, "Refunded"),
-        )
-
     billing_name = models.CharField("Billing Name", max_length=500)				# billing name for order
     billing_address = models.TextField("Billing Address", blank=True)				# billing address 
     billing_postcode = models.CharField("Billing Postcode", max_length=8)			# billing postcode
@@ -248,10 +351,10 @@ class Order(models.Model):
 
     unique_ref =  models.UUIDField("random uuid for email links", default=uuid.uuid4, editable=False) # random UUID for emails
 
-#    status = models.CharField("Status", max_length=1, choices=ORDER_STATUS_CHOICES, default=STATUS_UNPAID)
+    cancelled = models.BooleanField("Cancelled?", default=False)					# Is this order cancelled? 
 
     def __str__(self):
-        return "Order #" + str(self.pk) + " for " + str(self.name)
+        return "Purchase #" + str(self.pk) + " for " + str(self.name)
 
     @property
     def name(self):
@@ -260,20 +363,19 @@ class Order(models.Model):
         else:
             return self.billing_name
 
-
     @property
-    def grand_total(self):
+    def grand_total(self):					# grand total (inc. postage)
         return self.total + self.postage_amount
 
-    @property
-    def total(self):
+    @property			
+    def total(self):						# subtotal (without any postage)
         total = Decimal(0)
         for item in self.items.all():
             total = total + item.line_price
         return total
 
     @property
-    def items_in_order(self):
+    def items_in_order(self):					# total number of items that have been purchased
         x = self.items.aggregate(Sum('quantity_ordered'))
         return x['quantity_ordered__sum'] 
 
@@ -282,19 +384,25 @@ class Order(models.Model):
         return self.items.filter(item_postage_requred=True).exists()
 
     @property
-    def amount_owing(self):
+    def amount_owing(self):					# what is left to pay on this order?
         return self.grand_total - self.amount_paid()
 
-    def amount_paid(self):		# How much money has been paid on this order?
+    def amount_paid(self):					# How much money has been paid on this order?
         total = 0
-        for payment in self.payments.filter(status=PaymentStatus.CONFIRMED):
+        for payment in self.confirmed_payments():
             total = total + payment.total
 
         return total
  
-    @property				# Is this order completely paid for?
+    @property							# Is this order completely paid for?
     def fully_paid(self):
         return self.amount_paid() == self.grand_total
+
+    @property
+    def items_ready_to_dispatch(self):		# How many items can we give out right now
+        items = self.dispatch_items()
+        qty_to_dispatch = items.aggregate(Sum('quantity_allocated'))['quantity_allocated__sum']
+        return qty_to_dispatch or 0
 
     @property				# How many items are left to give out on this order?		
     def outstanding_item_count(self):
@@ -303,17 +411,64 @@ class Order(models.Model):
 
         ordered_qty = ordered['quantity_ordered__sum']
         delivered_qty = delivered['quantity_delivered__sum']
-        return (ordered_qty - delivered_qty)
+        return (ordered_qty - delivered_qty)		# TODO - take off refunded items too?
+
+    @property				# How many items are we waiting for stock on?
+    def total_waiting_for_stock(self):
+        on_order = self.on_order_items().aggregate(total=Sum(F('quantity_ordered') - F('quantity_allocated') - F('quantity_delivered') - F('quantity_refunded')))
+        waiting_for_stock = on_order['total']        
+        return waiting_for_stock or 0
+ 
+      
+    @property
+    def can_cancel(self):		# Can we cancel this order? Yes, if fully paid and no items dispatched / refunded
+        if self.fully_paid and (self.dispatched_items().count() == 0) and (self.refunded_items().count() == 0):
+            return True
+        else:
+            return False
+
+
+    @property
+    def status(self):
+        if self.cancelled:
+            return "Cancelled"
+        elif self.fully_paid != True:
+            return "Waiting payment"
+        elif self.items_ready_to_dispatch > 0:
+            return "Items ready to dispatch"
+        elif self.total_waiting_for_stock > 0:
+            return "Waiting for stock"
+        elif self.outstanding_item_count > 0:
+            return "Processing"
+        else:
+            return "Complete"
     
+
 # some helper methods to return filtered querysets 
-    def despatch_items(self):				# All items waiting to be given out / despatched
-        return self.items.filter(quantity_ordered__gt=F('quantity_delivered'), quantity_allocated__gt=0)
+    def dispatch_items(self):				# All items waiting to be given out / dispatched
+        if self.fully_paid:
+            return self.items.filter(quantity_ordered__gt=F('quantity_delivered'), quantity_allocated__gt=0)
+        else:
+            return self.items.none()
 
     def on_order_items(self):				# All items we are waiting on stock for
-        return self.items.filter(quantity_allocated__lt=F('quantity_ordered')-F('quantity_delivered'))
+        if self.fully_paid:
+            return self.items.filter(quantity_allocated__lt=F('quantity_ordered')-F('quantity_delivered')-F('quantity_refunded'))
+        else:
+            return self.items.none()
 
-    def despatched_items(self):				# All items we have given out to the purchaser
+    def dispatched_items(self):				# All items we have given out to the purchaser
         return self.items.filter(quantity_delivered__gt=0)
+
+    def refunded_items(self):				# All items we have returned & refunded
+        return self.items.filter(quantity_refunded__gt=0)
+
+    def confirmed_payments(self):			# All confirmed payments (only ones that can be refunded)
+        return self.payments.filter(status=PaymentStatus.CONFIRMED)
+
+
+
+
 
 
 
@@ -329,9 +484,9 @@ class OrderItem(models.Model):
     quantity_ordered = models.IntegerField(
         validators=[MinValueValidator(0)], default=Decimal(0))					# what was ordered originally
     quantity_allocated= models.IntegerField(
-        validators=[MinValueValidator(0)], default=Decimal(0))					# what is allocated, but not yet delivered
+        validators=[MinValueValidator(0)], default=Decimal(0))					# what is physically allocated, but not yet delivered
     quantity_delivered = models.IntegerField(
-        validators=[MinValueValidator(0)], default=Decimal(0))					# what was supplied
+        validators=[MinValueValidator(0)], default=Decimal(0))					# what was supplied to customer
     quantity_refunded = models.IntegerField(
         validators=[MinValueValidator(0)], default=Decimal(0))					# what has been refunded
  
@@ -345,13 +500,17 @@ class OrderItem(models.Model):
     # helper to adjust status when we ship stuff
     @property
     def status(self):
-        if self.quantity_refunded == 0:
+        if self.quantity_ordered == 0:
+            return "Cancelled"
+        elif self.quantity_refunded == 0:
             if self.quantity_ordered == self.quantity_delivered:
-                return "Fully despatched"
+                return "Fully dispatched"
+            elif self.order.fully_paid != True:		# this feels most natural place to display that order isn't fully paid
+                return "Awaiting payment"
             elif self.quantity_delivered > 0:
-                return "Partially despatched"
+                return "Partially dispatched"
             elif self.quantity_allocated > 0:
-                return "Ready to despatch"
+                return "Ready to dispatch"
             else:
                 return "Waiting for stock"
         elif self.quantity_refunded == self.quantity_ordered:
@@ -361,27 +520,85 @@ class OrderItem(models.Model):
         
     @property
     def left_to_deliver(self):
-        return self.quantity_ordered - self.quantity_delivered 
+        return self.quantity_ordered - (self.quantity_delivered + self.quantity_refunded)
 
-    def despatch(self, quantity):    # mark this many of the item as despatched (move them from allocated to delivered)
+
+    @property
+    def unallocated(self):
+        return self.quantity_ordered - self.quantity_delivered - self.quantity_allocated - self.quantity_refunded
+
+
+    def dispatch(self, quantity):    # mark this many of the item as dispatched (move them from allocated to delivered)
         if (quantity > 0) and (quantity <= self.left_to_deliver):
-            self.quantity_delivered = self.quantity_delivered + quantity
-            self.quantity_allocated = self.quantity_allocated - quantity
+            self.quantity_delivered = F('quantity_delivered') + quantity
+            self.quantity_allocated = F('quantity_allocated') - quantity
             self.save()
 
-            m = str(quantity) + " x " + str(self) + " - despatched"
-            oh = OrderHistory(order=self.order, comment=m)
+            m = str(quantity) + " x " + str(self.item_name) + " - dispatched"
+            oh = OrderHistory(order=self.order, comment=m)		# Create a history entry for this item
             oh.save()
-	    # TODO: log this as a history item
+            ph = ProductHistory(item=self.item, quantity=quantity, event=ProductHistory.DISPATCHED)
+            ph.save()
 
 
+    # cancel this order item and return allocated items to stock etc (before items are delivered to customer)
+    def cancel(self):
+        amount = self.quantity_allocated
+        m = str(self.quantity_ordered) + " x " + str(self.item_name) + " - cancelled "
+        
+        if self.item:
+            problem_items = self.item.stock_returned(self.quantity_ordered, self.quantity_allocated)	
+            m = m + "and " + str(amount) + " returned to stock"
+        else:
+            m = m + ", " + str(amount) + " NOT returned to stock (item no longer exists!)"
+            problem_items = 0
+       
+        self.quantity_allocated = 0
+ #       self.quantity_ordered = 0	
+        self.save()
+
+        oh = OrderHistory(order=self.order, comment=m)
+        oh.save()
+ 
+        if problem_items > 0:
+            oh = OrderHistory(order=self.order, comment="!!! Items on order !!! " + str(problem_items) + " are already on order from the supplier")
+            oh.save()
+
+        return (problem_items > 0)
+
+
+    def refund(self, amount=None):		# mark <amount> of item as refunded & return items to stock (all if amount is unset)
+        if amount == None or amount > self.quantity_ordered:
+            amount = self.quantity_ordered
+
+        self.quantity_delivered = self.quantity_delivered - amount		# Change allocation of items on this order item
+        self.quantity_refunded = self.quantity_refunded + amount
+        self.save()
+
+	# also return the item into stock
+
+        m = str(amount) + " x " + str(self.item_name) + " - refunded "
+
+        if self.item:
+            self.item.quantity_in_stock = self.item.quantity_in_stock + amount
+            self.item.save()
+            m = m + "and returned to stock"
+        else:
+            m = m + "NOT returned to stock (item no longer exists!)"
+       
+        oh = OrderHistory(order=self.order, comment=m)
+        oh.save()
+        ph = ProductHistory(item=self.item, quantity=amount, event=ProductHistory.REFUNDED)
+        ph.save()
+  
 
 class OrderHistory(models.Model):
     created = models.DateTimeField("Date Time", auto_now_add=True)
     comment = models.CharField("Comment", max_length=500, blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='comments')
 
-    # TODO: maybe create automatically based on post_save signal?
+    class Meta:
+        ordering = ['-created']
 
 
 ################################################ BASKET RELATED MODELS ################################################

@@ -1,0 +1,92 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Return Item - {{ orderitem.item_name }}</h1>
+          </div>
+
+<div>
+
+  <p>You are marking <em>{{ orderitem.item_name }}</em> as a returned item in order {{ orderitem.order }}.</p>
+
+  <p>The per item cost was <strong>&pound;{{orderitem.item_price}}</strong>.</p>
+  <p>{{ orderitem.quantity_ordered }} were originally ordered.</p>
+  <p>{{ orderitem.quantity_delivered }} {{ orderitem.quantity_delivered|pluralize:"has,have" }} been delivered to {{ orderitem.order.name }}.</p>
+  <p>{{ orderitem.quantity_refunded }} {{ orderitem.quantity_refunded|pluralize:"has,have"  }} been returned previously.</p>
+
+  <form method="post" id="returnForm" class="form-horizontal" >
+            {% csrf_token %}
+	 	{% bootstrap_form form layout="horizontal" %} 
+                        <p class="text-right">	
+				<a class="btn btn-outline-primary" href="{% url 'dashboard:order' orderitem.order.pk %}" role="button">cancel</a>	
+                		<button type="submit" id="returnButton" class="btn btn-primary">Return item</button>
+            		</p>
+        </form>
+
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Refund Information</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>By returning <span id="q">number</span> of {{ orderitem.item_name }}, a refund of &pound;<span id="t">0.00</span> 
+{% if cash %}<strong>will need to be returned via cash</strong>{%else%}will be returned via PayPal{%endif%} when you click "Make return".</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">edit</button>
+        <button type="button" id="realSubmit" class="btn btn-primary">Make return</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+ {% endblock %} 
+
+
+{% block extrafooter %}
+
+<script>
+
+var doSubmit = false;
+
+$('#returnForm').submit(function( event ) {
+   if (doSubmit) {
+	console.log("Sending form");
+      	return;
+  } else {
+ 	var p = {{orderitem.item_price}};
+  	var q = $('#id_quantity').val();
+  	var t = q * p;
+  	console.log("Return " + t + " via paypal");
+
+  	$("#q").text(q);
+  	$("#t").text(t);
+
+  	$('#exampleModal').modal('show');
+  	event.preventDefault();
+	console.log("preventing submission");
+    }
+});
+
+
+$("#realSubmit").click(function() {
+	console.log("Really submitting");
+  	$('#exampleModal').modal('hide');
+  	doSubmit = true;
+ 	$( "#returnForm" ).submit();
+
+});    
+
+
+
+</script>
+
+{% endblock %}

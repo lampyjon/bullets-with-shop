@@ -12,16 +12,19 @@
     <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Order</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="despatch-tab" data-toggle="tab" href="#despatch" role="tab" aria-controls="profile" aria-selected="false">Items to despatch  <span class="badge badge-primary">{{ order.despatch_items.count }}</span></a>
+    <a class="nav-link" id="dispatch-tab" data-toggle="tab" href="#dispatch" role="tab" aria-controls="profile" aria-selected="false">Items to dispatch  <span class="badge badge-primary">{{ order.dispatch_items.count }}</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="order-tab" data-toggle="tab" href="#order" role="tab" aria-controls="contact" aria-selected="false">Items waiting for stock <span class="badge badge-primary">{{ order.on_order_items.count }}</span></a>
+    <a class="nav-link" id="order-tab" data-toggle="tab" href="#order" role="tab" aria-controls="contact" aria-selected="false">Items waiting for stock <span class="badge badge-primary">{{ order.total_waiting_for_stock }}</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="despatched-tab" data-toggle="tab" href="#despatched" role="tab" aria-controls="contact" aria-selected="false">Items despatched</a>
+    <a class="nav-link" id="dispatched-tab" data-toggle="tab" href="#dispatched" role="tab" aria-controls="contact" aria-selected="false">Items dispatched <span class="badge badge-secondary"><span>{{order.dispatched_items.count }}</span></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="refund-tab" data-toggle="tab" href="#refund" role="tab" aria-controls="contact" aria-selected="false">Items refunded</a>
+    <a class="nav-link" id="refund-tab" data-toggle="tab" href="#refund" role="tab" aria-controls="contact" aria-selected="false">Items refunded  <span class="badge badge-secondary"><span>{{order.refunded_items.count }}</span></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="payments-tab" data-toggle="tab" href="#payments" role="tab" aria-controls="contact" aria-selected="false">Payments</a>
   </li>
 
 </ul>
@@ -90,7 +93,7 @@
 				<tbody>
 					{% for history in order.comments.all %}
 				    <tr>
-					<td>{{ history.created|date:"d/m/y H:m:s" }}</td>
+					<td>{{ history.created|date:"d/m/y H:i:s" }}</td>
 					<td>{{ history.comment }}</td>
 				    </tr>
 					{% endfor %}
@@ -150,6 +153,9 @@
 			{% endfor %}
 			</tbody>
 		</table>
+		{% if order.can_cancel %}
+		<a href="{% url 'dashboard:order-cancel' order.pk %}" class="btn btn-outline-danger btn-block btn-sm">Refund & cancel order</a>
+		{% endif %}
 		</div>
 	</div>
 
@@ -161,8 +167,8 @@
 </div>
 
 
-  <div class="tab-pane fade" id="despatch" role="tabpanel" aria-labelledby="despatch-tab">
-		<form method="post" class="form-horizontal" action="{% url 'dashboard:order-items-despatch' order.pk %}">
+  <div class="tab-pane fade" id="dispatch" role="tabpanel" aria-labelledby="dispatch-tab">
+		<form method="post" class="form-horizontal" action="{% url 'dashboard:order-items-dispatch' order.pk %}">
             		{% csrf_token %}
 
 			<table class="table">
@@ -170,13 +176,13 @@
 					<tr>
 						<th>Item</th>
 						<th>Status</th>
-						<th class="text-right">Qty. ordered</th>
-						<th class="text-right">Qty. ready to despatch</th>
-						<th class="text-right">Qty. despatched</th>
+						<th class="text-right">Qty. purchased</th>
+						<th class="text-right">Qty. ready to dispatch</th>
+						<th class="text-right">Qty. dispatched</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for item in order.despatch_items.all %}
+					{% for item in order.dispatch_items.all %}
 					<tr>
 						<td class="align-middle">{{item.item_name}}</td>
 						<td class="align-middle">{{item.status}}</td>
@@ -187,8 +193,8 @@
 					{% endfor %}
 				</tbody>
 			</table>
-			{% if  order.despatch_items.all.count > 0 %}
-			<button type="submit" class="btn btn-primary btn-block mb-3">Despatch Items!</button>
+			{% if  order.dispatch_items.all.count > 0 %}
+			<button type="submit" class="btn btn-primary btn-block mb-3">Dispatch Items!</button>
 			{% endif %}
 
 		</form>
@@ -201,23 +207,22 @@
 				<thead>
 					<tr>
 						<th>Item</th>
-						<th>Status</th>
-						<th class="text-right">Qty. ordered</th>
+						<th class="text-right">Qty. purchased</th>
 						<th class="text-right">Qty. delivered</th>
-						<th class="text-right">Qty. on order</th>
-						<th class="text-right">Qty. to order</th>
+						<th class="text-right">Qty. allocated</th>
+						<th class="text-right">Qty. needed</th>
+						<th class="text-right">Qty. on order from supplier</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for item in order.on_order_items.all %}
 					<tr>
 						<td class="align-middle">{{item.item_name}}</td>
-						<td class="align-middle">{{item.status}}</td>
 						<td class="align-middle text-right">{{item.quantity_ordered}}</td>
 						<td class="align-middle text-right">{{item.quantity_delivered}}</td>
+						<td class="align-middle text-right">{{item.quantity_allocated}}</td>
+						<td class="align-middle text-right">{{item.unallocated}}</td>
 						<td class="align-middle text-right">{{item.item.quantity_on_order}}</td>
-						<td class="align-middle text-right">{{item.item.quantity_to_order}}</td>
-
 					</tr>
 					{% endfor %}
 				</tbody>
@@ -226,8 +231,34 @@
 
   </div>
 
-  <div class="tab-pane fade" id="despatched" role="tabpanel" aria-labelledby="despatched-tab">
+  <div class="tab-pane fade" id="dispatched" role="tabpanel" aria-labelledby="dispatched-tab">
 
+	<table class="table">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>Status</th>
+						<th class="text-right">Qty. purchased</th>
+						<th class="text-right">Qty. delivered</th>
+						<th class="text-right">Qty. remaining</th>
+ 						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in order.dispatched_items.all %}
+					<tr>
+						<td class="align-middle">{{item.item_name}}</td>
+						<td class="align-middle">{{item.status}}</td>
+						<td class="align-middle text-right">{{item.quantity_ordered}}</td>
+						<td class="align-middle text-right">{{item.quantity_delivered}}</td>
+						<td class="align-middle text-right">{{item.left_to_deliver}}</td>
+						<td class="align-middle"><a href="{% url 'dashboard:order-item-return' item.pk %}" class="btn-secondary btn-sm">Return</a></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+  </div>
+ <div class="tab-pane fade" id="refund" role="tabpanel" aria-labelledby="refund-tab">
 	<table class="table">
 				<thead>
 					<tr>
@@ -235,26 +266,51 @@
 						<th>Status</th>
 						<th class="text-right">Qty. ordered</th>
 						<th class="text-right">Qty. delivered</th>
-						<th class="text-right">Qty. on order</th>
+						<th class="text-right">Qty. refunded</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for item in order.despatched_items.all %}
+					{% for item in order.refunded_items.all %}
 					<tr>
 						<td class="align-middle">{{item.item_name}}</td>
 						<td class="align-middle">{{item.status}}</td>
 						<td class="align-middle text-right">{{item.quantity_ordered}}</td>
 						<td class="align-middle text-right">{{item.quantity_delivered}}</td>
-						<td class="align-middle text-right">{{item.item.quantity_on_order}}</td>
+						<td class="align-middle text-right">{{item.quantity_refunded}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+	</table>
+  </div>
+
+  <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
+	<p>Details of payments made and refunded on this order</p>
+	<table class="table">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Date</th>
+						<th>Status</th>
+						<th>Variant</th>
+						<th>Fraud Status</th>
+ 						<th>Amount</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for payment in order.payments.all %}
+					<tr>
+						<td>{{payment.id}}</td>
+						<td>{{payment.created}}</td>
+						<td>{{payment.get_status_display}}</td>
+						<td>{{payment.variant}}</td>
+						<td>{{payment.get_fraud_status_display}}</td>
+						<td class="align-right">&pound;{{payment.total }}</td>
 					</tr>
 					{% endfor %}
 				</tbody>
 			</table>
-
   </div>
- <div class="tab-pane fade" id="refund" role="tabpanel" aria-labelledby="refund-tab">
 
-  </div>
 
 
 </div>

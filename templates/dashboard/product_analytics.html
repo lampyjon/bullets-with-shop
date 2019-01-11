@@ -1,0 +1,83 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">{{ product }} - Analytics </h1><a href="{% url 'dashboard:product-view' product.pk  %}" class="float-right btn btn-outline-primary btn-sm">view product</a>
+          </div>
+
+	<h4 class="h4">Items dispatched per month</h4>
+
+			<table class="table table-sm">
+				<thead class="thead-light">
+				   <tr>
+					<th></th>
+				 	<th class="text-left"><a href="{% url 'dashboard:product-analytics' product.pk lastYear %}"><span>&laquo;</span></a></th>
+					<th colspan="10" class="text-center">{{ year }}</th>
+					<th class="text-right"><a href="{% url 'dashboard:product-analytics' product.pk nextYear %}"><span>&raquo;</span></a></th>
+					<th></th>
+				   </tr>
+  				   <tr>
+					<th>Item</th>
+					<th style="width: 7%" class="text-right">Jan</th>
+					<th style="width: 7%" class="text-right">Feb</th>
+					<th style="width: 7%" class="text-right">Mar</th>
+					<th style="width: 7%" class="text-right">Apr</th>
+					<th style="width: 7%" class="text-right">May</th>
+					<th style="width: 7%" class="text-right">Jun</th>
+					<th style="width: 7%" class="text-right">Jul</th>
+					<th style="width: 7%" class="text-right">Aug</th>
+					<th style="width: 7%" class="text-right">Sep</th>
+					<th style="width: 7%" class="text-right">Oct</th>
+					<th style="width: 7%" class="text-right">Nov</th>
+					<th style="width: 7%" class="text-right">Dec</th>
+					<th style="width: 7%" class="text-right">Total</th>
+				   </tr>
+				</thead>
+				<tbody>
+					{% for item, months in items.items %}
+						<tr>
+							<th>{% if product.no_options %}{{product.name}}{% else %}{{ item.extra_text }}{% endif %}</th>
+							<td class="text-right">{{ months.Jan }}</td>
+							<td class="text-right">{{ months.Feb }}</td>
+							<td class="text-right">{{ months.Mar }}</td>							
+							<td class="text-right">{{ months.Apr }}</td>
+							<td class="text-right">{{ months.May }}</td>
+							<td class="text-right">{{ months.Jun }}</td>
+							<td class="text-right">{{ months.Jul }}</td>							
+							<td class="text-right">{{ months.Aug }}</td>
+							<td class="text-right">{{ months.Sep }}</td>
+							<td class="text-right">{{ months.Oct }}</td>
+							<td class="text-right">{{ months.Nov }}</td>
+							<td class="text-right">{{ months.Dec }}</td>
+							<td class="text-right">{{ months.total }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+          			<tfoot>
+					<tr class="thead-light">
+						<th>Total</th>
+						<th class="text-right">{{ monthTotal.Jan }}</th>
+						<th class="text-right">{{ monthTotal.Feb }}</th>
+						<th class="text-right">{{ monthTotal.Mar }}</th>							
+						<th class="text-right">{{ monthTotal.Apr }}</th>
+						<th class="text-right">{{ monthTotal.May }}</th>
+						<th class="text-right">{{ monthTotal.Jun }}</th>
+						<th class="text-right">{{ monthTotal.Jul }}</th>							
+						<th class="text-right">{{ monthTotal.Aug }}</th>
+						<th class="text-right">{{ monthTotal.Sep }}</th>
+						<th class="text-right">{{ monthTotal.Oct }}</th>
+						<th class="text-right">{{ monthTotal.Nov }}</th>
+						<th class="text-right">{{ monthTotal.Dec }}</th>
+						<th class="text-right">{{ monthTotal.total }}</th>
+					</tr>
+				</tfoot>
+	
+			</table>			
+
+ {% endblock %}
+
+
+

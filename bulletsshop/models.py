@@ -178,6 +178,10 @@ class ProductItem(models.Model):
         to_order = (quantity - from_stock - from_order)
         return (self.OK_TO_BUY_OR_ORDER, from_stock, from_order, to_order)
  
+    def ok_to_add_to_basket(self, quantity):
+        (status, a, b, c) = self.order_or_allocate(quantity)
+        print(str(status))
+        return (status != self.CANNOT_BUY)
 
     @property
     def quantity_allocated(self):

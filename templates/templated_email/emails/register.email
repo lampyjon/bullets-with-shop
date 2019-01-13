@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - Registration{% endblock %}
+{% block html %}
+{% include 'templated_email/output/register.html' %}
+{% endblock %}

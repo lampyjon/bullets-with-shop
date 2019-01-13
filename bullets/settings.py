@@ -29,6 +29,26 @@ DEBUG = get_bool_from_env('DEBUG', True)
 ALLOWED_HOSTS = []
 
 
+# EMAIL
+EMAIL_URL = os.environ.get('EMAIL_URL')
+email_config = dj_email_url.parse(EMAIL_URL or 'console://')
+
+EMAIL_FILE_PATH = email_config['EMAIL_FILE_PATH']
+EMAIL_HOST_USER = email_config['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = email_config['EMAIL_HOST_PASSWORD']
+EMAIL_HOST = email_config['EMAIL_HOST']
+EMAIL_PORT = email_config['EMAIL_PORT']
+EMAIL_BACKEND = email_config['EMAIL_BACKEND']
+EMAIL_USE_TLS = email_config['EMAIL_USE_TLS']
+EMAIL_USE_SSL = email_config['EMAIL_USE_SSL']
+
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+
+AWS_SES_REGION_NAME = 'eu-west-1'   # TODO: make parameters
+AWS_SES_REGION_ENDPOINT = 'email.eu-west-1.amazonaws.com'
+EMAIL_BACKEND = 'django_ses.SESBackend'
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -113,6 +133,7 @@ USE_L10N = True
 USE_TZ = True
 
 
+
 NOCAPTCHA = True
 
 # Set Google's reCaptcha keys
@@ -195,3 +216,6 @@ PAYMENT_VARIANTS = {
 
 
 LOGIN_REDIRECT_URL = 'core-team-admin'
+
+
+

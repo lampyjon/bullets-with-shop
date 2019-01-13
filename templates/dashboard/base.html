@@ -13,7 +13,7 @@
 
 
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href="{% static 'css/bullets-shop-bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bullets-shop-bootstrap.css' %}?a=1">
 <script src="https://unpkg.com/feather-icons"></script>
 
 	{% block extraheader %}{% endblock %}
@@ -36,43 +36,43 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href="#">
+                <a class="nav-link {%block dashboardHome%}{%endblock%}" href="#">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
               </li>
              <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:products' %}">
+                <a class="nav-link {%block dashboardProducts%}{%endblock%}" href="{% url 'dashboard:products' %}">
                   <span data-feather="shopping-cart"></span>
                   Products
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:orders-paid-outstanding' %}">
+                <a class="nav-link {%block dashboardOrders%}{%endblock%}" href="{% url 'dashboard:orders-paid-outstanding' %}">
                   <span data-feather="file"></span>
                   Purchases 
                 </a>
               </li>
                <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:allocations' %}">
+                <a class="nav-link {%block dashboardAllocations%}{%endblock%}" href="{% url 'dashboard:allocations' %}">
                   <span data-feather="layers"></span>
                   Allocations
                 </a>
               </li>
              <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:categories' %}">
+                <a class="nav-link {%block dashboardCategories%}{%endblock%}" href="{% url 'dashboard:categories' %}">
                   <span data-feather="folder"></span>
                   Categories
                 </a>
               </li>
                <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:suppliers' %}">
+                <a class="nav-link {%block dashboardSuppliers%}{%endblock%}" href="{% url 'dashboard:suppliers' %}">
                   <span data-feather="users"></span>
                   Suppliers
                 </a>
               </li>
                <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard:postage' %}">
+                <a class="nav-link {%block dashboardPostage%}{%endblock%}" href="{% url 'dashboard:postage' %}">
                   <span data-feather="truck"></span>
                   Postage
                 </a>

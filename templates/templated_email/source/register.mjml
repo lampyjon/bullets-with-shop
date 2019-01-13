@@ -1,0 +1,21 @@
+<mjml>
+  <mj-head>
+    <mj-include path="shared/styles" />
+  </mj-head>
+  <mj-body>
+      <mj-include path="shared/header" />
+      <mj-section>
+        <mj-column>
+          <mj-text font-size="16px">
+           Hello {{ name }}! 
+          </mj-text>
+          	<mj-text>Thank you for registering as a member of the Boldmere Bullets collective!</mj-text>
+
+   	  	<mj-text>Please confirm your email address by <a href="{{ confirm_url }}">clicking here.</a> We can only email you in the future if we have confirmed that this actually is your email address.</mj-text>
+
+		<mj-text>We look forward to seeing you on a ride or a run soon!</mj-text>
+        </mj-column>
+      </mj-section>
+     <mj-include path="shared/footer" />
+  </mj-body>
+</mjml>

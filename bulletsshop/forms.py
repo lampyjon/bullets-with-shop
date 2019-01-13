@@ -80,6 +80,11 @@ class ShopProductForm(forms.Form):
        product = kwargs.pop("product")
        super(ShopProductForm, self).__init__(*args, **kwargs)
 
+       if product.only_buy_one:
+           self.fields['quantity'].initial = 1
+           self.fields['quantity'].widget = forms.HiddenInput()
+      
+
        if (product.no_options):
 		# add a hidden field with the only item's ID in it?
            self.fields['item'].queryset = product.items

@@ -121,15 +121,21 @@ def ShopProduct(request, product_pk, slug):
             item = product_form.cleaned_data['item']
             qty = product_form.cleaned_data['quantity']
             # TODO: so much stuff to do here to keep things sane!
-            basket_item, created = BasketItem.objects.get_or_create(basket=basket, item=item, defaults={'quantity':qty})
-            if created:
-                messages.success(request, str(item) + " was added to your basket")
-            else:
-                basket_item.quantity = basket_item.quantity + qty
-                basket_item.save()
-                messages.success(request, str(item) + " - quantity updated in basket")
+            if item.product.only_buy_one and qty>1:
+               qty = 1
+               messages.info(request, "You can only buy one of this item at a time")
 
-            return redirect(reverse('shop:basket'))
+            if item.ok_to_add_to_basket(qty):            
+                basket_item, created = BasketItem.objects.get_or_create(basket=basket, item=item, defaults={'quantity':qty})
+                if created:
+                    messages.success(request, str(item) + " was added to your basket")
+                else:
+                    basket_item.quantity = basket_item.quantity + qty
+                    basket_item.save()
+                    messages.success(request, str(item) + " - quantity updated in basket")       
+                return redirect(reverse('shop:basket'))
+            else:
+                messages.error(request, "This product is not in stock or available to order")
             
     # reset product form 
     product_form = ShopProductForm(product=product)

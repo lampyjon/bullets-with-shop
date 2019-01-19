@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - Online Shop Order{% endblock %}
+{% block html %}
+{% include 'templated_email/output/order-confirmed.html' %}
+{% endblock %}

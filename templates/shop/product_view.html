@@ -35,12 +35,27 @@
       </div>
       <div class="col">
 		<h2>{{ product.name }}</h2>
+		{% if product.anything_to_buy %}		
 		<p class="lead">{{product.display_price}}</p>
   		<form method="post" class="form-horizontal" >
             		{% csrf_token %}
 	 			{% bootstrap_form product_form layout="horizontal" %} 
+                {% if product.allow_supplier_orders %}<p><small>
+			{% if product.no_options %}
+                    		{% if product.no_options_stock == 0 %}
+                    		This item can be ordered, but may take some time to be delivered as it is not currently in stock.
+ 		    		{% endif %}
+                	{% else %}
+			Items marked with (*) can be ordered, but may take some time to be delivered as they are not currently in stock.
+			{% endif %}
+			</small></p>
+		{% endif %}
+
 			<button type="submit" class="btn btn-primary btn-block mb-3">Add to basket</button>
 		</form> 
+		{% else %}
+		<p>This product is not currently available to purchase</p>
+		{% endif %}
 		<h5 class="text-uppercase border-bottom">Description</h5>
 		<p>{{ product.description|safe }}</p>
       </div>

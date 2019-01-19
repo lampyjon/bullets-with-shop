@@ -22,10 +22,13 @@
 	<input type="hidden" name="item_pk" value="{{ item.pk }}">
        <tr>
         <td><a href="{% url 'shop:product' item.item.product.pk item.item.product.slug %}">{{item.item}}</a></td>
-        <td class="text-right"><button type="submit" name="action" value="up"><i data-feather="plus"></i></button></td>
-        <td class="text-center">{{item.quantity}}</td>
-	<td class="text-left"><button type="submit" name="action" value="down"><i data-feather="minus"></i></button></td>
-
+	{% if item.item.product.only_buy_one %}
+		<td colspan="3" class="text-center">{{item.quantity}}</td>
+	{%else%}
+        	<td class="text-right"><button type="submit" name="action" value="up"><i data-feather="plus"></i></button></td> 
+		<td class="text-center">{{item.quantity}}</td>
+		<td class="text-left"><button type="submit" name="action" value="down"><i data-feather="minus"></i></button></td>
+	{% endif %}  
         <td class="text-right">&pound;{{item.price}}</td>
         <td class="text-right">&pound;{{item.total}}</td>
  	<td class="text-right"><button type="submit" name="action" value="delete"><i data-feather="trash-2"></i></button></td>
@@ -41,7 +44,7 @@
       </tr>
     </tfoot>
   </table>
-  <a class="btn btn-primary btn-block mb-3" href="{% url 'shop:checkout' %}">Go to checkout</a>
+  {% if basket.items.count > 0 %}<a class="btn btn-primary btn-block mb-3" href="{% url 'shop:checkout' %}">Go to checkout</a>{%endif%}
 
  {% endblock %}
 

@@ -127,6 +127,24 @@ class Product(models.Model):
     def get_history(self): 	# TODO: date range filter?
         return ProductHistory.objects.filter(item__product=self)
 
+    @property
+    def items_for_sale(self):	# 	return all the ProductItems for this Product which can be sold (in stock or for order)
+        if self.allow_supplier_orders:
+            return self.items.all()
+        else:
+            return self.items.filter(quantity_in_stock__gt=0) 	# TODO: could sell stuff that's not allocated but is on order too
+
+    @property
+    def no_options_stock(self):
+        if self.no_options:
+            return self.items.first().quantity_in_stock
+        else:
+            return 0
+
+    @property
+    def anything_to_buy(self):
+        return self.items_for_sale.exists()
+
 
 
 # create at least one of these per product, this is stock keeping unit
@@ -198,9 +216,12 @@ class ProductItem(models.Model):
 
     def __str__(self):
         if self.product.no_options:
-            return str(self.product)
+            x = str(self.product)
         else:
-            return str(self.product) + " - " + str(self.extra_text)
+            x = str(self.product) + " - " + str(self.extra_text)
+        if (self.quantity_in_stock) == 0 and self.product.allow_supplier_orders:
+            x = x + " (*)"
+        return x
 
 
     def stock_returned(self, quantity_ordered, quantity_allocated):	# an order is being cancelled, and this many items have just been freed up.
@@ -385,7 +406,7 @@ class Order(models.Model):
 
     @property
     def postage_required(self):
-        return self.items.filter(item_postage_requred=True).exists()
+        return self.items.filter(item_postage_required=True).exists()
 
     @property
     def amount_owing(self):					# what is left to pay on this order?
@@ -522,6 +543,10 @@ class OrderItem(models.Model):
         else:
             return "Partially refunded"
         
+    @property
+    def need_to_order(self):					# ONLY use in the email to customer - otherwise use status()
+        return self.quantity_allocated != self.quantity_ordered
+
     @property
     def left_to_deliver(self):
         return self.quantity_ordered - (self.quantity_delivered + self.quantity_refunded)

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import django.core.exceptions
 from django.conf import settings
 from django.contrib import messages
@@ -18,8 +18,8 @@ from django.urls import reverse_lazy, reverse
 
 from django.contrib.sites.models import Site
 
-from django.forms import formset_factory
-from django.forms import inlineformset_factory
+from django.forms import formset_factory, inlineformset_factory
+
 
 # Python imports 
 #from datetime import timedelta
@@ -75,9 +75,8 @@ def index(request):
 
 ## Product views
 class ShopProductList(ListView):
-    model = Product
     template_name="shop/product_list.html"
-    context_object_name = 'products'		# TODO: only display products that user can see
+    context_object_name = 'products'		
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -85,6 +84,12 @@ class ShopProductList(ListView):
         context['basket'] = get_basket(self.request)  # add the basket to the context
         context['categories'] = get_categories()
         return context
+
+    def get_queryset(self):
+        today = datetime.date.today()
+        qs = Product.objects.filter(hidden=False).filter(available_from__lte=today).filter(Q(available_until__gte=today)|Q(available_until=None))
+        return qs
+
 
 ## Product views
 class ShopProductCategoryList(ListView):
@@ -94,9 +99,11 @@ class ShopProductCategoryList(ListView):
 
     def get_queryset(self):
         self.category = get_object_or_404(ProductCategory, pk=self.kwargs['category_pk'])
-        if self.category.hidden:			# TODO: maybe improve visibility checks here?
+        if self.category.hidden:			
             return None
-        return Product.objects.filter(category=self.category)
+        today = datetime.date.today()
+        qs = Product.objects.filter(category=self.category).filter(hidden=False).filter(available_from__lte=today).filter(Q(available_until__gte=today)|Q(available_until=None))
+        return qs
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -235,6 +242,7 @@ def create_order_from_basket(basket, note):
                               order=order,
                               item_name=str(basket_item.item),
                               item_price=basket_item.item.product.price,
+                              item_postage_required=basket_item.item.product.postage_required,
                               quantity_ordered=basket_item.quantity,
                               quantity_allocated=0,
                               quantity_delivered=0)
@@ -438,11 +446,14 @@ def product_create(request, category_pk=None, product_pk=None, supplier_pk=None)
         if product_form.is_valid():
              product = product_form.save()
              messages.success(request, str(product) + " was saved")
+             if product_pk:
+                 return redirect(reverse('dashboard:product-view', args=[product.pk]))		# we are editing, so don't show the item list
+
              if product_form.cleaned_data.get("create_items", False):
                  return redirect(reverse('dashboard:product-edit-items', args=[product.pk]))
              else:
                  # create a fake item underneath this product
-                 item = ProductItem(product=product)
+                 item = ProductItem(product=product)				
                  item.save()
 
              ph = ProductHistory(item=item, quantity=0, event=ProductHistory.CREATED)
@@ -462,6 +473,21 @@ def product_create(request, category_pk=None, product_pk=None, supplier_pk=None)
 
     return render(request, "dashboard/product_form.html", {'product_form':product_form, 'product':product})
 
+def product_edit_ajax(request, product_pk):
+    product = get_object_or_404(Product, pk=product_pk)
+
+    v = request.POST.get("store_to")
+    o = request.POST.get("on_off") == "true"
+    if (v == 'hidden'):
+        product.hidden = o
+    elif (v == 'allow_supplier_orders'):
+        product.allow_supplier_orders = o
+    elif (v== 'only_buy_one'):
+        product.only_buy_one = o
+
+    product.save()
+    print("got " + str(v) + " - " + str(o))
+    return JsonResponse({'thank':'you'})
 
 
 def product_view(request, product_pk=None):

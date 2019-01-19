@@ -1,0 +1,18 @@
+<mjml>
+  <mj-head>
+    <mj-include path="./shared/styles.mjml" />
+  </mj-head>
+  <mj-body>
+      <mj-include path="./shared/header.mjml" />
+      <mj-section>
+        <mj-column>
+          <mj-text font-size="16px">
+           Hello {{ name }}! 
+          </mj-text>
+          	<mj-text>We have received your request to unregister as a member of the Boldmere Bullets.</mj-text>
+		<mj-text>Please click <a href="{{ unregister_url }}">this link</a> to confirm your unregistration.</mj-text>
+        </mj-column>
+      </mj-section>
+     <mj-include path="./shared/footer.mjml" />
+  </mj-body>
+</mjml>

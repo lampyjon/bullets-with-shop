@@ -93,7 +93,7 @@ class ShopProductForm(forms.Form):
 
        else:
 		# multiple items to display
-           self.fields['item'].queryset = product.items
+           self.fields['item'].queryset = product.items_for_sale		# TODO: need to return a queryset of stuff that is purchasable
       
 
 class OrderFormPostage(forms.Form):

@@ -36,6 +36,7 @@ dashboard_patterns = ([
     path('products/add/supplier/<int:supplier_pk>', views.product_create, name='product-add-supplier'),
 
     path('products/edit/<int:product_pk>', views.product_create, name='product-edit'),
+    path('products/edit/ajax/<int:product_pk>', views.product_edit_ajax, name='product-edit-ajax'),
     path('products/view/<int:product_pk>', views.product_view, name='product-view'),
     path('products/sell-now/<int:item_pk>', views.product_sell_now, name='product-sell-now'),
 

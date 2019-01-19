@@ -5,6 +5,8 @@ from payments import PaymentStatus
 from .models import Payment, OrderHistory, Order, ProductItem
 from django.db.models import F
 
+from bulletsweb.utils import send_bullet_mail
+
 @receiver(pre_save, sender=Payment)
 def payment_made(sender, instance, **kwargs):
     payment = instance
@@ -31,7 +33,8 @@ def payment_made(sender, instance, **kwargs):
         if payment.status == PaymentStatus.CONFIRMED:
             print("Payment is now Confirmed!")
             update_order_after_payment(order)
-
+            # Now send the customer an email to confirm we've received their payment
+            send_bullet_mail("emails/order-confirmed", [order.email], {'order':order})
     else:
         print("Payment status unchanged")
   
@@ -49,6 +52,8 @@ def update_order_after_payment(order):
  		# we will simply flag a problem, and let the shop admin figure out the best course of action
             oh = OrderHistory(order=order, comment="!!! Insufficient Stock !!! Cannot allocate " + str(orderitem.quantity_ordered) + " x " + str(orderitem.item_name))
             oh.save()
+	    # TODO: send a manager email here if this situation occurs.
+
         else: 
             # update the amount of stock allocated to this order item
             orderitem.quantity_allocated=to_allocate_stock
@@ -59,11 +64,12 @@ def update_order_after_payment(order):
                 oh = OrderHistory(order=order, comment=str(to_allocate_stock) + " x " + str(orderitem.item_name) + " - allocated")
                 oh.save()
 
-            # and also adjust the productItem's stock levels		TODO: change to F()s?
+            # and also adjust the productItem's stock levels		
             orderitem.item.quantity_in_stock = F('quantity_in_stock') - to_allocate_stock
             orderitem.item.quantity_to_order = F('quantity_to_order') + to_order
             orderitem.item.quantity_allocated_on_order = F('quantity_allocated_on_order') + to_allocate_from_order
             orderitem.item.save()
 
         #print("leaving signal handler, with qty allocated = " + str(orderitem.quantity_allocated))
+
 

@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - Contact Form{% endblock %}
+{% block html %}
+{% include 'templated_email/output/contact-thanks.html' %}
+{% endblock %}

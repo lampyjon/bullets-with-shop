@@ -1,18 +1,14 @@
 <mj-section>
   <mj-column>
     <mj-text>
-      {% blocktrans trimmed context "Base email text" %}
-        This is an automatically generated email, please do not reply.
-      {% endblocktrans %}
+         If you have any questions please get in touch! 
     </mj-text>
   </mj-column>
 </mj-section>
 <mj-section background-color="#F2F2F2">
   <mj-column>
     <mj-text align="center">
-      {% blocktrans trimmed context "Base email footer" %}
-        Sincerely, {{ site_name }}
-      {% endblocktrans %}
+        Lots of love - the Boldmere Bullets
     </mj-text>
   </mj-column>
 </mj-section>

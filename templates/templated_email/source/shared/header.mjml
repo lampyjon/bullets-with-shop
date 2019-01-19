@@ -1,8 +1,10 @@
-<mj-raw>
-  {% load staticfiles %}
-</mj-raw>
-<mj-section>
+<mj-section css-class="no-display">
   <mj-column>
-    <mj-image src="{{ protocol}}://{{ domain }}{% static 'images/logo-document.svg' %}" height="38px" width="176px"/>
+    <mj-text>{% load staticfiles %}</mj-text>
+  </mj-column>
+</mj-section>
+<mj-section background-color="#FC4C02">
+  <mj-column vertical-align="middle">
+    <mj-image src="{{ bullet_pic }}" height="100px" width="100px"/>
   </mj-column>
 </mj-section>

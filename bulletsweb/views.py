@@ -195,7 +195,7 @@ def unregister(request):
             try:	
                 email = unregister_form.cleaned_data["email"]
                 bullets = Bullet.objects.filter(email__iexact=email)
-                
+
                 for bullet in bullets:					
                     # Because there can be multiple bullets on a single email - email them all
                     bullet.email_check_ref = uuid.uuid4()   # update the unique ref 
@@ -206,7 +206,7 @@ def unregister(request):
                     context = {'name': bullet.name, 'unregister_url':unregister_url}
 
                     bullet.send_email(
-                        template="bullets/unregister", 
+                        template="emails/unregister", 
                         context=context, 
                         override_email_safety=True)
 
@@ -260,7 +260,7 @@ def mailchimp_webhook(request, apikey):
         context = {'name': bullet.name, 'unregister_url':unregister_url}
 
         bullet.send_email(
-            template="bullets/unregister_list", 
+            template="emails/unregister_list", 
             context=context, 
             override_email_safety=True)
    
@@ -280,12 +280,12 @@ def contact(request):
 			context = contact_form.cleaned_data 
 
 			send_manager_email(
-        			template_name='bullets/contact',
+        			template_name='emails/contact',
                                 extra_headers={'Reply-To':contact_form.cleaned_data['email']},
         			context=context)
 
 			send_bullet_mail(
-        			template_name='bullets/contact_thanks',
+        			template_name='emails/contact_thanks',
                			recipient_list=[contact_form.cleaned_data['email']],
         			context={})
 

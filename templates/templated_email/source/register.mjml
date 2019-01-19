@@ -1,9 +1,9 @@
 <mjml>
   <mj-head>
-    <mj-include path="shared/styles" />
+    <mj-include path="./shared/styles.mjml" />
   </mj-head>
   <mj-body>
-      <mj-include path="shared/header" />
+      <mj-include path="./shared/header.mjml" />
       <mj-section>
         <mj-column>
           <mj-text font-size="16px">
@@ -16,6 +16,6 @@
 		<mj-text>We look forward to seeing you on a ride or a run soon!</mj-text>
         </mj-column>
       </mj-section>
-     <mj-include path="shared/footer" />
+     <mj-include path="./shared/footer.mjml" />
   </mj-body>
 </mjml>

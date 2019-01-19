@@ -244,8 +244,8 @@
             <tr>
               <td align="left" style="font-size: 0px; padding: 10px 25px; word-break: break-word;">
                 
-      <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:16px;line-height:1;text-align:left;color:#000000;">
-        Hello {{ name }}!
+      <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">
+        There has been a new message sent to us via the Boldmere Bullets Website!
       </div>
     
               </td>
@@ -255,7 +255,7 @@
               <td align="left" style="font-size: 0px; padding: 10px 25px; word-break: break-word;">
                 
       <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">
-        Thank you for registering as a member of the Boldmere Bullets collective!
+        {{ name }} ({{ email }}) has left the following message:
       </div>
     
               </td>
@@ -265,7 +265,7 @@
               <td align="left" style="font-size: 0px; padding: 10px 25px; word-break: break-word;">
                 
       <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">
-        Please confirm your email address by <a href="{{ confirm_url }}">clicking here.</a> We can only email you in the future if we have confirmed that this actually is your email address.
+        <pre>{{ comment }}</pre>
       </div>
     
               </td>
@@ -275,7 +275,7 @@
               <td align="left" style="font-size: 0px; padding: 10px 25px; word-break: break-word;">
                 
       <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">
-        We look forward to seeing you on a ride or a run soon!
+        Press 'reply' to respond to {{ name }}.
       </div>
     
               </td>

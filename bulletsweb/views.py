@@ -28,7 +28,7 @@ import os
 from .forms import RegisterForm, UnRegisterForm, ContactForm, NewsForm, RunningEventForm, BulletEventForm 
 from .models import Bullet, News, RunningEvent, ActivityCache, BulletEvent, FredRider, FredHighLeaderBoard, FredLowLeaderBoard 
 
-from .utils import send_bullet_mail, who_to_email, send_manager_email, build_absolute_uri 
+from .utils import send_bullet_mail, who_to_email, send_manager_email, build_absolute_uri, is_core_team, is_stats_team
 
 # SALEOR imports
 #from saleor.core.utils import build_absolute_uri
@@ -42,16 +42,6 @@ from stravalib import Client, unithelper
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
-
-
-# Decorator style for checking login status
-def is_core_team(user):
-    return user.groups.filter(name='CoreTeam').exists()
-
-# Decorator style for checking login status
-def is_stats_team(user):
-    return user.groups.filter(name='StatsTeam').exists()
 
 
 

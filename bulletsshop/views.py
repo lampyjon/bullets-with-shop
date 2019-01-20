@@ -15,23 +15,25 @@ from django.views.generic.detail import DetailView
 from django.utils import timezone
 from django.db.models import Q, Sum, F
 from django.urls import reverse_lazy, reverse
-
 from django.contrib.sites.models import Site
-
 from django.forms import formset_factory, inlineformset_factory
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 
 # Python imports 
-#from datetime import timedelta
 import datetime
 import uuid
 import random
 import os
+import calendar
+
 
 from .models import Product, ProductCategory, Supplier, ProductItem, ProductPicture, Order, OrderItem, Basket, BasketItem, Postage, OrderHistory, ProductHistory
 from .forms import ProductForm, ItemForm, ProductPictureForm, OrderHistoryItemForm, ShopProductForm, OrderFormPostage, OrderFormBillingAddress, OrderFormDeliveryAddress, ReturnItemForm, OfflineSaleForm
 
 from payments import PaymentStatus
+
+from bulletsweb.utils import is_shop_team
 
 
 def get_client_ip(request):
@@ -417,18 +419,23 @@ def payment_success(request, uuid):
 
 
 
-######################################## DASHBOARD VIEWS #####################
+######################################## DASHBOARD VIEWS #####################################################################
 
-#TODO: AUTH
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def dashboard(request):
     return render(request, "dashboard/index.html", {})
 
 
 ## Product views
-class ProductList(ListView):
+class ProductList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Product
     template_name="dashboard/product_list.html"
+    def test_func(self):
+        return is_shop_team(self.request.user)
 
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def product_create(request, category_pk=None, product_pk=None, supplier_pk=None):
     if category_pk:
         category = get_object_or_404(ProductCategory, pk=category_pk)
@@ -473,7 +480,9 @@ def product_create(request, category_pk=None, product_pk=None, supplier_pk=None)
 
     return render(request, "dashboard/product_form.html", {'product_form':product_form, 'product':product})
 
-def product_edit_ajax(request, product_pk):
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def product_edit_ajax(request, product_pk):			# This view allows the product edit page to toggle properties
     product = get_object_or_404(Product, pk=product_pk)
 
     v = request.POST.get("store_to")
@@ -486,17 +495,19 @@ def product_edit_ajax(request, product_pk):
         product.only_buy_one = o
 
     product.save()
-    print("got " + str(v) + " - " + str(o))
     return JsonResponse({'thank':'you'})
 
 
-def product_view(request, product_pk=None):
+
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def product_view(request, product_pk=None):				# View a product in the dashboard
     product = get_object_or_404(Product, pk=product_pk)
     return render(request, "dashboard/product_view.html", {'product':product})
 
 
-import calendar
-
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def product_analytics(request, product_pk, year=None):
     product = get_object_or_404(Product, pk=product_pk)
     now = datetime.datetime.now()
@@ -534,8 +545,13 @@ def product_analytics(request, product_pk, year=None):
     
     return render(request, "dashboard/product_analytics.html", {'product':product, 'items':items, 'monthTotal':monthTotal, 'lastYear':year-1, 'nextYear':year+1, 'year':year})
 
+
+
+
 ## Product Image views
 
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def product_picture_create(request, product_pk):
     product = get_object_or_404(Product, pk=product_pk)
     if request.method == 'POST':
@@ -549,7 +565,6 @@ def product_picture_create(request, product_pk):
     else:
         form = ProductPictureForm()
 
-    print(str(form))
     return render(request, 'dashboard/productpicture_form.html', {'form': form, 'product':product})
 
 
@@ -557,6 +572,9 @@ def product_picture_create(request, product_pk):
 
 ## Product Item Views
 
+
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def product_edit_items(request, product_pk):			# edit/add items to an existing product
     product = get_object_or_404(Product, pk=product_pk)
     ItemFormset = inlineformset_factory(Product, ProductItem, fields=['extra_text', 'quantity_in_stock'], extra=5, can_delete=False)
@@ -576,6 +594,9 @@ def product_edit_items(request, product_pk):			# edit/add items to an existing p
     return render(request, "dashboard/product_items_add.html", {'product':product, 'item_formset':item_formset})
 
 
+
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def product_sell_now(request, item_pk):				# sell an item immediately (ish)
     item = get_object_or_404(ProductItem, pk=item_pk)
 
@@ -647,37 +668,55 @@ def product_sell_now(request, item_pk):				# sell an item immediately (ish)
 
 
 ## Product Category views
-class CategoryList(ListView):
+class CategoryList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ProductCategory
     template_name="dashboard/productcategory_list.html"
+    def test_func(self):
+        return is_shop_team(self.request.user)
 
-class CategoryCreate(SuccessMessageMixin, CreateView):
+
+class CategoryCreate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
     model = ProductCategory
     template_name="dashboard/productcategory_form.html"
     fields = ['name', 'hidden']
     success_url = reverse_lazy('dashboard:categories')
     success_message = "%(name)s was created successfully"
 
-class CategoryUpdate(SuccessMessageMixin, UpdateView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+class CategoryUpdate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = ProductCategory
     template_name="dashboard/productcategory_form.html"
     fields = ['name', 'hidden']
     success_url = reverse_lazy('dashboard:categories')
     success_message = "%(name)s was updated successfully"
 
-class CategoryDelete(DeleteView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+class CategoryDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = ProductCategory
     template_name="dashboard/productcategory_delete.html"
     success_url = reverse_lazy('dashboard:categories')
 
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
 
 ## Product Postage views
-class PostageList(ListView):
+class PostageList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Postage
     context_object_name = 'postage_list'
     template_name="dashboard/postage_list.html"
 
-class PostageCreate(SuccessMessageMixin, CreateView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+class PostageCreate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
     model = Postage
     context_object_name = 'postage'
     template_name="dashboard/postage_form.html"
@@ -685,7 +724,11 @@ class PostageCreate(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('dashboard:postage')
     success_message = "%(name)s was created successfully"
 
-class PostageUpdate(SuccessMessageMixin, UpdateView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+class PostageUpdate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = Postage
     context_object_name = 'postage'
     template_name="dashboard/postage_form.html"
@@ -693,46 +736,76 @@ class PostageUpdate(SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy('dashboard:postage')
     success_message = "%(name)s was updated successfully"
 
-class PostageDelete(DeleteView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+class PostageDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Postage
     context_object_name = 'postage'
     template_name="dashboard/postage_delete.html"
     success_url = reverse_lazy('dashboard:postage')
 
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
 
 
 
 ## Supplier views
-class SupplierList(ListView):
+class SupplierList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Supplier
     template_name="dashboard/supplier_list.html"
 
-class SupplierCreate(SuccessMessageMixin, CreateView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+class SupplierCreate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
     model = Supplier
     template_name="dashboard/supplier_form.html"
     fields = ['name']
     success_url = reverse_lazy('dashboard:suppliers')
     success_message = "%(name)s was created successfully"
 
-class SupplierUpdate(SuccessMessageMixin, UpdateView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+class SupplierUpdate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = Supplier
     template_name="dashboard/supplier_form.html"
     fields = ['name']
     success_url = reverse_lazy('dashboard:suppliers')
     success_message = "%(name)s was updated successfully"
 
-class SupplierDelete(DeleteView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+class SupplierDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Supplier
     template_name="dashboard/supplier_delete.html"
     success_url = reverse_lazy('dashboard:suppliers')
 
-class SupplierDetail(DetailView):
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+class SupplierDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Supplier
     template_name="dashboard/supplier_view.html"
     context_object_name = 'supplier'
 
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
 
 # receive a delivery from this supplier & update the stock levels
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def supplier_delivery(request, supplier_pk):
     supplier = get_object_or_404(Supplier, pk=supplier_pk)
  
@@ -766,6 +839,8 @@ def supplier_delivery(request, supplier_pk):
 
 
 # create a new order for this supplier, and adjust stock levels accordingly
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def supplier_order(request, supplier_pk):
     supplier = get_object_or_404(Supplier, pk=supplier_pk)
 
@@ -821,8 +896,8 @@ def supplier_order(request, supplier_pk):
 
 ## Order Views
 
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def order_list(request, status='all'):
     orders = Order.objects.all()
 
@@ -865,13 +940,15 @@ def order_list(request, status='all'):
     return render(request, 'dashboard/order_list.html', {'orders':results_list, 'order_status':status, 'orders_all':orders_all, 'orders_unpaid':orders_unpaid, 'orders_paid':orders_unpaid, 'orders_paid_outstanding':orders_paid_outstanding})
   
 
-def order_comment(request, pk):
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def order_comment(request, pk):						# Add a comment to the order
     order = get_object_or_404(Order, pk=pk)
     if request.POST:
         comment_form = OrderHistoryItemForm(request.POST)
         if comment_form.is_valid():
             comment = comment_form.cleaned_data["comment"]
-            oh = OrderHistory(order=order, comment=comment)
+            oh = OrderHistory(order=order, comment=comment)		# TODO: annotate with logged in user name
             oh.save()
             messages.success(request, "Comment was added")
 
@@ -880,7 +957,7 @@ def order_comment(request, pk):
 
 
 
-class OrderDetail(DetailView):
+class OrderDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Order
     template_name="dashboard/order_view.html"
     context_object_name = 'order'
@@ -890,8 +967,15 @@ class OrderDetail(DetailView):
         context['form'] = OrderHistoryItemForm()
         return context
 
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
 
 # dispatch some items
+
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def order_items_dispatch(request, pk):
     order = get_object_or_404(Order, pk=pk)
     
@@ -925,6 +1009,8 @@ def order_items_dispatch(request, pk):
 
 
 # pay an order in cash if there's any balance outstanding on it
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def order_cash_payment(request, pk):
     order = get_object_or_404(Order, pk=pk)
     
@@ -961,6 +1047,8 @@ def order_cash_payment(request, pk):
 
 
 # Full cancellation of order - all allocated items back to stock, and full refund of money paid in
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def order_cancel(request, pk):			
     order = get_object_or_404(Order, pk=pk)
 
@@ -1001,6 +1089,8 @@ def order_cancel(request, pk):
     return render(request, "dashboard/order_cancel_confirm.html", {'order': order})
 
 
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def order_item_return(request, pk):		# Return an item from an order
     orderitem = get_object_or_404(OrderItem, pk=pk)
     
@@ -1056,6 +1146,8 @@ def order_item_return(request, pk):		# Return an item from an order
 
 
 # Product allocations
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def allocations(request, order_by='name', item_pk=None):
     ordering = 'pk'	# default for item
     if order_by == 'date':

@@ -6,5 +6,5 @@ urlpatterns = [
     path('bullets-shop/', include('bulletsshop.urls')),
     path('', include('bulletsweb.urls')),
     path('summernote/', include('django_summernote.urls')),
-    path('vlb-accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

@@ -47,3 +47,17 @@ def build_absolute_uri(location):
     current_uri = '%s://%s' % (protocol, host)
     location = urljoin(current_uri, location)
     return iri_to_uri(location)	
+
+
+
+# Decorator style for checking user is in the Core Team & can edit things on the site (News Items, etc)
+def is_core_team(user):
+    return user.groups.filter(name='CoreTeam').exists()
+
+# Decorator style for checking user is in a view-only mode, and can see statistics etc.
+def is_stats_team(user):
+    return user.groups.filter(name='StatsTeam').exists()
+
+# Decorator style for checking user is in the Shop Team, and can edit things in the shop
+def is_shop_team(user):
+    return user.groups.filter(name='ShopTeam').exists()

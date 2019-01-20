@@ -28,6 +28,8 @@ DEBUG = get_bool_from_env('DEBUG', True)
 
 ALLOWED_HOSTS = []
 
+LOGOUT_REDIRECT_URL = "/"
+
 
 # EMAIL
 EMAIL_URL = os.environ.get('EMAIL_URL')

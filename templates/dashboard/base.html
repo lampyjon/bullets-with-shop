@@ -25,7 +25,7 @@
       <a class="navbar-brand mr-0" href="#">Boldmere Bullets Shop - Dashboard</a>
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-          <a class="nav-link" href="#">Sign out</a>
+          <a class="nav-link" href="{% url 'logout' %}">Sign out {{ user.username }}</a>
         </li>
       </ul>
     </nav>

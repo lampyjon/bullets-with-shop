@@ -1,0 +1,48 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block dashboardProducts %}active{% endblock %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">{{ product }} - Purchase History </h1><a href="{% url 'dashboard:product-view' product.pk  %}" class="float-right btn btn-outline-primary btn-sm">view product</a>
+          </div>
+
+	<h4 class="h4">All confirmed purchasers of {{ product }}</h4>
+	<div class="table-responsive">
+	<table class="table table-sm">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Email</th>
+				<th class="text-right">Qty</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for pi, oi in items.items %}
+			{% if product.no_options == False %}
+			<tr>
+				<td colspan="4"><h4 class="mt-3">{{ oi.0 }}</h4></td>
+			</tr>
+			{% endif %}
+           	{% for item in oi.1 %}
+			{% if item.order.fully_paid %}
+			<tr>
+				<td>{{ item.order.name }}</td>
+				<td>{{ item.order.email }} </td>
+				<td class="text-right">{{ item.quantity_ordered }}</td>
+				<td>{{ item.status }}</td>
+			</tr>
+			{% endif %}
+		{% endfor %}
+	{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+ {% endblock %}
+
+
+

@@ -375,8 +375,8 @@ class Order(models.Model):
     updated = models.DateTimeField("Order last updated", auto_now=True)				# When changed
 
     unique_ref =  models.UUIDField("random uuid for email links", default=uuid.uuid4, editable=False) # random UUID for emails
-
-    cancelled = models.BooleanField("Cancelled?", default=False)					# Is this order cancelled? 
+    cancelled = models.BooleanField("Cancelled?", default=False)				# Is this order cancelled? 
+    email_chase = models.BooleanField("Has stale order been chased via email?", default=False)	# We do a one-time chase on unpaid orders	
 
     def __str__(self):
         return "Purchase #" + str(self.pk) + " for " + str(self.name)

@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - Unfinished Online Shop Order{% endblock %}
+{% block html %}
+{% include 'templated_email/output/order-chase.html' %}
+{% endblock %}

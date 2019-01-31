@@ -5,7 +5,9 @@ from payments import PaymentStatus
 from .models import Payment, OrderHistory, Order, ProductItem
 from django.db.models import F
 
-from bulletsweb.utils import send_bullet_mail
+from bulletsweb.utils import send_bullet_mail, build_absolute_uri
+from django.urls import reverse
+
 
 @receiver(pre_save, sender=Payment)
 def payment_made(sender, instance, **kwargs):
@@ -34,7 +36,9 @@ def payment_made(sender, instance, **kwargs):
             print("Payment is now Confirmed!")
             update_order_after_payment(order)
             # Now send the customer an email to confirm we've received their payment
-            send_bullet_mail("emails/order-confirmed", [order.email], {'order':order})
+
+            url = build_absolute_uri(reverse('shop:view-order', args=[order.unique_ref]))
+            send_bullet_mail("emails/order-confirmed", [order.email], {'order':order, 'url':url})
     else:
         print("Payment status unchanged")
   

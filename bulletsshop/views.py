@@ -361,27 +361,7 @@ def CheckoutSummary(request):
                 messages.error(request, "There was a problem creating your order") 
                 return redirect('shop:basket')
 
-            # made order ok - make payment object for the order
-            Payment = get_payment_model()
-            payment = Payment.objects.create(
-                order=order,
-                variant='default',  # this is the variant from PAYMENT_VARIANTS
-                description='Boldmere Bullet Shop Purchase',
-                total=order.grand_total,
-                tax=Decimal(0),
-                currency='GBP',
-                delivery=order.postage_amount,
-                billing_first_name=order.billing_name,
-                billing_last_name='',
-                billing_address_1=order.billing_address,
-                billing_address_2='',
-                billing_city='',
-                billing_postcode=order.billing_postcode,
-                billing_country_code='UK',
-                billing_country_area='',
-                customer_ip_address=get_client_ip(request))
-          
-            return redirect(reverse('shop:pay', args=[payment.pk]))		# go to the payment page
+            return do_payment(request, order)
 
     else:
         orderform = OrderHistoryItemForm()
@@ -417,14 +397,54 @@ def payment_success(request, uuid):
 
 # TODO: payment_failure page
 
+def do_payment(request, order):					# make a payment and redirect to the payment page
+    # made order ok - make payment object for the order
+    Payment = get_payment_model()
+    payment = Payment.objects.create(
+                order=order,
+                variant='default',  # this is the variant from PAYMENT_VARIANTS
+                description='Boldmere Bullet Shop Purchase',
+                total=order.grand_total,
+                tax=Decimal(0),
+                currency='GBP',
+                delivery=order.postage_amount,
+                billing_first_name=order.billing_name,
+                billing_last_name='',
+                billing_address_1=order.billing_address,
+                billing_address_2='',
+                billing_city='',
+                billing_postcode=order.billing_postcode,
+                billing_country_code='UK',
+                billing_country_area='',
+                customer_ip_address=get_client_ip(request))
+          
+    return redirect(reverse('shop:pay', args=[payment.pk]))		# go to the payment page
+
+def view_order(request, uuid):					# Page to view order details
+    order = get_object_or_404(Order, unique_ref=uuid)
+    return render(request, 'shop/order.html', {'order':order})
+
+def make_payment(request, uuid):					# Quick redirection to payment page
+    order = get_object_or_404(Order, unique_ref=uuid)
+    return do_payment(request, order)
 
 
 ######################################## DASHBOARD VIEWS #####################################################################
 
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
-def dashboard(request):
-    return render(request, "dashboard/index.html", {})
+def dashboard(request):			# stuff we see first
+    orders = Order.objects.order_by('-created')
+    purchases = []
+    for order in orders:
+        if order.fully_paid:
+            purchases.append(order)
+
+    items = ProductItem.objects.filter(quantity_to_order__gt=0).order_by('product__supplier')
+
+    allocations = OrderItem.objects.order_by('order__created').filter(quantity_allocated__gt=0)
+
+    return render(request, "dashboard/index.html", {'allocations':allocations[:10], 'purchases':purchases[:10], 'stock_required':items})
 
 
 ## Product views
@@ -479,6 +499,8 @@ def product_create(request, category_pk=None, product_pk=None, supplier_pk=None)
         product_form = ProductForm(initial=initial, instance=product)
 
     return render(request, "dashboard/product_form.html", {'product_form':product_form, 'product':product})
+
+
 
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
@@ -547,9 +569,21 @@ def product_analytics(request, product_pk, year=None):
 
 
 
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def product_purchases(request, product_pk):				# a view to show every single purchaser of this product
+    product = get_object_or_404(Product, pk=product_pk)
+
+    items = {}
+    for pi in product.items.all():
+        oi = pi.ordered_items.filter(quantity_ordered__gt=0).filter(quantity_refunded__lt=F('quantity_ordered'))  # TODO: NOT FINISHED HERE!!!!!
+        items[pi.pk] = (pi, oi)
+
+    return render(request, "dashboard/product_purchases.html", {'product':product, 'items':items})
+
+
 
 ## Product Image views
-
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def product_picture_create(request, product_pk):
@@ -571,7 +605,6 @@ def product_picture_create(request, product_pk):
 
 
 ## Product Item Views
-
 
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?

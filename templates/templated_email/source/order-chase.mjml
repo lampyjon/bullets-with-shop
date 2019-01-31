@@ -9,7 +9,7 @@
           <mj-text font-size="16px">
            Hello {{ order.name }}! 
           </mj-text>
-          	<mj-text>Thank you for your order from ye olde Boldmere Bullets Online Shoppe. We have successfully received your payment.</mj-text>
+          	<mj-text>We noticed you recently started an order on the Boldmere Bullets Online Shop, but didn't complete it.</mj-text>
 
    	  	<mj-text>Order {{ order.id }}:</mj-text>
         	<mj-table>
@@ -38,17 +38,7 @@
 				<th style="text-align:right;">&pound;{{order.grand_total}}</th>
 			</tr>
         	</mj-table>
-		<mj-text>Items marked with (*) will be ordered from the supplier, and may take some time to deliver.</mj-text>
-		<mj-text>{% if order.postage_amount > 0 %}Items in your order will be posted to the following address:</mj-text>
-		<mj-text><pre>
-{{order.delivery_name}}
-{{order.delivery_address}}
-{{order.delivery_postcode}}</pre></mj-text>
-		<mj-text>If this address is not correct, please let us know immediately, and we can correct this.{%endif%}</mj-text>
-
-		<mj-text>You can view your order <a href="{{ url }}">online</a>.</mj-text>
-		</mj-column>
-		</mj-section>
+		<mj-text>If you would like to complete your order, please <a href="{{ url }}">click here</a> - this link will work for the next seven days, after which the order will be deleted. If not, don't worry - we won't bother you again!</mj-text>
         </mj-column>
       </mj-section>
      <mj-include path="./shared/footer.mjml" />

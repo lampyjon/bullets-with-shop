@@ -195,7 +195,7 @@
           </div>
 
 <div class="row">
- <div class="col-8">
+ <div class="col-sm-8">
 	<div class="card mb-3">
   		<div class="card-header">Description</div>
 	        <div class="card-body">{{ product.description|safe }}</div>
@@ -204,6 +204,7 @@
 	<div class="card mb-3">
   		<div class="card-header">Stock and Orders <a href="{% url 'dashboard:product-edit-items' product.pk %}" class="float-right btn btn-outline-primary btn-sm">add / edit</a></div>
 	        <div class="card-body">
+			<div class="table-responsive-sm">
 			<table class="table table-sm">
 				<thead>
 					<tr>
@@ -234,10 +235,11 @@
 				{% endfor %}
 				</tbody>
 			</table>
+			</div>
       		</div>
 	</div>
 	<div class="card mb-3">
-  		<div class="card-header">History <a href="{% url 'dashboard:product-analytics' product.pk %}" class="float-right btn btn-outline-primary btn-sm">analytics</a></div>
+  		<div class="card-header">History  <a href="{% url 'dashboard:product-purchases' product.pk %}" class="float-right ml-3 btn btn-outline-primary btn-sm">purchase history</a> <a href="{% url 'dashboard:product-analytics' product.pk %}" class="float-right btn btn-outline-primary btn-sm">analytics</a></div>
 	        <div class="card-body">
 			<table class="table table-sm">
 				<thead>

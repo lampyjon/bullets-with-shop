@@ -30,10 +30,6 @@ from .models import Bullet, News, RunningEvent, ActivityCache, BulletEvent, Fred
 
 from .utils import send_bullet_mail, who_to_email, send_manager_email, build_absolute_uri, is_core_team, is_stats_team
 
-# SALEOR imports
-#from saleor.core.utils import build_absolute_uri
-
-
 import mailchimp  # for adding users to our mailing list
 import logging    # For the logging library
 

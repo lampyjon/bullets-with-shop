@@ -8,7 +8,7 @@
             <h1 class="h1">{{ order }}</h1>
           </div>
 
-<ul class="nav nav-tabs mb-2" id="myTab" role="tablist">
+<ul class="nav nav-tabs flex-column flex-sm-row mb-2" id="myTab" role="tablist">
   <li class="nav-item">
     <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Order</a>
   </li>
@@ -35,12 +35,12 @@
   <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
 <div class="row">
- <div class="col-8">
+ <div class="col-sm-8">
 	<div class="card mb-3">
 
 	<div class="card-header">Items</div>
 	        <div class="card-body">
-			<table class="table table-sm">
+			<table class="table-responsive table-sm">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -84,7 +84,7 @@
 	<div class="card mb-3">
   		<div class="card-header">Notes and history</div>
 	        <div class="card-body">
-			<table class="table table-sm">
+			<table class="table-responsive table-sm">
 				<thead>
   				   <tr>
 					<th>When</th>
@@ -172,7 +172,7 @@
 		<form method="post" class="form-horizontal" action="{% url 'dashboard:order-items-dispatch' order.pk %}">
             		{% csrf_token %}
 
-			<table class="table">
+			<table class="table-responsive">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -204,7 +204,7 @@
 
   <div class="tab-pane fade" id="order" role="tabpanel" aria-labelledby="order-tab">
 
-	<table class="table">
+	<table class="table-responsive">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -234,7 +234,7 @@
 
   <div class="tab-pane fade" id="dispatched" role="tabpanel" aria-labelledby="dispatched-tab">
 
-	<table class="table">
+	<table class="table-responsive">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -260,7 +260,7 @@
 			</table>
   </div>
  <div class="tab-pane fade" id="refund" role="tabpanel" aria-labelledby="refund-tab">
-	<table class="table">
+	<table class="table-responsive">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -286,7 +286,7 @@
 
   <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
 	<p>Details of payments made and refunded on this order</p>
-	<table class="table">
+	<table class="table-responsive">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -320,4 +320,34 @@
  {% endblock %}
 
 
+{% block extrafooter %}
+<script>
+$(document).ready(() => {
+  let url = location.href.replace(/\/$/, "");
+ 
+  if (location.hash) {
+    const hash = url.split("#");
+    $('#myTab a[href="#'+hash[1]+'"]').tab("show");
+    url = location.href.replace(/\/#/, "#");
+    history.replaceState(null, null, url);
+    setTimeout(() => {
+      $(window).scrollTop(0);
+    }, 400);
+  } 
+   
+  $('a[data-toggle="tab"]').on("click", function() {
+    let newUrl;
+    const hash = $(this).attr("href");
+    if(hash == "#home") {
+      newUrl = url.split("#")[0];
+    } else {
+      newUrl = url.split("#")[0] + hash;
+    }
+    newUrl += "/";
+    history.replaceState(null, null, newUrl);
+  });
+});
+
+</script>
+{% endblock %}
 

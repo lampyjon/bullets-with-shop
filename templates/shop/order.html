@@ -1,0 +1,121 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% load bootstrap_field bootstrap_form from bootstrap4 %}
+{% block title %}Order #{{order.id}}{% endblock %}
+
+{% block content %} 
+   <h1>Order details (#{{order.id}}) : {{ order.status }}</h1>
+   <div class="row mb-3">
+    <div class="col">
+	<div class="card h-100">
+		<div class="card-header">Billing Address</div>
+	        <div class="card-body">
+		  <address  class="mb-0"><strong>{{ order.billing_name }}</strong> ({{order.email}})<br/>
+			{{ order.billing_address }}<br/>
+			{{ order.billing_postcode }}
+		  </address>
+		  <address></address>   
+		</div>
+	 </div>
+     </div>
+     {% if order.postage_amount != 0 %}
+
+     <div class="col">
+	<div class="card h-100">
+  		<div class="card-header">Delivery Address</div>
+	        <div class="card-body">
+		<address class="mb-0"><strong>{{ order.delivery_name }}</strong><br/>
+			{{ order.delivery_address }}<br/>
+			{{ order.delivery_postcode }}
+		</address>
+		</div>
+	</div>
+      </div>
+     {% endif %}	
+  </div>
+  
+
+   <div class="row mb-3">
+    <div class="col">
+	<div class="card h-100">
+		<div class="card-header">Items in order</div>
+	        <div class="card-body">
+
+   <table class="table table-sm">
+    <thead>
+     <tr>
+       <th>Item</th>
+       <th class="text-right">Quantity</th>
+       <th class="text-right">Price</th>
+       <th class="text-right">Total</th>
+     </tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+       <tr>
+        <td>{{item.item}}</a></td>
+        <td class="text-right">{{item.quantity_ordered}}</td>
+        <td class="text-right">&pound;{{item.item_price}}</td>
+        <td class="text-right">&pound;{{item.line_price}}</td>
+       </tr>
+	</form>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="3" class="text-right">Subtotal</th>
+	<th class="text-right">&pound;{{order.total}}</th>
+      </tr>
+      <tr>
+        <th colspan="3" class="text-right">Postage</th>
+        <th class="text-right">&pound;{{order.postage_amount}}</th>
+       </tr>
+       <tr>
+        <th colspan="3" class="text-right">Total</th>
+        <th class="text-right">&pound;{{order.grand_total}}</th>
+       </tr>
+     
+    </tfoot>
+ 	 </table>
+		</div>
+   
+	</div>
+     </div>
+    <div class="col">
+	<div class="card h-100">
+		<div class="card-header">Payment details</div>
+	        <div class="card-body">
+			{% if order.confirmed_payments.all.count > 0 %}
+			<p>Details of payments made and refunded on this order:</p>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Status</th>
+ 						<th>Amount</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for payment in order.confirmed_payments.all %}
+					<tr>
+						<td>{{payment.created}}</td>
+						<td>{{payment.get_status_display}}</td>
+						<td class="align-right">&pound;{{payment.total }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			{% else %}
+				<p>There are no payments on this order.</p>
+			{% endif %}
+			{% if order.fully_paid != True and order.cancelled != True %}
+			<a href="{% url 'shop:pay-order' order.unique_ref %}" class="btn btn-primary btn-block mb-3">Pay</a>
+			{% endif %}	
+		</div>
+	</div>
+     </div>
+  </div>
+{% endblock %}
+
+
+

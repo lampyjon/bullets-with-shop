@@ -23,6 +23,10 @@ shop_patterns = ([
    
     path('checkout/pay/<int:payment_id>', views.payment_details, name='pay'),
     path('checkout/pay/success/<uuid:uuid>', views.payment_success, name='payment-success'),
+
+    path('purchase/view/<uuid:uuid>', views.view_order, name='view-order'),
+    path('purchase/pay/<uuid:uuid>', views.make_payment, name='pay-order'),
+
 ], 'shop')
 
 
@@ -45,7 +49,7 @@ dashboard_patterns = ([
 
     path('products/<int:product_pk>/analytics', views.product_analytics, name='product-analytics'),
     path('products/<int:product_pk>/<int:year>/analytics', views.product_analytics, name='product-analytics'),
-
+    path('products/<int:product_pk>/purchases', views.product_purchases, name='product-purchases'),
 
     path('orders', views.order_list, {'status':'all'}, name='orders'),
     path('orders/paid', views.order_list, {'status':'paid'}, name='orders-paid'),

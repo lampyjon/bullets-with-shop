@@ -22,10 +22,47 @@
 
 <body id="page-top">
   <nav class="navbar navbar-dark bg-dark">
-      <a class="navbar-brand mr-0" href="#">Boldmere Bullets Shop - Dashboard</a>
+    <div class="dropdown d-block d-sm-none">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span data-feather="menu"></span>
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item nav-link" href="{% url 'dashboard:index' %}">
+                  <span data-feather="home"></span>
+                  Dashboard <span class="sr-only">(current)</span>
+                </a>
+
+                <a class="dropdown-item nav-link" href="{% url 'dashboard:products' %}">
+                  <span data-feather="shopping-cart"></span>
+                  Products
+                </a>
+
+                <a class="dropdown-item nav-link" href="{% url 'dashboard:orders-paid-outstanding' %}">
+                  <span data-feather="file"></span>
+                  Purchases 
+                </a>
+                <a class="dropdown-item nav-link" href="{% url 'dashboard:allocations' %}">
+                  <span data-feather="layers"></span>
+                  Allocations
+                </a>
+                <a class="dropdown-item nav-link" href="{% url 'dashboard:categories' %}">
+                  <span data-feather="folder"></span>
+                  Categories
+                </a>
+                <a class="dropdown-item nav-link" href="{% url 'dashboard:suppliers' %}">
+                  <span data-feather="users"></span>
+                  Suppliers
+                </a>
+                <a class="dropdown-item nav-link" href="{% url 'dashboard:postage' %}">
+                  <span data-feather="truck"></span>
+                  Postage
+                </a>
+  </div>
+</div>
+      <a class="navbar-brand mr-0" href="{% url 'dashboard:index' %}"><div class="d-none d-md-inline">Boldmere Bullets Shop - </div>Dashboard</a>
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-          <a class="nav-link" href="{% url 'logout' %}">Sign out {{ user.username }}</a>
+          <a class="nav-link" href="{% url 'logout' %}">Sign out<div class="d-none d-md-inline"> {{ user.username }}</div></a>
         </li>
       </ul>
     </nav>
@@ -36,7 +73,7 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link {%block dashboardHome%}{%endblock%}" href="#">
+                <a class="nav-link {%block dashboardHome%}{%endblock%}" href="{% url 'dashboard:index' %}">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>

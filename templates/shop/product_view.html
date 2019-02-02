@@ -5,7 +5,7 @@
 
 {% block content %} 
     <div class="row">
-      <div class="col">
+      <div class="col-sm-6">
 	{% if product.pictures.count > 1 %}
 			<div id="carouselExampleIndicators" class="carousel slide mb-3" data-ride="carousel">
   				<ol class="carousel-indicators">
@@ -33,7 +33,7 @@
 		<img class="d-block img-fluid" src="{{ product.picture_url }}" alt="Picture of {{ product }}">
 	{% endif %}
       </div>
-      <div class="col">
+      <div class="col-sm-6">
 		<h2>{{ product.name }}</h2>
 		{% if product.anything_to_buy %}		
 		<p class="lead">{{product.display_price}}</p>

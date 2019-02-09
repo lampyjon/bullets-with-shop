@@ -1,0 +1,85 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form bootstrap_field from bootstrap4 %}
+{% block dashboardVouchers %}active{% endblock %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Voucher - {{ voucher.code }}</h1>
+          </div>
+<div class="row">
+    <div class="col-sm-6">
+	<div class="card mb-3">
+  		<div class="card-header">Details</div>
+	        <div class="card-body">
+			<table class="table table-sm">
+				<tr><th>Code</th><td class="text-right">{{voucher.code}}</td></tr>
+				<tr><th>Value</th><td class="text-right">&pound;{{voucher.value}}</td></tr>
+				<tr><th>Valid from</th><td class="text-right">{{voucher.available_from }}</td></tr>				
+				<tr><th>Valid until</th><td class="text-right">{{voucher.available_until|default_if_none:"Forever" }}</td></tr>
+				<tr><th>Active?</th><td class="text-right">{{voucher.active }}</td></tr>
+				<tr><th>Number of uses</th><td class="text-right">{{voucher.number_of_uses }}</td></tr>
+				<tr><th>Used count</th><td class="text-right">{{voucher.used_count }}</td></tr>				
+			</table>
+			<a href="{% url 'dashboard:voucher-edit' voucher.pk %}" class="btn btn-block btn-outline-primary">edit</a>
+		</div>
+	</div>
+    </div>
+    <div class="col-sm-6">
+	<div class="card mb-3">
+  		<div class="card-header">Products</div>
+	        <div class="card-body">
+			{% if voucher.universal %}
+			<p>This voucher can be used on all products. Add a product to restrict the voucher.</p>
+			{% else %}
+ 				<form  method="post" class="form">
+            			{% csrf_token %}
+  				<input type="hidden" name="what" value="dpv">
+
+			{% for product in voucher.products.all %}
+				<div class="row"><div class="col"><a href="{% url 'dashboard:product-view' product.pk %}">{{product}}</a></div><div class="col"><button class="btn btn-sm btn-outline-danger" type="submit" name="product_id" value="{{ product.id }}">delete</button></div></div>
+			{% endfor %}
+			</form>
+			{% endif %}
+			  <form  method="post" class="form-inline mt-2" >
+            			{% csrf_token %}
+  				<input type="hidden" name="what" value="apv">
+				{% bootstrap_field apf.add_product show_label=False layout="horizontal" placeholder="Voucher" %} 
+				<button type="submit" class="btn btn-outline-primary ml-3">add</button>
+			</form>
+		</div>
+	</div>
+    </div>
+</div>
+
+<div class="card mb-3">
+  		<div class="card-header">Purchases associated with voucher</div>
+	        <div class="card-body">
+		    {% if voucher.used_count > 0 %}
+			<table class="table table-sm table-hover">
+  				<thead>
+    					<tr>
+						<th>#</th>
+						<th>Name</th>
+						<th class="text-right">Status</th>
+						<th class="text-right">Total</th>
+					</tr>
+  				</thead>
+  				<tbody>
+				{% for order in  voucher.order_set.all %}
+				<tr class='clickable-row' data-href='{% url 'dashboard:order' order.pk %}'>
+				<td>{{order.pk}}</td>
+				<td>{{order.name}}</td>
+				<td class="text-right">{{order.status}}</td>
+				<td class="text-right">&pound;{{order.grand_total}}</td>
+				</tr>
+				{% endfor %}
+  				</tbody>
+			</table>
+		{% else %}
+		<p>There are no purchases associated with this voucher yet.</p>
+		{% endif %}
+				</div>
+	</div>
+
+ {% endblock %} 

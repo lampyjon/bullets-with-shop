@@ -20,7 +20,9 @@ shop_patterns = ([
     path('checkout/billing', views.CheckoutBillingAddress, name='checkout-billing'),
     path('checkout/delivery', views.CheckoutDeliveryAddress, name='checkout-delivery'),
     path('checkout/summary', views.CheckoutSummary, name='checkout-summary'),
-   
+    path('checkout/voucher', views.CheckoutAddVoucher, name='checkout-voucher'),
+    path('checkout/voucher/remove', views.CheckoutRemoveVoucher, name='checkout-voucher-remove'),
+  
     path('checkout/pay/<int:payment_id>', views.payment_details, name='pay'),
     path('checkout/pay/success/<uuid:uuid>', views.payment_success, name='payment-success'),
 
@@ -68,6 +70,13 @@ dashboard_patterns = ([
     path('categories/add', views.CategoryCreate.as_view(), name='category-add'),
     path('categories/<int:pk>/edit', views.CategoryUpdate.as_view(), name='category-update'),
     path('categories/<int:pk>/delete', views.CategoryDelete.as_view(), name='category-delete'),
+
+
+    path('vouchers', views.VoucherList.as_view(), name='vouchers'),
+    path('vouchers/add', views.VoucherCreate.as_view(), name='voucher-add'),
+    path('vouchers/create-gift-voucher', views.gift_voucher_create, name='voucher-create-gift-voucher'),
+    path('vouchers/view/<int:pk>', views.voucher_view, name='voucher-view'),
+    path('vouchers/edit/<int:pk>', views.VoucherEdit.as_view(), name='voucher-edit'),
 
 
     path('suppliers', views.SupplierList.as_view(), name='suppliers'),

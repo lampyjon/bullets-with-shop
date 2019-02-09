@@ -354,6 +354,59 @@ class ProductHistory(models.Model):
         return str(self.item) + " " + self.get_event_display() + " (" + str(self.quantity) + ")"
 
 
+################################################ DISCOUNT CODE RELATED MODELS ################################################
+# 	Single use, one time money off voucher (fixed amount) - gift vouchers
+#	General sale voucher (fixed amount)
+
+class Voucher(models.Model):
+    code = models.CharField("Voucher Code", max_length=500, blank=False, unique=True)			# the code for the voucher
+    number_of_uses = models.IntegerField("How many times voucher can be used", default=1)		# max number of uses
+    used_count = models.IntegerField("Number of times voucher has been used", default=0)		# number of times used			
+    value = models.DecimalField("Price", max_digits=5, decimal_places=2)				# value of voucher
+    available_from = models.DateField("Available on or after this date", default=date.today)		# only purchase after this date
+    available_until = models.DateField("Available until this date", blank=True, null=True)		# stop purchases after this date
+    active = models.BooleanField("Active", default=True)						# can it be used?
+
+    products = models.ManyToManyField(Product, blank=True)			# which products does this apply to
+
+    def __str__(self):
+        return "Voucher " + str(self.code) + " (£" + str(self.value) + ")"
+
+    @property
+    def universal(self):				# Does this voucher apply to one or more products?
+        return not self.products.all().exists()
+
+    @property
+    def is_active(self):
+        if self.active != True:
+            return False
+
+        today = date.today()
+        if (today < self.available_from):
+            return False			# This voucher doesn't appear for a while 
+        
+        if self.available_until:
+            if (self.available_until < today):
+                return False			# This voucher appeared in the past
+
+        return True
+
+    @property					# Is this voucher still available to be used right now?
+    def is_valid(self):
+       return self.is_active and (self.used_count < self.number_of_uses)
+
+
+    def ok_for_product(self, product):		# can this voucher be used on this product?
+        if self.is_valid != True:
+            return False
+        if self.universal:
+            return True
+        return self.products.filter(pk=product.pk).exists()	# if the product appears anywhere in the set of products this voucher is for
+
+
+
+
+
 ################################################ ORDER RELATED MODELS ################################################
 
 class Order(models.Model):
@@ -378,6 +431,8 @@ class Order(models.Model):
     cancelled = models.BooleanField("Cancelled?", default=False)				# Is this order cancelled? 
     email_chase = models.BooleanField("Has stale order been chased via email?", default=False)	# We do a one-time chase on unpaid orders	
 
+    voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.SET_NULL)	# Any voucher on this order?
+
     def __str__(self):
         return "Purchase #" + str(self.pk) + " for " + str(self.name)
 
@@ -390,10 +445,14 @@ class Order(models.Model):
 
     @property
     def grand_total(self):					# grand total (inc. postage)
-        return self.total + self.postage_amount
+        x = self.total + self.postage_amount			
+        if self.voucher:
+            x = x - self.voucher.value
+        return max(x, Decimal(0.00))
+
 
     @property			
-    def total(self):						# subtotal (without any postage)
+    def total(self):						# subtotal (without any postage)	
         total = Decimal(0)
         for item in self.items.all():
             total = total + item.line_price
@@ -647,6 +706,7 @@ class Basket(models.Model):
 
     postage_amount = models.DecimalField("Postage", max_digits=5, decimal_places=2, default=Decimal(0))		# amount paid for postage
 
+    voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.SET_NULL)			# any voucher?
 
     @property
     def has_items(self):
@@ -669,7 +729,10 @@ class Basket(models.Model):
 
     @property
     def grand_total(self):
-        return self.basket_total + self.postage_amount
+        x = self.basket_total + self.postage_amount 
+        if self.voucher:
+            x = x - self.voucher.value
+        return max(x, Decimal(0.00))
 
     @property
     def must_not_post(self):  # return true if all item in the basket do not allow posting
@@ -697,6 +760,21 @@ class Basket(models.Model):
         return postage
 
 
+    def add_voucher(self, voucher):	# try to add a voucher to this basket
+        if voucher.is_valid != True:	# this voucher isn't valid!
+            return False		
+        if voucher.universal != True:	# this is a voucher for a specific product
+            x = False
+            for item in self.items.all():
+                if voucher.ok_for_product(item.item.product):	# this voucher is good for an item in the basket
+                    x = True
+            if x != True:		# No products match this voucher
+                return False
+
+        self.voucher = voucher		# ok to add this voucher to the basket
+        self.save()
+        return True
+
 
 class BasketItem(models.Model):
     basket = models.ForeignKey(Basket, on_delete=models.CASCADE, related_name='items')
@@ -707,7 +785,6 @@ class BasketItem(models.Model):
     @property
     def price(self):
         return self.item.product.price
-
 
     @property
     def total(self):
@@ -738,13 +815,5 @@ class Payment(BasePayment):
 
 
 
-################################################ DISCOUNT CODE RELATED MODELS ################################################
 
-
-#class DiscountCode
-#code name
-#percentage_off
-#fixed_amount_off
-#applies_to_product
-#applies_to_postage
 

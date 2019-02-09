@@ -1,11 +1,10 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Product, ProductItem, ProductPicture, Order
+from .models import Product, ProductItem, ProductPicture, Order, Voucher
 from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 from captcha.fields import ReCaptchaField
 import datetime
-
-
+from decimal import Decimal
 
 
 class ProductForm(ModelForm):
@@ -45,11 +44,6 @@ class ProductPictureForm(ModelForm):
         model = ProductPicture
         fields = ['image']
 
-
-class OrderHistoryItemForm(forms.Form):
-    comment = forms.CharField(required=False)
-
-
 class ReturnItemForm(forms.Form):
     quantity = forms.IntegerField(label="Quantity to Return", min_value=0)
     orderitem = forms.IntegerField(widget=forms.HiddenInput())
@@ -67,6 +61,60 @@ class OfflineSaleForm(forms.Form):
     name = forms.CharField(label="Name", max_length=500, required=False)
     address= forms.CharField(label="Address", widget=forms.Textarea(attrs={'rows':4}), required=False)
     postcode = forms.CharField(label="Postcode", max_length=8, required=False)
+
+
+class GiftVoucherForm(forms.Form):
+    value = forms.DecimalField(label="Value", min_value=Decimal(0.00), max_value=Decimal(100.00), initial=Decimal(25.00))
+
+
+class VoucherProduct(forms.Form):
+    add_product = forms.ModelChoiceField(queryset=Product.objects, label="Add product")
+
+    def __init__(self, *args, **kwargs):
+        voucher = kwargs.pop("voucher")
+        super(VoucherProduct, self).__init__(*args, **kwargs)
+
+        vp = voucher.products.all().values_list('pk', flat=True)		# tried to do this with .difference but it didn't work
+        qs = Product.objects.exclude(pk__in=vp)					# and gave a multipleobjectsreturned exception on the queryset 
+										# when the difference was an empty QS. 
+
+        self.fields['add_product'].queryset = qs
+
+
+class VoucherCreateForm(forms.ModelForm):
+    available_from = forms.DateField(widget=forms.DateInput(format = '%d-%m-%Y', attrs={'class': 'datepicker'},), input_formats=('%d-%m-%Y',), initial=datetime.date.today)
+    available_until = forms.DateField(widget=forms.DateInput(format = '%d-%m-%Y', attrs={'class': 'datepicker'},), input_formats=('%d-%m-%Y',), required=False )
+
+    class Meta:
+        model = Voucher
+        fields = ['code', 'value', 'number_of_uses', 'available_from', 'available_until', 'products']
+
+    def __init__(self, *args, **kwargs):
+        super(VoucherCreateForm, self).__init__(*args, **kwargs)
+        p = ('%d-%m-%Y','%Y-%m-%d')
+        self.fields['available_from'].input_formats=(p)
+        self.fields['available_until'].input_formats=(p)
+
+
+
+class VoucherEditForm(forms.ModelForm):
+    available_from = forms.DateField(widget=forms.DateInput(format = '%d-%m-%Y', attrs={'class': 'datepicker'},), input_formats=('%d-%m-%Y',), initial=datetime.date.today)
+    available_until = forms.DateField(widget=forms.DateInput(format = '%d-%m-%Y', attrs={'class': 'datepicker'},), input_formats=('%d-%m-%Y',), required=False )
+
+    class Meta:
+        model = Voucher
+        fields = ['code', 'number_of_uses', 'available_from', 'available_until', 'active']
+
+    def __init__(self, *args, **kwargs):
+        super(VoucherEditForm, self).__init__(*args, **kwargs)
+        p = ('%d-%m-%Y','%Y-%m-%d')
+        self.fields['available_from'].input_formats=(p)
+        self.fields['available_until'].input_formats=(p)
+
+
+
+
+
 
 
 
@@ -146,5 +194,12 @@ class OrderFormDeliveryAddress(forms.Form):
     delivery_address= forms.CharField(label="Address", widget=forms.Textarea(attrs={'rows':4}))
     delivery_postcode = forms.CharField(label="Postcode", max_length=8)
 
-# TODO set initial based on basket contents
+
+class OrderHistoryItemForm(forms.Form):
+    comment = forms.CharField(required=False)
+
+
+class VoucherForm(forms.Form):
+    code = forms.CharField(required=True)
+
 

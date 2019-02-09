@@ -23,7 +23,7 @@ def payment_made(sender, instance, **kwargs):
         pass # Object is new
 
     if payment.status != old_status:	
-        print("Payment status changed from " + str(old_status) + " to " + str(payment.status))
+        #print("Payment status changed from " + str(old_status) + " to " + str(payment.status))
         m = "Payment of £" + str(payment.total) + " (" + str(payment.variant) + ") status: " + str(payment.status)
  
         if payment.status == PaymentStatus.ERROR:
@@ -33,22 +33,36 @@ def payment_made(sender, instance, **kwargs):
         oh.save()
 
         if payment.status == PaymentStatus.CONFIRMED:
-            print("Payment is now Confirmed!")
+           # print("Payment is now Confirmed!")
             update_order_after_payment(order)
             # Now send the customer an email to confirm we've received their payment
 
             url = build_absolute_uri(reverse('shop:view-order', args=[order.unique_ref]))
             send_bullet_mail("emails/order-confirmed", [order.email], {'order':order, 'url':url})
-    else:
-        print("Payment status unchanged")
-  
+		
+            # TODO: send manager an email to advise of a new, paid order.
+
+     
 
 
 # When an order becomes fully paid, try and allocate some stock to it.
 def update_order_after_payment(order):
+    # mark any associated voucher as being used to the value of this order
+    if order.voucher:			
+        if order.voucher.is_valid:
+            order.voucher.used_count = F('used_count') + 1
+            order.voucher.save()
+        else:
+            # This is a problem - the voucher has become invalid during the payment flow. We'll make a note of this, and remove the voucher from the order.
+            oh = OrderHistory(order=order, comment="!!! " + str(order.voucher) + " - was used on this order. It has been automatically removed during the payment process, so there is still money owing on this order. !!!")
+            oh.save()
+
+            order.voucher = None
+            order.save()
+	    # TODO: send a manager email here, advising of the issue.
+
     for orderitem in order.items.all():
         (status, to_allocate_stock, to_allocate_from_order, to_order) = orderitem.item.order_or_allocate(orderitem.quantity_ordered)
-        #print("In update_order_after_payment " + str(status) + " - " + str(to_allocate_stock) + " - " + str(to_allocate_from_order) + " - " + str(to_order))
 
         if status == ProductItem.CANNOT_BUY:
 		# This is a big problem, as between the customer starting the order, and us getting the payment confirmed, we've run low/out of stock
@@ -73,7 +87,5 @@ def update_order_after_payment(order):
             orderitem.item.quantity_to_order = F('quantity_to_order') + to_order
             orderitem.item.quantity_allocated_on_order = F('quantity_allocated_on_order') + to_allocate_from_order
             orderitem.item.save()
-
-        #print("leaving signal handler, with qty allocated = " + str(orderitem.quantity_allocated))
 
 

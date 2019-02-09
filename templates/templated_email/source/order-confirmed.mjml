@@ -23,19 +23,25 @@
           			<tr>
             				<td>{{ item.item_name }} {% if item.need_to_order %}(*){% endif %}</td>
             				<td style="text-align:right;">{{item.quantity_ordered}}</td>
-            				<td style="text-align:right;">&pound;{{item.item_price}}</td>
-            				<td style="text-align:right;">&pound;{{item.line_price}}</td>
+            				<td style="text-align:right;">&pound;{{item.item_price|floatformat:2}}</td>
+            				<td style="text-align:right;">&pound;{{item.line_price|floatformat:2}}</td>
           			</tr>
           			{% endfor %}
 			{% if order.postage_amount > 0 %}
           			<tr>
-            				<th colspan="3" style="text-align:right;">Postage</th>
-					<th style="text-align:right;">&pound;{{order.postage_amount}}</th>
+            				<td colspan="3" style="text-align:right;">Postage</td>
+					<td style="text-align:right;">&pound;{{order.postage_amount|floatformat:2}}</td>
 				</tr>
+			{% endif %}
+			{% if order.voucher %}
+      				<tr>
+       					<td colspan="3" style="text-align:right;">Voucher ({{order.voucher.code}})</td>
+        				<td style="text-align:right;">-&pound;{{ order.voucher.value|floatformat:2}} </td>
+      				</tr>
 			{% endif %}
           		<tr>
             			<th colspan="3" style="text-align:right;">Grand Total</th>
-				<th style="text-align:right;">&pound;{{order.grand_total}}</th>
+				<th style="text-align:right;">&pound;{{order.grand_total|floatformat:2}}</th>
 			</tr>
         	</mj-table>
 		<mj-text>Items marked with (*) will be ordered from the supplier, and may take some time to deliver.</mj-text>

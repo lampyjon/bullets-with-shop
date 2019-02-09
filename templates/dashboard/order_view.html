@@ -40,7 +40,8 @@
 
 	<div class="card-header">Items</div>
 	        <div class="card-body">
-			<table class="table-responsive table-sm">
+		    <div class="table-responsive">
+			<table class="table table-sm">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -63,28 +64,30 @@
 				</tbody>
 				<tfoot>
 					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td class="text-right">Postage</td>
+						<td colspan="4" class="text-right">Postage</td>
 						<td class="text-right">&pound;{{order.postage_amount}}</td>
 					</tr>
+				{% if order.voucher %}
+      					<tr>
+       						<td colspan="4" class="text-right">Voucher (<a href="{% url 'dashboard:voucher-view' order.voucher.pk %}">{{order.voucher.code}}</a>)</td>
+        					<td class="text-right">-&pound;{{ order.voucher.value|floatformat:2}} </td>
+      					</tr>
+				{% endif %}
 					<tr>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th class="text-right">Grand total</th>
+						<th colspan="4" class="text-right">Grand total</th>
 						<th class="text-right">&pound;{{order.grand_total}}</th>
 					</tr>
 				</tfoot>
 			</table>
+		    </div>
 		</div>
 	</div>
 
 	<div class="card mb-3">
   		<div class="card-header">Notes and history</div>
 	        <div class="card-body">
-			<table class="table-responsive table-sm">
+		    <div class="table-responsive">
+			<table class="table table-sm">
 				<thead>
   				   <tr>
 					<th>When</th>
@@ -116,6 +119,7 @@
 				    </tr>
 				</tfoot>
 			</table>
+  		    </div>
 		</div>
 	</div>
 
@@ -171,8 +175,9 @@
   <div class="tab-pane fade" id="dispatch" role="tabpanel" aria-labelledby="dispatch-tab">
 		<form method="post" class="form-horizontal" action="{% url 'dashboard:order-items-dispatch' order.pk %}">
             		{% csrf_token %}
+		       <div class="table-responsive">
 
-			<table class="table-responsive">
+			<table class="table table-sm">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -194,6 +199,7 @@
 					{% endfor %}
 				</tbody>
 			</table>
+			</div>
 			{% if  order.dispatch_items.all.count > 0 %}
 			<button type="submit" class="btn btn-primary btn-block mb-3">Dispatch Items!</button>
 			{% endif %}
@@ -203,8 +209,9 @@
   </div>
 
   <div class="tab-pane fade" id="order" role="tabpanel" aria-labelledby="order-tab">
+    <div class="table-responsive">
 
-	<table class="table-responsive">
+	<table class="table table-sm">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -229,12 +236,13 @@
 				</tbody>
 			</table>
 
-
+	</div>
   </div>
 
   <div class="tab-pane fade" id="dispatched" role="tabpanel" aria-labelledby="dispatched-tab">
+     <div class="table-responsive">
 
-	<table class="table-responsive">
+	<table class="table table-sm">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -258,9 +266,11 @@
 					{% endfor %}
 				</tbody>
 			</table>
+	 </div>
   </div>
  <div class="tab-pane fade" id="refund" role="tabpanel" aria-labelledby="refund-tab">
-	<table class="table-responsive">
+   <div class="table-responsive">
+	<table class="table table-sm">
 				<thead>
 					<tr>
 						<th>Item</th>
@@ -282,11 +292,14 @@
 					{% endfor %}
 				</tbody>
 	</table>
+	</div>
   </div>
 
   <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
 	<p>Details of payments made and refunded on this order</p>
-	<table class="table-responsive">
+	<div class="table-responsive">
+
+	<table class="table table-sm">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -310,6 +323,7 @@
 					{% endfor %}
 				</tbody>
 			</table>
+	</div>
   </div>
 
 

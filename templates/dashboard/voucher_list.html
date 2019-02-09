@@ -1,0 +1,37 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block dashboardVouchers %}active{% endblock %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Vouchers</h1>
+          </div>
+<div>
+<table class="table table-sm">
+  <thead>
+	<tr>
+		<th>Code</th>
+		<th>Valid?</th>
+		<th class="text-right">Value</th>
+		<th class="text-right">Uses</th>
+		<th class="text-right">All products?</th>
+	</tr>
+  </thead>
+  <tbody>
+	{% for voucher in object_list %}
+	<tr>
+		<td><a href="{% url 'dashboard:voucher-view' voucher.pk %}">{{ voucher.code }}</a></td>
+		<td>{{ voucher.is_active|yesno:"Yes,No" }}</td>
+		<td class="text-right">&pound;{{ voucher.value }}</td>
+		<td class="text-right">{{ voucher.used_count }} / {{ voucher.number_of_uses }}</td>
+		<td class="text-right">{{ voucher.universal|yesno:"Yes,No" }}</td>
+	</tr>
+	{% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-outline-primary" href="{% url 'dashboard:voucher-create-gift-voucher' %}" role="button">Create gift voucher</a>
+<a class="btn btn-outline-primary" href="{% url 'dashboard:voucher-add' %}" role="button">Add new</a>
+
+</div>
+ {% endblock %} 

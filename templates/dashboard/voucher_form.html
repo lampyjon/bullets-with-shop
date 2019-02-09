@@ -1,0 +1,46 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+{% block dashboardVouchers %}active{% endblock %}
+
+
+
+{% block extraheader %}
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+{% endblock %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">{% if object %}Edit{% else %}Add{% endif %} Voucher</h1>
+          </div>
+<div>
+
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+	 {% bootstrap_form form layout="horizontal" %} 
+                       <p class="text-right">
+                		<button type="submit" class="btn btn-primary">Save</button>
+            		</p>
+        </form>
+
+
+
+</div>
+ {% endblock %}
+
+{% block footer_scripts %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+
+    <script>
+	$('.datepicker').datepicker({dateFormat: 'dd-mm-yy'});
+    </script>
+{% endblock %}
+ 

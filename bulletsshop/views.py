@@ -18,6 +18,9 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.sites.models import Site
 from django.forms import formset_factory, inlineformset_factory
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.views.decorators.csrf import csrf_exempt
+
+from payments import get_payment_model, RedirectNeeded
 
 
 # Python imports 
@@ -26,10 +29,11 @@ import uuid
 import random
 import os
 import calendar
+import string
 
 
-from .models import Product, ProductCategory, Supplier, ProductItem, ProductPicture, Order, OrderItem, Basket, BasketItem, Postage, OrderHistory, ProductHistory
-from .forms import ProductForm, ItemForm, ProductPictureForm, OrderHistoryItemForm, ShopProductForm, OrderFormPostage, OrderFormBillingAddress, OrderFormDeliveryAddress, ReturnItemForm, OfflineSaleForm
+from .models import Product, ProductCategory, Supplier, ProductItem, ProductPicture, Order, OrderItem, Basket, BasketItem, Postage, OrderHistory, ProductHistory, Voucher
+from .forms import ProductForm, ItemForm, ProductPictureForm, OrderHistoryItemForm, ShopProductForm, OrderFormPostage, OrderFormBillingAddress, OrderFormDeliveryAddress, ReturnItemForm, OfflineSaleForm, VoucherForm, GiftVoucherForm, VoucherProduct, VoucherCreateForm, VoucherEditForm
 
 from payments import PaymentStatus
 
@@ -215,7 +219,8 @@ def create_order_from_basket(basket, note):
                   delivery_postcode = basket.delivery_postcode,
                   email = basket.email,
                   postage_amount = basket.postage_amount,
-                  customer_notes = note)
+                  customer_notes = note,
+                  voucher=basket.voucher)
 
     order.save()
     
@@ -350,7 +355,13 @@ def CheckoutSummary(request):
     basket = get_basket(request)
 
     if basket == None:
-       return redirect('shop:home')
+       return redirect('shop:home')		
+
+    if basket.voucher != None:			# validate on entry that any voucher on this basket is ok (and remove if not)
+        if basket.add_voucher(basket.voucher) != True:		# bit of a cheeky way of 
+            messages.error(request, "That voucher cannot be used with this order")
+            basket.voucher = None
+            basket.save()
 
     if request.POST:
         orderform = OrderHistoryItemForm(request.POST)
@@ -366,13 +377,48 @@ def CheckoutSummary(request):
     else:
         orderform = OrderHistoryItemForm()
 
-    print(str(orderform))
-    return render(request, "shop/checkout-summary.html", {'basket':basket, 'form':orderform})
+    voucherform = VoucherForm()
+
+    return render(request, "shop/checkout-summary.html", {'basket':basket, 'form':orderform, 'voucherform':voucherform})
 
 
 
-from django.views.decorators.csrf import csrf_exempt
-from payments import get_payment_model, RedirectNeeded
+
+def CheckoutAddVoucher(request):		# Add a voucher to the basket (and check it is valid for the basket's contents)
+    basket = get_basket(request)
+
+    if basket == None:
+       return redirect('shop:home')
+
+    if request.POST:
+        voucherform = VoucherForm(request.POST)
+        if voucherform.is_valid():
+            vouchers = Voucher.objects.filter(code__iexact=voucherform.cleaned_data['code'])
+            if vouchers.exists():
+                voucher = vouchers[0]		# just take the first one
+                if basket.add_voucher(voucher):
+                    messages.success(request, "The voucher has been added successfully")
+                else:
+                    messages.error(request, "That voucher cannot be used with this order")
+            else:
+                messages.error(request, "Sorry, that is not a valid voucher")
+
+    return redirect(reverse('shop:checkout-summary'))	
+    
+            
+
+def CheckoutRemoveVoucher(request):		# Zero out the voucher from the basket
+    basket = get_basket(request)
+
+    if basket == None:
+       return redirect('shop:home')
+
+    basket.voucher = None
+    basket.save()
+    messages.success(request, "The voucher was removed")
+    return redirect(reverse('shop:checkout-summary'))
+
+
 
 
 def payment_details(request, payment_id):
@@ -420,9 +466,11 @@ def do_payment(request, order):					# make a payment and redirect to the payment
           
     return redirect(reverse('shop:pay', args=[payment.pk]))		# go to the payment page
 
+
 def view_order(request, uuid):					# Page to view order details
     order = get_object_or_404(Order, unique_ref=uuid)
     return render(request, 'shop/order.html', {'order':order})
+
 
 def make_payment(request, uuid):					# Quick redirection to payment page
     order = get_object_or_404(Order, unique_ref=uuid)
@@ -1195,3 +1243,81 @@ def allocations(request, order_by='name', item_pk=None):
     return render(request, "dashboard/allocations.html", {'allocations':allocations, 'order_by':order_by})
 
 
+
+
+
+## Voucher views
+class VoucherList(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Voucher
+    template_name="dashboard/voucher_list.html"
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+class VoucherCreate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
+    model = Voucher
+    form_class = VoucherCreateForm
+    template_name="dashboard/voucher_form.html"
+    success_url = reverse_lazy('dashboard:vouchers')
+    success_message = "Voucher was created successfully"
+
+    def test_func(self):
+        return is_shop_team(self.request.user)
+
+
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def gift_voucher_create(request):
+    if request.POST:
+        voucher_form = GiftVoucherForm(request.POST)
+        if voucher_form.is_valid():
+            x = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+            vcode = "BULLET_GIFT_" + x
+            voucher = Voucher(value=voucher_form.cleaned_data["value"], code=vcode)
+            voucher.save()
+            messages.success(request, "Voucher ("+ str(vcode) + ") was created")
+            return redirect(reverse('dashboard:vouchers'))
+    else:
+        voucher_form = GiftVoucherForm()
+  
+    return render(request, "dashboard/gift_voucher.html", {'form':voucher_form})
+
+
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def voucher_view(request, pk):
+    voucher = get_object_or_404(Voucher, pk=pk)
+
+    if request.POST:
+        x = request.POST.get("what", None)
+        if x == "apv":					# add a product to the voucher
+            apf = VoucherProduct(request.POST, voucher=voucher)
+            if apf.is_valid():
+               add_product = apf.cleaned_data['add_product']
+               voucher.products.add(add_product)
+               messages.success(request, str(add_product) + " was added to this voucher")
+
+        elif x == "dpv":				# delete a product from the voucher
+            product_id = request.POST.get("product_id", None)
+            product = get_object_or_404(Product, pk=product_id)
+            voucher.products.remove(product)
+            messages.success(request, str(product) + " was removed from this voucher")
+
+
+    apf = VoucherProduct(voucher=voucher)
+
+    return render(request, "dashboard/voucher_edit.html", {'voucher':voucher, 'apf':apf})    
+
+
+class VoucherEdit(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
+    model = Voucher
+    form_class = VoucherEditForm
+    template_name="dashboard/voucher_form.html"
+    success_message = "Voucher was updated successfully"
+
+    def test_func(self):
+        return is_shop_team(self.request.user)
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:voucher-view', kwargs={'pk': self.object.pk})
+ 
+    

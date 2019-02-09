@@ -6,7 +6,7 @@
 {% block content %} 
    <h1>Checkout : final review</h1>
    <div class="row mb-3">
-    <div class="col">
+    <div class="col-sm-6">
 	<div class="card h-100">
 		<div class="card-header">Billing Address
        		 <a href="{% url 'shop:checkout-billing' %}" class="btn btn-outline-primary btn-sm float-right">edit</a>
@@ -22,7 +22,7 @@
      </div>
      {% if basket.postage_amount != 0 %}
 
-     <div class="col">
+     <div class="col-sm-6">
 	<div class="card h-100">
   		<div class="card-header">Delivery Address
 <a href="{% url 'shop:checkout-delivery' %}" class="btn btn-outline-primary btn-sm float-right">edit</a>
@@ -40,52 +40,63 @@
   
 
    <div class="row mb-3">
-    <div class="col">
+    <div class="col-sm-6">
 	<div class="card h-100">
 		<div class="card-header">Items being ordered</div>
 	        <div class="card-body">
-
-   <table class="table table-sm">
-    <thead>
-     <tr>
-       <th>Item</th>
-       <th class="text-right">Quantity</th>
-       <th class="text-right">Price</th>
-       <th class="text-right">Total</th>
-     </tr>
-    </thead>
-    <tbody>
-      {% for item in basket.items.all %}
-       <tr>
-        <td><a href="{% url 'shop:product' item.item.product.pk item.item.product.slug %}">{{item.item}}</a></td>
-        <td class="text-right">{{item.quantity}}</td>
-        <td class="text-right">&pound;{{item.price}}</td>
-        <td class="text-right">&pound;{{item.total}}</td>
-       </tr>
-	</form>
-      {% endfor %}
-    </tbody>
-    <tfoot>
-      <tr>
-        <th colspan="3" class="text-right">Subtotal</th>
-	<th class="text-right">&pound;{{basket.basket_total}}</th>
-      </tr>
-      <tr>
-        <th colspan="3" class="text-right">Postage (<a href="{% url 'shop:checkout' %}">edit</a>)</th>
-        <th class="text-right">&pound;{{basket.postage_amount}}</th>
-       </tr>
-       <tr>
-        <th colspan="3" class="text-right">Total</th>
-        <th class="text-right">&pound;{{basket.grand_total}}</th>
-       </tr>
-     
-    </tfoot>
- 	 </table>
+   			<table class="table table-sm">
+    				<thead>
+     					<tr>
+      	 					<th>Item</th>
+       						<th class="text-right">Quantity</th>
+       						<th class="text-right">Price</th>
+       						<th class="text-right">Total</th>
+     					</tr>
+    				</thead>
+    				<tbody>
+      				{% for item in basket.items.all %}
+       				    <tr>
+        				<td><a href="{% url 'shop:product' item.item.product.pk item.item.product.slug %}">{{item.item}}</a></td>
+        				<td class="text-right">{{item.quantity}}</td>
+        				<td class="text-right">&pound;{{item.price|floatformat:2}}</td>
+        				<td class="text-right">&pound;{{item.total|floatformat:2}}</td>
+       				    </tr>
+      				{% endfor %}
+    				</tbody>
+   	 			<tfoot>
+      					<tr>
+        					<th colspan="3" class="text-right">Subtotal</th>
+						<th class="text-right">&pound;{{basket.basket_total|floatformat:2}}</th>
+      					</tr>
+      					<tr>
+        					<td colspan="3" class="text-right">Postage (<a href="{% url 'shop:checkout' %}">edit</a>)</td>
+        					<td class="text-right">&pound;{{basket.postage_amount|floatformat:2}}</td>
+       					</tr>
+		{% if basket.voucher %}
+      					<tr>
+        					<td colspan="3" class="text-right">Voucher ({{basket.voucher.code}}) (<a href="{% url 'shop:checkout-voucher-remove' %}">remove</a>)</td>
+        					<td class="text-right">-&pound;{{ basket.voucher.value|floatformat:2}} </td>
+       					</tr>
+		{% endif %}
+       					<tr>
+        					<th colspan="3" class="text-right">Total</th>
+        					<th class="text-right">&pound;{{basket.grand_total|floatformat:2}}</th>
+       					</tr>
+    				</tfoot>
+ 	 		</table>
+                {% if basket.voucher == None %}
+			<div class="float-right">
+			<form method="post" class="form-inline" action="{% url 'shop:checkout-voucher' %}">
+				{% csrf_token %}
+				{% bootstrap_field voucherform.code show_label=False layout="horizontal" placeholder="Voucher"%} 
+				<button type="submit" class="btn btn-outline-primary ml-3">add voucher</button>
+			</form>
+			</div>		
+		{% endif %}	
 		</div>
-   
 	</div>
      </div>
-    <div class="col">
+    <div class="col-sm-6">
 	<div class="card h-100">
 		<div class="card-header">Notes</div>
 	        <div class="card-body">

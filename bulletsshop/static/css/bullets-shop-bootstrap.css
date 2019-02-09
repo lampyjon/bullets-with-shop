@@ -2719,9 +2719,10 @@ input[type="button"].btn-block {
     text-decoration: none; }
   .nav-link.disabled {
     color: #6c757d; }
-  .active {
-    font-weight: bold; }
 
+a.nav-link.active {
+    font-weight: bold; 
+}
 
 .nav-tabs {
   border-bottom: 1px solid #dee2e6; }

@@ -133,8 +133,7 @@ def ShopProduct(request, product_pk, slug):
             # add to basket
             item = product_form.cleaned_data['item']
             qty = product_form.cleaned_data['quantity']
-            # TODO: so much stuff to do here to keep things sane!
-            if item.product.only_buy_one and qty>1:
+            if product.only_buy_one and qty>1:
                qty = 1
                messages.info(request, "You can only buy one of this item at a time")
 
@@ -143,17 +142,20 @@ def ShopProduct(request, product_pk, slug):
                 if created:
                     messages.success(request, str(item) + " was added to your basket")
                 else:
-                    basket_item.quantity = basket_item.quantity + qty
-                    basket_item.save()
-                    messages.success(request, str(item) + " - quantity updated in basket")       
+                    if product.only_buy_one != True:			# prevent adding items that you can only have one of!
+                        basket_item.quantity = basket_item.quantity + qty
+                        basket_item.save()
+                        messages.success(request, str(item) + " - quantity updated in basket")       
                 return redirect(reverse('shop:basket'))
             else:
                 messages.error(request, "This product is not in stock or available to order")
             
     # reset product form 
     product_form = ShopProductForm(product=product)
+
+    allow_add_product = not(basket.items.filter(item__product=product).exists() and product.only_buy_one) 
  
-    return render(request, "shop/product_view.html", {'product_form':product_form, 'product':product, 'basket':basket, 'categories':get_categories()})
+    return render(request, "shop/product_view.html", {'product_form':product_form, 'product':product, 'basket':basket, 'categories':get_categories(), 'allow_add_product':allow_add_product})
 
 
 def ShopBasketUpdate(request):			# update the basket with a single up/down for items
@@ -170,10 +172,13 @@ def ShopBasketUpdate(request):			# update the basket with a single up/down for i
                 messages.success(request, str(item.item) + " has been removed from your basket")
                 item.delete()
             elif action == "up":
-                # TODO: stock level check AND ALSO whether they're trying to buy multiple of a single item
-                item.quantity = item.quantity + 1
-                item.save()
-                messages.success(request, "Added 1 x " + str(item.item) + " to your basket")
+                # stock level check AND ALSO whether they're trying to buy multiple of a single item
+                if item.item.ok_to_add_to_basket(item.quantity+1):
+                    item.quantity = item.quantity + 1
+                    item.save()
+                    messages.success(request, "Added 1 x " + str(item.item) + " to your basket")
+                else:
+                    messages.error(request, "Cannot add " + str(item.item) + " to your basket")
             elif action == "down":
                 messages.success(request, "Removed 1 x " + str(item.item) + " from your basket")
                 if item.quantity > 1:
@@ -432,16 +437,15 @@ def payment_details(request, payment_id):
 
 @csrf_exempt
 def payment_success(request, uuid):
-    order = get_object_or_404(Order, unique_ref=uuid)		# TODO: what to do here?
-
-    print("order " + str(order) + " was paid!")
-    print(str(request.POST))
-
+    order = get_object_or_404(Order, unique_ref=uuid)		
     messages.success(request, "Your payment was received")
+    return redirect(reverse('shop:view_order', args=[order.unique_ref]))
 
-    return redirect(reverse('shop:home'))
-
-# TODO: payment_failure page
+@csrf_exempt
+def payment_failed(request, uuid):
+    order = get_object_or_404(Order, unique_ref=uuid)		
+    messages.error(request, "There was a problem processing your payment")
+    return redirect(reverse('shop:view_order', args=[order.unique_ref]))
 
 def do_payment(request, order):					# make a payment and redirect to the payment page
     # made order ok - make payment object for the order
@@ -470,6 +474,7 @@ def do_payment(request, order):					# make a payment and redirect to the payment
 def view_order(request, uuid):					# Page to view order details
     order = get_object_or_404(Order, unique_ref=uuid)
     return render(request, 'shop/order.html', {'order':order})
+
 
 
 def make_payment(request, uuid):					# Quick redirection to payment page
@@ -1245,10 +1250,27 @@ def allocations(request, order_by='name', item_pk=None):
 
     allocations = OrderItem.objects.order_by(ordering).filter(quantity_allocated__gt=0)
 
-    return render(request, "dashboard/allocations.html", {'allocations':allocations, 'order_by':order_by})
+    if item_pk:
+        item = get_object_or_404(ProductItem, pk=item_pk)
+        allocations = allocations.filter(item=item)
+
+    return render(request, "dashboard/allocations.html", {'allocations':allocations, 'order_by':order_by, 'item_pk':item_pk})
 
 
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def product_bulk_ship(request, item_pk):			# Bulk ship a particular productItem
+    productitem = get_object_or_404(ProductItem, pk=item_pk)
+    orderitems = OrderItem.objects.filter(quantity_allocated__gt=0).filter(item=productitem)
 
+    if request.POST:
+        for item in orderitems.all():
+            item.dispatch(item.quantity_allocated)	# This has got safety checks in it.
+
+        messages.success(request, "Bulk dispatch was completed")
+        return redirect(reverse('dashboard:product-view', args=[productitem.product.pk]))	
+
+    return render(request, "dashboard/product_bulk_ship.html", {'items':orderitems, 'productitem':productitem})
 
 
 ## Voucher views

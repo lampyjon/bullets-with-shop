@@ -1,0 +1,36 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block dashboardProducts %}active{% endblock %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Bulk Dispatch {{ productitem }}</h1>
+          </div>
+ 	<p>Do you wish to mark the following items as dispatched?</p>
+	<table class="table table-sm">
+		<thead>
+			<tr><th>Order #</th><th>Name</th><th>Quantity</th></tr>
+		</thead>
+		<tbody>
+	{% for item in items %}
+			<tr>
+				<td>{{ item.order.id }}</td>
+				<td>{{ item.order.name }}</td>
+				<td>{{ item.quantity_allocated }}</td>
+			</tr>
+	{% endfor %}	
+		</tbody>
+	</table>
+
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+	                        <p class="text-right">
+				<a class="btn btn-outline-primary" href="{% url 'dashboard:product-view' productitem.product.pk %}" role="button">cancel</a>			
+                		<button type="submit" class="btn btn-primary">dispatch</button>
+            		</p>
+        </form>
+     {% endblock %}
+
+
+

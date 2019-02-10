@@ -25,6 +25,7 @@ shop_patterns = ([
   
     path('checkout/pay/<int:payment_id>', views.payment_details, name='pay'),
     path('checkout/pay/success/<uuid:uuid>', views.payment_success, name='payment-success'),
+    path('checkout/pay/problem/<uuid:uuid>', views.payment_failed, name='payment-problem'),
 
     path('purchase/view/<uuid:uuid>', views.view_order, name='view-order'),
     path('purchase/pay/<uuid:uuid>', views.make_payment, name='pay-order'),
@@ -52,6 +53,8 @@ dashboard_patterns = ([
     path('products/<int:product_pk>/analytics', views.product_analytics, name='product-analytics'),
     path('products/<int:product_pk>/<int:year>/analytics', views.product_analytics, name='product-analytics'),
     path('products/<int:product_pk>/purchases', views.product_purchases, name='product-purchases'),
+
+    path('products/<int:item_pk>/dispatch', views.product_bulk_ship, name='product-bulk-ship'),
 
     path('orders', views.order_list, {'status':'all'}, name='orders'),
     path('orders/paid', views.order_list, {'status':'paid'}, name='orders-paid'),
@@ -98,8 +101,6 @@ dashboard_patterns = ([
     path('allocations/order', views.allocations, {'order_by': 'order'}, name='allocations-order'),
     path('allocations/item', views.allocations, {'order_by': 'item'}, name='allocations-item'),
     path('allocations/item/<int:item_pk>', views.allocations, name='allocations-specific-item'),
-
-
 
 
 ], 'dashboard')

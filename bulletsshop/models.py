@@ -201,6 +201,9 @@ class ProductItem(models.Model):
         return (self.OK_TO_BUY_OR_ORDER, from_stock, from_order, to_order)
  
     def ok_to_add_to_basket(self, quantity):
+        print("OBON : " + str(self.product.only_buy_one) + " - " + str(quantity))
+        if self.product.only_buy_one and quantity > 1:
+            return False
         (status, a, b, c) = self.order_or_allocate(quantity)
         print(str(status))
         return (status != self.CANNOT_BUY)
@@ -802,7 +805,7 @@ class Payment(BasePayment):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
 
     def get_failure_url(self):
-        return build_absolute_uri(reverse('shop:home'))			# TODO: what to do if failed
+        return build_absolute_uri(reverse('shop:payment-problem', kwargs={'uuid': self.order.unique_ref}))
 
     def get_success_url(self):
         return build_absolute_uri(reverse('shop:payment-success', kwargs={'uuid': self.order.unique_ref}))

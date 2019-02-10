@@ -227,7 +227,7 @@
 						</td>
 						{% if product.no_options != True %}<td>{{ item.extra_text }}</td>{% endif %}
 						<td class="text-right">{{ item.quantity_in_stock }}</td>
-						<td class="text-right">{{ item.quantity_allocated }}</td>
+						<td class="text-right"><a href="{% url 'dashboard:allocations-specific-item' item.pk %}">{{ item.quantity_allocated }}</a></td>
 						<td class="text-right">{{ item.quantity_to_order }}</td>
 						<td class="text-right">{{ item.quantity_on_order }}</td>
 						<td class="text-right">{{ item.spare_in_order }}</td>

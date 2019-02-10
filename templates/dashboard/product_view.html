@@ -202,7 +202,7 @@
 	</div>
 
 	<div class="card mb-3">
-  		<div class="card-header">Stock and Orders <a href="{% url 'dashboard:product-edit-items' product.pk %}" class="float-right btn btn-outline-primary btn-sm">add / edit</a></div>
+  		<div class="card-header">Stock and Orders <a href="{% url 'dashboard:product-edit-items' product.pk %}" class="float-right ml-3 btn btn-outline-primary btn-sm">add / edit</a> {% if product.anything_to_order %}<a href="{% url 'dashboard:supplier-order' product.supplier.pk %}" class="float-right btn btn-outline-primary btn-sm">order more stock</a>{% endif %}</div>
 	        <div class="card-body">
 			<div class="table-responsive-sm">
 			<table class="table table-sm">

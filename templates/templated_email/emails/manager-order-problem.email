@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - Purchase Problem{% endblock %}
+{% block html %}
+{% include 'templated_email/output/manager-order-problem.html' %}
+{% endblock %}

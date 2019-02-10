@@ -1,0 +1,22 @@
+<mjml>
+  <mj-head>
+    <mj-include path="./shared/styles.mjml" />
+  </mj-head>
+  <mj-body>
+      <mj-include path="./shared/header.mjml" />
+      <mj-section>
+        <mj-column>
+          <mj-text font-size="16px">
+           Hello! 
+          </mj-text>
+          	<mj-text>There was a problem when payment was received for a purchase on the Boldmere Bullets Online Shop</mj-text>
+   	  	<mj-text>Order {{ order.id }} for  {{ order.name }} ({{order.email}}).</mj-text>
+		<mj-text>The message is : {{ problem }}</mj-text>
+		<mj-text>You can view the order <a href="{{ url }}">online</a>.</mj-text>
+		</mj-column>
+		</mj-section>
+        </mj-column>
+      </mj-section>
+     <mj-include path="./shared/footer.mjml" />
+  </mj-body>
+</mjml>

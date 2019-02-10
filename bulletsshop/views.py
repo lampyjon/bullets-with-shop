@@ -156,7 +156,7 @@ def ShopProduct(request, product_pk, slug):
     return render(request, "shop/product_view.html", {'product_form':product_form, 'product':product, 'basket':basket, 'categories':get_categories()})
 
 
-def ShopBasketUpdate(request):
+def ShopBasketUpdate(request):			# update the basket with a single up/down for items
     basket = get_basket(request)
 
     if request.POST:
@@ -170,7 +170,7 @@ def ShopBasketUpdate(request):
                 messages.success(request, str(item.item) + " has been removed from your basket")
                 item.delete()
             elif action == "up":
-                # TODO: stock level check
+                # TODO: stock level check AND ALSO whether they're trying to buy multiple of a single item
                 item.quantity = item.quantity + 1
                 item.save()
                 messages.success(request, "Added 1 x " + str(item.item) + " to your basket")
@@ -475,6 +475,11 @@ def view_order(request, uuid):					# Page to view order details
 def make_payment(request, uuid):					# Quick redirection to payment page
     order = get_object_or_404(Order, unique_ref=uuid)
     return do_payment(request, order)
+
+
+
+
+
 
 
 ######################################## DASHBOARD VIEWS #####################################################################

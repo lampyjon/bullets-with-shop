@@ -145,6 +145,10 @@ class Product(models.Model):
     def anything_to_buy(self):
         return self.items_for_sale.exists()
 
+    @property
+    def anything_to_order(self):
+        return self.items.filter(quantity_to_order__gt=0).exists()
+
 
 
 # create at least one of these per product, this is stock keeping unit

@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - New Order{% endblock %}
+{% block html %}
+{% include 'templated_email/output/manager-order-confirmed.html' %}
+{% endblock %}

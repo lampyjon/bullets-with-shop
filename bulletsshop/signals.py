@@ -5,7 +5,7 @@ from payments import PaymentStatus
 from .models import Payment, OrderHistory, Order, ProductItem
 from django.db.models import F
 
-from bulletsweb.utils import send_bullet_mail, build_absolute_uri
+from bulletsweb.utils import send_bullet_mail, build_absolute_uri, send_manager_email
 from django.urls import reverse
 
 
@@ -39,8 +39,9 @@ def payment_made(sender, instance, **kwargs):
 
             url = build_absolute_uri(reverse('shop:view-order', args=[order.unique_ref]))
             send_bullet_mail("emails/order-confirmed", [order.email], {'order':order, 'url':url})
-		
-            # TODO: send manager an email to advise of a new, paid order.
+
+            url = build_absolute_uri(reverse('dashboard:order', args=[order.id]))
+            send_manager_email("emails/manager-order-confirmed", {'order':order, 'url':url})
 
      
 
@@ -59,7 +60,11 @@ def update_order_after_payment(order):
 
             order.voucher = None
             order.save()
-	    # TODO: send a manager email here, advising of the issue.
+
+	    #  send a manager email here, advising of the issue.
+            url = build_absolute_uri(reverse('dashboard:order', args=[order.id]))
+            send_manager_email("emails/manager-order-problem", {'order':order, 'url':url, 'problem': "A voucher was used which is no longer valid"})
+
 
     for orderitem in order.items.all():
         (status, to_allocate_stock, to_allocate_from_order, to_order) = orderitem.item.order_or_allocate(orderitem.quantity_ordered)
@@ -70,7 +75,11 @@ def update_order_after_payment(order):
  		# we will simply flag a problem, and let the shop admin figure out the best course of action
             oh = OrderHistory(order=order, comment="!!! Insufficient Stock !!! Cannot allocate " + str(orderitem.quantity_ordered) + " x " + str(orderitem.item_name))
             oh.save()
-	    # TODO: send a manager email here if this situation occurs.
+	    # send a manager email here if this situation occurs.
+            url = build_absolute_uri(reverse('dashboard:order', args=[order.id]))
+            send_manager_email("emails/manager-order-problem", {'order':order, 'url':url, 'problem': "There is insufficient stock for a purchase that was just paid for. Cannot allocate an item for this purchase."})
+
+
 
         else: 
             # update the amount of stock allocated to this order item

@@ -53,6 +53,16 @@ def update_order_after_payment(order):
         if order.voucher.is_valid:
             order.voucher.used_count = F('used_count') + 1
             order.voucher.save()
+
+            # figure out if there is any money left on this voucher, and let the admin know they need to issue a new voucher.
+            subtotal = (order.total + order.postage_amount)
+            voucher_difference = order.voucher.value - subtotal
+            if order.voucher.number_of_uses == 1 and voucher_difference > 0:
+                url = build_absolute_uri(reverse('dashboard:order', args=[order.id]))
+                send_manager_email("emails/manager-order-problem", {'order':order, 'url':url, 'problem': "A gift voucher (" + str(order.voucher.code) + ") was partially used. The voucher value was £"+str(order.voucher.value) + " and the order value was £"+ str(subtotal) + ". You need to create a new voucher with a value of £" + str(voucher_difference) + " for " + order.name + "("+order.email + ")"})
+
+          	# potential future improvement - automatically do this ^^^
+
         else:
             # This is a problem - the voucher has become invalid during the payment flow. We'll make a note of this, and remove the voucher from the order.
             oh = OrderHistory(order=order, comment="!!! " + str(order.voucher) + " - was used on this order. It has been automatically removed during the payment process, so there is still money owing on this order. !!!")

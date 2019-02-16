@@ -9,7 +9,7 @@
           <mj-text font-size="16px">
            Hello {{ order.name }}! 
           </mj-text>
-          	<mj-text>Thank you for your order from ye olde Boldmere Bullets Online Shoppe. We have successfully received your payment.</mj-text>
+          	<mj-text>Thank you for your order from the Boldmere Bullets Online Shop. We have successfully received your payment.</mj-text>
 
    	  	<mj-text>Order {{ order.id }}:</mj-text>
         	<mj-table>
@@ -50,7 +50,7 @@
 {{order.delivery_name}}
 {{order.delivery_address}}
 {{order.delivery_postcode}}</pre></mj-text>
-		<mj-text>If this address is not correct, please let us know immediately, and we can correct this.{%endif%}</mj-text>
+		<mj-text>If this address is not correct, please let us know immediately, and we can correct this. Please reply to this email to let us know the right address.{%endif%}</mj-text>
 
 		<mj-text>You can view your order <a href="{{ url }}">online</a>.</mj-text>
 		</mj-column>

@@ -12,6 +12,14 @@
 
     <title>Boldmere Bullets - Shop - {% block title %}{% endblock %}</title>
 
+    <meta property="og:url"                content="https://www.boldmerebullets.com{{ request.path }}" />
+    <meta property="og:type"               content="website" />
+    <meta property="og:title"              content="Boldmere Bullets - {% block facebookTitle %}{% endblock %}" />
+    <meta property="og:description"        content="{% block facebookDescription %}Boldmere Bullets Online Shop{% endblock %}" />
+    <meta property="og:image"              content="{% block facebookPicture %}{% static 'images/logo.png'%}{% endblock %}" />
+    <meta property="fb:app_id" 		   content="1861837574051990" />
+    <meta property="og:image:width"	   content="955">
+    <meta property="og:image:height"	   content="960">
 
     <!-- Bootstrap Core CSS -->
    <link rel="stylesheet" href="{% static 'css/bullets-shop-bootstrap.css' %}">

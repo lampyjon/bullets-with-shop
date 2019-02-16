@@ -439,13 +439,14 @@ def payment_details(request, payment_id):
 def payment_success(request, uuid):
     order = get_object_or_404(Order, unique_ref=uuid)		
     messages.success(request, "Your payment was received")
-    return redirect(reverse('shop:view_order', args=[order.unique_ref]))
+    return redirect(reverse('shop:view-order', args=[order.unique_ref]))
 
 @csrf_exempt
 def payment_failed(request, uuid):
     order = get_object_or_404(Order, unique_ref=uuid)		
     messages.error(request, "There was a problem processing your payment")
-    return redirect(reverse('shop:view_order', args=[order.unique_ref]))
+    return redirect(reverse('shop:view-order', args=[order.unique_ref]))
+
 
 def do_payment(request, order):					# make a payment and redirect to the payment page
     # made order ok - make payment object for the order

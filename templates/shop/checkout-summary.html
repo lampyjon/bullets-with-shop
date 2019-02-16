@@ -89,7 +89,7 @@
 			<form method="post" class="form-inline" action="{% url 'shop:checkout-voucher' %}">
 				{% csrf_token %}
 				{% bootstrap_field voucherform.code show_label=False layout="horizontal" placeholder="Voucher"%} 
-				<button type="submit" class="btn btn-outline-primary ml-3">add voucher</button>
+				<button type="submit" class="btn btn-outline-primary ml-3">add<span class="d-none d-md-inline"> voucher</span></button>
 			</form>
 			</div>		
 		{% endif %}	

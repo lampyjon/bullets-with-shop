@@ -2,6 +2,8 @@
 {% load static %}
 {% load bootstrap_form from bootstrap4 %}
 {% block title %}{{ product.name}}{% endblock %}
+{% block facebookTitle %}{{ product.name }}{% endblock %}
+{% block facebookDescription %}{{ product.description|safe }} {% endblock %}
 
 {% block content %} 
     <div class="row">

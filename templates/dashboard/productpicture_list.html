@@ -1,0 +1,34 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block dashboardProducts %}active{% endblock %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Pictures: {{ product }}</h1>
+          </div>
+<div>
+
+<div class="row">
+	{% for pic in product.pictures.all %}
+	<div class="col-md-3 mb-3 d-flex align-items-stretch">
+		<div class="card">
+  			<div class="card-body">
+				<img class="card-img-top" src="{{  pic.image.thumbnail.150x150 }}" alt="Picture of {{ product.name }}">
+    				<a href="{% url 'dashboard:product-picture-delete' pic.pk %}" class="btn btn-danger btn-block mt-2">delete</a>
+  			</div>
+		</div>
+	</div>
+        
+	{% endfor %}
+</div>
+
+
+                       <p class="text-right">
+				<a href="{% url 'dashboard:product-picture-add' product.pk %}" class="btn btn-primary">add picture</a>
+                		<a href="{% url 'dashboard:product-view' product.pk %}" class="btn btn-outline-primary">back to product</a>
+            		</p>
+
+
+</div>
+ {% endblock %} 

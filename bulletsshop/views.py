@@ -661,6 +661,29 @@ def product_picture_create(request, product_pk):
     return render(request, 'dashboard/productpicture_form.html', {'form': form, 'product':product})
 
 
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def product_picture_list(request, product_pk):
+    product = get_object_or_404(Product, pk=product_pk)
+   
+    return render(request, 'dashboard/productpicture_list.html', {'product':product})
+
+
+
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def product_picture_delete(request, productpicture_pk):
+    productpicture = get_object_or_404(ProductPicture, pk=productpicture_pk)
+
+    if request.method == 'POST':
+        product_pk = productpicture.product.pk
+        productpicture.delete()
+        messages.success(request, "Picture was deleted")
+        return redirect(reverse('dashboard:product-picture-view', args=[product_pk]))
+   
+    return render(request, 'dashboard/productpicture_delete.html', {'picture':productpicture})
+
+
 
 
 ## Product Item Views

@@ -347,7 +347,10 @@
 			</div>
 			{% endif %}
 
-			<a href="{% url 'dashboard:product-picture-add' product.pk %}" class="btn btn-primary btn-block">Add picture</a>
+			<a href="{% url 'dashboard:product-picture-add' product.pk %}" class="btn btn-primary btn-block">add picture</a>
+			{% if product.pictures.count > 0 %}
+				<a href="{% url 'dashboard:product-pictures-view' product.pk %}" class="btn btn-outline-primary btn-block">view pictures</a>
+			{% endif %}
   		</div>
 	</div>
 

@@ -1,0 +1,25 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Delete Product Picture</h1>
+          </div>
+<div>
+ <p>Deleting picture from {{ picture.product }}.</p>
+
+  <img class="img-thumbnail" src="{{  picture.image.thumbnail.150x150 }}" alt="Picture of {{ picture.product.name }}">
+
+  <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+                       <p class="text-right">
+				<a class="btn btn-outline-primary" href="{% url 'dashboard:product-pictures-view' picture.product.pk %}" role="button">back to pictures</a>				
+                		<button type="submit" class="btn btn-danger">Delete</button>
+            		</p>
+        </form>
+
+
+
+</div>
+ {% endblock %} 

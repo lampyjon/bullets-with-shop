@@ -49,6 +49,9 @@ dashboard_patterns = ([
 
     path('products/<int:product_pk>/items/edit', views.product_edit_items, name='product-edit-items'),
     path('products/<int:product_pk>/pictures/add', views.product_picture_create, name='product-picture-add'),
+    path('products/<int:product_pk>/pictures/view', views.product_picture_list, name='product-pictures-view'),
+    path('products/pictures/<int:productpicture_pk>/delete', views.product_picture_delete, name='product-picture-delete'),
+
 
     path('products/<int:product_pk>/analytics', views.product_analytics, name='product-analytics'),
     path('products/<int:product_pk>/<int:year>/analytics', views.product_analytics, name='product-analytics'),

@@ -26,7 +26,7 @@
 <table class="table table-sm table-hover">
   <thead>
         <tr>
-		<th colspan="4"></th>
+		<th colspan="5"></th>
 		<th colspan="4" class="text-center">Items</th>
 		<th></th>
 	</tr>
@@ -34,6 +34,7 @@
 		<th>#</th>
 		<th>Name</th>
 		<th class="text-right">Status</th>
+		<th class="text-right">Postage?</th>
 		<th class="text-right">Total</th>
 		<th class="text-right">Purchased</th>
 		<th class="text-right">Despatched</th>
@@ -48,6 +49,7 @@
 		<td>{{order.pk}}</td>
 		<td>{{order.name}}</td>
 		<td class="text-right">{{order.status}}</td>
+		<td class="text-center">{% if order.postage_amount > 0 %}<span class="badge badge-primary">post</span>{% endif %}</td>
 		<td class="text-right">&pound;{{order.grand_total}}</td>
 		<td class="text-right">{{order.items_in_order}}</td>
 		<td class="text-right">{{order.dispatched_items.count}}</td>

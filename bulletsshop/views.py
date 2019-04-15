@@ -917,16 +917,14 @@ def supplier_delivery(request, supplier_pk):
                 item = ProductItem.objects.get(pk=y)
                 qty_arrived = int(value)
 
-                p = item.stock_arrived(qty_arrived)
-                print(str(p))			# TODO: This looks wrong. Shouldn't it be an append?
-                allocations.extend(p)
+                allocations.extend(item.stock_arrived(qty_arrived))
                 ph = ProductHistory(item=item, quantity=qty_arrived, event=ProductHistory.RECEIVED)
                 ph.save()
 
                 items_count = items_count + qty_arrived
 
         messages.success(request, 'Added %d items from delivery' % (items_count,))
-        print("allocations = " + str(allocations))
+       # print("allocations = " + str(allocations))
         return render(request, 'dashboard/supplier_delivery_allocations.html', {'supplier':supplier, 'allocations':allocations})
 
     return render(request, 'dashboard/supplier_delivery.html', {'supplier': supplier, 'items': items })

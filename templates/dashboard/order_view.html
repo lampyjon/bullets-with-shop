@@ -91,10 +91,15 @@
 				<thead>
   				   <tr>
 					<th>When</th>
-					<th>Note</th>
+					<th>Activity</th>
 				   </tr>
 				</thead>
 				<tbody>
+				   {% if order.customer_notes %}
+				   <tr>
+					<td>{{ order.created|date:"d/m/y H:i:s"}}</td>
+					<td><strong>customer note: </strong>{{order.customer_notes}}</td>
+				   </tr>{% endif %}
 					{% for history in order.comments.all %}
 				    <tr>
 					<td>{{ history.created|date:"d/m/y H:i:s" }}</td>
@@ -127,6 +132,17 @@
 
  </div>
  <div class="col">
+	{% if order.postage_amount > 0 %}
+ 	<div class="card mb-3">
+  		<div class="card-header">Postage <div class="float-right">&pound;{{order.postage_amount}}</div></div>
+	        <div class="card-body">
+			<address><strong>{{ order.delivery_name }}</strong><br/>
+			{{ order.delivery_address }}<br/>
+			{{ order.delivery_postcode }}
+			</address>
+		</div>
+	</div>
+	{% endif %}
  	<div class="card mb-3">
   		<div class="card-header">Billing</div>
 	        <div class="card-body">

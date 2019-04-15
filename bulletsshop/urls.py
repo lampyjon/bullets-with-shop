@@ -88,6 +88,7 @@ dashboard_patterns = ([
     path('suppliers/<int:pk>/delete', views.SupplierDelete.as_view(), name='supplier-delete'),
     path('suppliers/<int:pk>', views.SupplierDetail.as_view(), name='supplier-view'),
     path('suppliers/<int:supplier_pk>/delivery', views.supplier_delivery, name='supplier-delivery'),
+    path('suppliers/delivery/dispatch', views.supplier_delivery_dispatch, name='supplier-delivery-dispatch'),
     path('suppliers/<int:supplier_pk>/order', views.supplier_order, name='supplier-order'),
 #   path('suppliers/<int:supplier_pk>/order/save', views.supplier_order_save, name='supplier-order-save'),
 

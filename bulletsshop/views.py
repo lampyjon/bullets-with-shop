@@ -917,17 +917,41 @@ def supplier_delivery(request, supplier_pk):
                 item = ProductItem.objects.get(pk=y)
                 qty_arrived = int(value)
 
-                allocations = item.stock_arrived(qty_arrived)
+                p = item.stock_arrived(qty_arrived)
+                print(str(p))			# TODO: This looks wrong. Shouldn't it be an append?
+                allocations.extend(p)
                 ph = ProductHistory(item=item, quantity=qty_arrived, event=ProductHistory.RECEIVED)
                 ph.save()
 
                 items_count = items_count + qty_arrived
 
         messages.success(request, 'Added %d items from delivery' % (items_count,))
-
+        print("allocations = " + str(allocations))
         return render(request, 'dashboard/supplier_delivery_allocations.html', {'supplier':supplier, 'allocations':allocations})
 
     return render(request, 'dashboard/supplier_delivery.html', {'supplier': supplier, 'items': items })
+
+
+
+# dispatch all items associated with a supplier order that has just arrived
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def supplier_delivery_dispatch(request):
+    if request.method == 'POST':
+        for key, value in request.POST.items():
+            #print(str(key) + " - " + str(value))
+            if key.startswith("orderitem_pk_"):
+                x = key[13:]
+                y = int(x)
+                item = OrderItem.objects.get(pk=y)
+                qty = int(value)
+
+                item.dispatch(qty)
+
+    messages.success(request, "Items dispatched")
+    return redirect(reverse('dashboard:allocations'))
+
+
 
 
 # create a new order for this supplier, and adjust stock levels accordingly

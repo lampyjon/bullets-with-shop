@@ -266,8 +266,9 @@ class ProductItem(models.Model):
 
 
 
-    def stock_arrived(self, qty_arrived):
+    def stock_arrived(self, qty_arrived): 
         # add stock into the inventory and then try and distribute to existing orders
+	# returns a list of {'orderitem':orderitem, 'just_allocated':oi_to_allocate} - which orderitems just got how many items allocated to them
 
         to_allocate = min(qty_arrived, self.quantity_allocated_on_order) 			# how many do we have to allocate?
         spare = max(0, qty_arrived - to_allocate)						# what's left from the order after allocations?

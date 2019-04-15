@@ -7,7 +7,9 @@
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h1">Delivery from {{ supplier }}</h1>
           </div>
- 	<p>The follow items in the delivery are allocated to these people:</p>
+       <form method="post" id="form-product" action="{% url 'dashboard:supplier-delivery-dispatch' %}">
+            {% csrf_token %}
+ 	<p>The following items in the delivery are allocated to these people:</p>
             <table class="table">
               <thead>
                 <tr>
@@ -21,12 +23,17 @@
 		<tr>
 		  <td>{{thing.orderitem.item_name}}</td>
 		  <td><a href="{% url 'dashboard:order' thing.orderitem.order.pk %}">{{thing.orderitem.order}}</a></td>
-		  <td class="text-right">{{thing.just_allocated}}</td>
+		  <td class="text-right">{{thing.just_allocated}} <input name="orderitem_pk_{{ thing.orderitem.pk }}" id="orderitem_pk_{{ thing.orderitem.pk }}" type="hidden" value="{{ thing.just_allocated }}">
+</td>
 		</tr>
 		{% endfor %}
 	      </tbody>
 	    </table>
-	<a href="{% url 'dashboard:allocations' %}" class="btn btn-primary btn-block mb-3">View all allocations</a>
+	{% if allocations %}
+		<button type="submit" class="btn btn-primary btn-block">Dispatch all of these items</button>
+	{% endif %}
+
+	<a href="{% url 'dashboard:allocations' %}" class="btn btn-outline-primary btn-block mb-3">View all allocations</a>
 
      {% endblock %}
 

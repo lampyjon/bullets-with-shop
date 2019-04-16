@@ -53,8 +53,10 @@
 	<h2>Email addresses for these purchasers</h2>
 	<p>You <strong>must</strong> ensure you use BCC to email these people!</p>
         {% regroup allocations by order.email as email_list %}
-	<samp>
+	<samp><a href="mailto:?bcc={% for email, items in email_list %}{{ email }}{% if forloop.last != True%},{%endif%}{%endfor%}&subject=Your Boldmere Bullets Order">
+
 {% for email, items in email_list %}{{ email }}{% if forloop.last != True%}, {%endif%}{% endfor %}
+	</a>
 	</samp>
 
 

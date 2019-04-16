@@ -41,9 +41,9 @@
 	<p>You <strong>must</strong> ensure you use BCC to email these people!</p>
         {% regroup on_order_items by order.email as email_list %}
 
-	<pre>
-{% for email, items in email_list %}{{ email }}{% if forloop.last != True%}, {%endif%}{% endfor %}
-	</pre>
+	<samp><a href="mailto:?bcc={% for email, items in email_list %}{{ email }}{% if forloop.last != True%},{%endif%}{%endfor%}&subject=Your Boldmere Bullets Order">
+{% for email, items in email_list %}{{ email }}{% if forloop.last != True%}, {%endif%}{% endfor %}</a>
+	</samp>
 
      {% endblock %}
 

@@ -229,7 +229,7 @@
 						<td class="text-right">{{ item.quantity_in_stock }}</td>
 						<td class="text-right"><a href="{% url 'dashboard:allocations-specific-item' item.pk %}">{{ item.quantity_allocated }}</a></td>
 						<td class="text-right">{{ item.quantity_to_order }}</td>
-						<td class="text-right">{{ item.quantity_on_order }}</td>
+						<td class="text-right"><a href="{% url 'dashboard:on-order-allocations' item.pk %}">{{ item.quantity_on_order }}</a></td>
 						<td class="text-right">{{ item.spare_in_order }}</td>
 					</tr>
 				{% endfor %}

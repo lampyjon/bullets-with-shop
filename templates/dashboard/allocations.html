@@ -17,9 +17,10 @@
 			<div class="col-9">
 				<div class="row">
 					<div class="col-2"><strong><a href="{% url 'dashboard:allocations-order' %}">Order #</a></strong></div>
-					<div class="col-3 text-right"><strong><a href="{% url 'dashboard:allocations-date' %}">Date</a></strong></div>
+					<div class="col-1 text-right"><strong><a href="{% url 'dashboard:allocations-date' %}">Date</a></strong></div>
 					<div class="col-1 text-right"><strong>Qty.</strong></div>
 					<div class="col"><strong><a href="{% url 'dashboard:allocations-item' %}">Item</a></strong></div>
+					<div class="col"><strong>notes</strong></div>
 				</div>
 			</div>
 		</div>
@@ -35,9 +36,10 @@
 				{% for item in items %}
 				<div class="row">
 					<div class="col-2"><a href="{% url 'dashboard:order' item.order.pk %}">Order #{{ item.order.pk }}</a></div>
-					<div class="col-3 text-right">{{ item.order.created|date:"d/m/y H:i:s" }}</div>
+					<div class="col-1 text-right">{{ item.order.created|date:"d/m/y" }}</div>
 					<div class="col-1 text-right">{{ item.quantity_allocated }}</div>
 					<div class="col">{{ item.item_name }}</div>
+					<div class="col">{{ item.order.customer_notes }}</div>
 					</div>
 				{% endfor %}
 			</div>
@@ -47,6 +49,15 @@
 	{% if item_pk %}
         	<a href="{% url 'dashboard:product-bulk-ship' item_pk %}" class="btn btn-outline-primary btn-block">bulk ship these items</a>
 	{% endif %}
+
+	<h2>Email addresses for these purchasers</h2>
+	<p>You <strong>must</strong> ensure you use BCC to email these people!</p>
+        {% regroup allocations by order.email as email_list %}
+	<samp>
+{% for email, items in email_list %}{{ email }}{% if forloop.last != True%}, {%endif%}{% endfor %}
+	</samp>
+
+
      {% endblock %}
 
 

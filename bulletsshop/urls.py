@@ -106,6 +106,9 @@ dashboard_patterns = ([
     path('allocations/item', views.allocations, {'order_by': 'item'}, name='allocations-item'),
     path('allocations/item/<int:item_pk>', views.allocations, name='allocations-specific-item'),
 
+    path('allocations/item/on-order/<int:item_pk>', views.on_order_allocations, name='on-order-allocations'),
+
+
 
 ], 'dashboard')
 

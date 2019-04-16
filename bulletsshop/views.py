@@ -1282,6 +1282,8 @@ def order_item_return(request, pk):		# Return an item from an order
 
 
 
+
+
 # Product allocations
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
@@ -1305,6 +1307,17 @@ def allocations(request, order_by='name', item_pk=None):
 
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def on_order_allocations(request, item_pk):		# This view shows us who has this item which is on order from a supplier
+    item = get_object_or_404(ProductItem, pk=item_pk)
+
+    on_order_items = item.ordered_items.filter(quantity_ordered__gt=F('quantity_delivered')+F('quantity_allocated')+F('quantity_refunded'))	# TODO: make a property on ProductItem?
+
+    return render(request, "dashboard/allocations_on_order.html", {'item':item, 'on_order_items':on_order_items})
+
+
+
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def product_bulk_ship(request, item_pk):			# Bulk ship a particular productItem
     productitem = get_object_or_404(ProductItem, pk=item_pk)
     orderitems = OrderItem.objects.filter(quantity_allocated__gt=0).filter(item=productitem)
@@ -1317,6 +1330,8 @@ def product_bulk_ship(request, item_pk):			# Bulk ship a particular productItem
         return redirect(reverse('dashboard:product-view', args=[productitem.product.pk]))	
 
     return render(request, "dashboard/product_bulk_ship.html", {'items':orderitems, 'productitem':productitem})
+
+
 
 
 ## Voucher views

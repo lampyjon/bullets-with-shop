@@ -1,0 +1,51 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block dashboardAllocations %}active{% endblock %}
+
+
+{% block content %} 
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h1">Allocations for {{ item }} (on order)</h1>
+          </div>
+ 	<p>The following purchases are waiting for stock of <a href="{% url 'dashboard:product-view' item.product.pk %}">{{item}}</a> which is on order from the supplier:</p>
+
+	<table class="table table-sm">
+		<thead>
+			<tr>
+				<th>Purchase #</th>
+				<th>Name</th>
+				<th class="text-right">Qty on order</th>
+				<th>Notes</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for oi in on_order_items %}
+			<tr>
+				<td><a href="{% url 'dashboard:order' oi.order.pk %}#order">{{ oi.order.pk}}</a></td>
+				<td>{{ oi.order.name }}</td>
+				<td class="text-right">{{ oi.unallocated }}</td>
+				<td>{{ oi.order.customer_notes}}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+		<tfoot>
+			<tr>
+				<th></th>
+				<th class="text-right">total:</th>
+				<th class="text-right">{{item.quantity_allocated_on_order }}</th>
+				<th></th>
+			</tr>
+	</table>
+
+	<h2>Email addresses for these purchasers</h2>
+	<p>You <strong>must</strong> ensure you use BCC to email these people!</p>
+        {% regroup on_order_items by order.email as email_list %}
+
+	<pre>
+{% for email, items in email_list %}{{ email }}{% if forloop.last != True%}, {%endif%}{% endfor %}
+	</pre>
+
+     {% endblock %}
+
+
+

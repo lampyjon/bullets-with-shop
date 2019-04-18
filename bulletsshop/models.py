@@ -221,11 +221,16 @@ class ProductItem(models.Model):
     def spare_in_order(self):
         return max(0, self.quantity_on_order - self.quantity_allocated_on_order)
 
-    def __str__(self):
+    @property
+    def raw_name(self):
         if self.product.no_options:
             x = str(self.product)
         else:
             x = str(self.product) + " - " + str(self.extra_text)
+        return x
+
+    def __str__(self):
+        x = self.raw_name
         if (self.quantity_in_stock) == 0 and self.product.allow_supplier_orders:
             x = x + " (*)"
         return x
@@ -589,7 +594,7 @@ class OrderItem(models.Model):
     def line_price(self):
         return (self.item_price * self.quantity_ordered)
 
-    # helper to adjust status when we ship stuff
+    # helper to display status 
     @property
     def status(self):
         if self.quantity_ordered == 0:

@@ -252,7 +252,7 @@ def create_order_from_basket(basket, note):
  	# make an order Item for this basket line
         orderitem = OrderItem(item=basket_item.item, 
                               order=order,
-                              item_name=str(basket_item.item),
+                              item_name=str(basket_item.item.raw_name),
                               item_price=basket_item.item.product.price,
                               item_postage_required=basket_item.item.product.postage_required,
                               quantity_ordered=basket_item.quantity,

@@ -47,7 +47,7 @@ def index(request):
     strava_runners = site.settings.runners 
     strava_cyclists = site.settings.cyclists
 
-#    now = timezone.now()
+    now = timezone.now()
 
 #    week_run_miles =  ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__gte=(now-datetime.timedelta(days=7))).aggregate(Sum('distance'))['distance__sum']
 #    week_ride_miles =  ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__gte=(now-datetime.timedelta(days=7))).aggregate(Sum('distance'))['distance__sum']

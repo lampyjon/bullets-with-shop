@@ -47,18 +47,18 @@ class Command(BaseCommand):
             self.stdout.write("Got this many cyclists = " + str(cycling_club.member_count))
             settings_obj.cyclists = cycling_club.member_count
             
-            self.stdout.write("Getting cycling activities")
-            cycling_activities = client.get_club_activities(settings.STRAVA_CYCLING_CLUB)	# Just get all of them, database can dedupe
-            self.insert_into_db(cycling_activities, ActivityCache.RIDE)
+    #        self.stdout.write("Getting cycling activities")
+    #        cycling_activities = client.get_club_activities(settings.STRAVA_CYCLING_CLUB)	# Just get all of them, database can dedupe
+    #        self.insert_into_db(cycling_activities, ActivityCache.RIDE)
 
         if settings.STRAVA_RUNNING_CLUB != 0:
             running_club = client.get_club(settings.STRAVA_RUNNING_CLUB)
             self.stdout.write("Got this many runners = " + str(running_club.member_count))
             settings_obj.runners = running_club.member_count
 
-            self.stdout.write("Getting running activities")
-            running_activities = client.get_club_activities(settings.STRAVA_RUNNING_CLUB)
-            self.insert_into_db(running_activities, ActivityCache.RUN)
+    #        self.stdout.write("Getting running activities")
+    #        running_activities = client.get_club_activities(settings.STRAVA_RUNNING_CLUB)
+    #        self.insert_into_db(running_activities, ActivityCache.RUN)
 
         settings_obj.save()
 

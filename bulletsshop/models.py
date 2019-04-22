@@ -819,7 +819,7 @@ class Payment(BasePayment):
 
     def get_purchased_items(self):
         items = []
-        for item in self.order.ordered_items.all():
+        for item in self.order.items.all():
             x = PurchasedItem(name=item.item_name, sku='SKU',
                             quantity=item.quantity_ordered, price=item.item_price, currency='GBP')
             items.append(x)

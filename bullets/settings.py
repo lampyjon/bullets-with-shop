@@ -209,7 +209,7 @@ if DEBUG_PAY:
         }
 else:
     PAYMENT_VARIANTS = {
-        'paypal': ('payments.paypal.PaypalProvider', {
+        'default': ('payments.paypal.PaypalProvider', {
             'client_id': os.environ.get('PAYPAL_CLIENT_ID'),   
             'secret': os.environ.get('PAYPAL_SECRET'),
             'endpoint': 'https://api.paypal.com',

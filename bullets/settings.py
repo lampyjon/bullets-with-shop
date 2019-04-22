@@ -215,7 +215,7 @@ else:
             'capture': True}),       
         }
 
-
+print("Payment Variants = " + str(PAYMENT_VARIANTS))
 
 LOGIN_REDIRECT_URL = 'core-team-admin'
 

@@ -25,6 +25,7 @@ def get_bool_from_env(name, default_value):
 
 
 DEBUG = get_bool_from_env('DEBUG', True)
+DEBUG_PAY = get_bool_from_env('DEBUG_PAY', True)
 
 ALLOWED_HOSTS = []
 
@@ -202,7 +203,7 @@ PAYMENT_HOST = get_host
 #
 PAYMENT_MODEL = 'bulletsshop.Payment'
 #
-if DEBUG:
+if DEBUG_PAY:
     PAYMENT_VARIANTS = {
         'default': ('payments.dummy.DummyProvider', {})
         }
@@ -214,8 +215,6 @@ else:
             'endpoint': 'https://api.paypal.com',
             'capture': True}),       
         }
-
-print("Payment Variants = " + str(PAYMENT_VARIANTS))
 
 LOGIN_REDIRECT_URL = 'core-team-admin'
 

@@ -350,7 +350,7 @@ def bullets_core_team(request):
 
     can_edit = is_core_team(request.user)
 
-    return render(request, "bullets/admin/core_team.html", {'bullets':bullets, 'bullets_week':bullets_week, 'bullets_month':bullets_month, 'news_items':news_items, 'big_bullets_riders':None, 'can_edit':can_edit})
+    return render(request, "bullets/admin/core_team.html", {'bullets':bullets, 'bullets_week':bullets_week, 'bullets_month':bullets_month, 'news_items':news_items, 'can_edit':can_edit})
 
 
 

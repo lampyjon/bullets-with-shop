@@ -1,48 +1,63 @@
 from django.core.management.base import BaseCommand, CommandError
-from bullets.models import ActivityCache
+from bulletsweb.models import Bullet
 from django.conf import settings
 import csv
-from storages.backends.s3boto import S3BotoStorage
 import codecs
+from django.utils import timezone
 
+# Bullet
+#    name = models.CharField("name", max_length=200)
+#    email = models.EmailField('email address', max_length=200)
+#    date_added = models.DateField("date created", auto_now_add=True)
+#    email_checked = models.DateField("date email confirmed", blank=True, null=True)
+#    email_check_ref = models.UUIDField("random uuid for email confirmation", default=uuid.uuid4, editable=False)
+#    postcode = models.CharField('first part of postcode', max_length=5)	
+#    contact_no = models.CharField('contact number', max_length=100)
+#    over_18 = models.BooleanField('over 18', help_text='Please confirm that you are over 18?')
+#    get_emails = models.BooleanField("happy to receive emails", help_text='Can we contact you regarding Collective events?')
+#    voting_ref = models.UUIDField("random uuid for voting", default=uuid.uuid4, editable=False, blank=True, null=True)		# URL for charity of the year 2017
 
-class CSVStorage(S3BotoStorage):
-    bucket_name = settings.CSVFILE_BUCKET_NAME
-    location = settings.CSVFILE_LOCATION
-    default_acl = 'private'
 
 
 class Command(BaseCommand):
-    help = 'Import the old CSV file into our database'
+    help = 'Import the old user CSV file into our database'
 
+    def add_arguments(self, parser):
+        parser.add_argument('csvname', help="File to load")
+        parser.add_argument(
+            '--oldformat',
+            action='store_true',
+            help='Old format of CSV file'
+        )
     def handle(self, *args, **options):
-        self.stdout.write("Importing the old Strava cache...")
+        csvname = options['csvname']
+        self.stdout.write("Importing the old user file: " + str(csvname))
 
-        x = CSVStorage()
         row_count = 0
         added = 0
         skipped = 0
 
-        with x.open("activities.csv", 'rt') as csvfile:
+
+
+        with open(csvname, 'rt') as csvfile:
             self.stdout.write("opened file")
-            reader = csv.DictReader(codecs.iterdecode(csvfile, 'utf-8'))
+            reader = csv.DictReader(csvfile)
             self.stdout.write("created reader")
             for row in reader:
-       #             self.stdout.write("processing %s - %s - %s - %s" % (row['activity_id'],row['activity_type'], row['distance'],row['start_date']))
-                    obj, created = ActivityCache.objects.get_or_create(
-                                activity_id=row['activity_id'], 
-                                activity_type=row['activity_type'], 
-                                defaults={
-                                        'distance': int(row['distance']),
-                                        'start_date': row['start_date'],
-                                        })
-
-                    if created:
-                        added = added + 1	
+                if options["oldformat"]:
+                    if row["email_checked"] == 'true':
+                        ec = row["joined"]
                     else:
-                        skipped = skipped + 1
-                    row_count = row_count + 1
+                        ec = None
+                else:
+                    if row["email_checked"] == "":
+                        ec = None
+                    else:
+                        ec = row["email_checked"]
 
-        self.stdout.write("Read in " + str(row_count) + " rows from S3 CSV")
-        self.stdout.write("Added " + str(added) + " activities, and skipped " + str(skipped))
+                obj, created = Bullet.objects.get_or_create(name=row["name"], email=row["email"], postcode=row["postcode"], over_18=row["over_18"]=='true', get_emails=row["get_emails"]=='true', contact_no=row["contact_no"], email_checked=ec)
+                self.stdout.write("Created " + str(obj))
+
+#	SELECT name, email, joined, email_checked, email_check_ref, postcode, contact_no, over_18, get_emails, voting_ref FROM bullets_oldbullet;
+# 	SELECT name, email, date_added, email_checked, email_check_ref, postcode, contact_no, over_18, get_emails, voting_ref FROM bullets_bullet;
 

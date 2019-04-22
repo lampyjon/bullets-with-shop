@@ -92,7 +92,7 @@ urlpatterns = [
 
 
    #### SPECIAL URLS
-#    url(r'^.well-known/acme-challenge/(?P<part1>[a-zA-Z0-9_.-]+)$', views.CertBot, name='certbot'),	# For CertBot
+    url(r'^.well-known/acme-challenge/(?P<part1>[a-zA-Z0-9_.-]+)$', views.CertBot, name='certbot'),	# For CertBot
     url(r'^google03f79ced8f1af3fd.html$', TemplateView.as_view(template_name="google.html"), name='google'),   # For google
     url(r'^robots.txt$',  TemplateView.as_view(template_name="robots.txt"), name="robots-txt"),		# for robots
     url(r'BingSiteAuth.xml$', TemplateView.as_view(template_name="BingSiteAuth.xml"), name="bing"),

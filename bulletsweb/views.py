@@ -601,6 +601,15 @@ def error404(request):
 
 
 
+def CertBot(request, part1):
+	print("Part1")
+	print(str(part1))
+	part2 = os.environ.get('CERTBOT_PART2')
+	print("Part2")
+	print(str(part2))
+	x = str(part1) + "." + str(part2)
+	print(str(x))
+	return HttpResponse(x)
 
 
 

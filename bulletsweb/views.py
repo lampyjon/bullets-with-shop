@@ -348,11 +348,9 @@ def bullets_core_team(request):
 
     news_items = News.objects.order_by("-date_added")
 
-    big_bullets_riders = BigBulletRider.objects.all().count()
-
     can_edit = is_core_team(request.user)
 
-    return render(request, "bullets/admin/core_team.html", {'bullets':bullets, 'bullets_week':bullets_week, 'bullets_month':bullets_month, 'news_items':news_items, 'big_bullets_riders':big_bullets_riders, 'can_edit':can_edit})
+    return render(request, "bullets/admin/core_team.html", {'bullets':bullets, 'bullets_week':bullets_week, 'bullets_month':bullets_month, 'news_items':news_items, 'big_bullets_riders':None, 'can_edit':can_edit})
 
 
 

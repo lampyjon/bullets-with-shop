@@ -17,7 +17,7 @@ class Command(BaseCommand):
 # if it has been more than an hour since we saw an order get created, but there's no associated payment, then we email the person reminding them of need to pay
         now = timezone.now()
         hour_ago = now - datetime.timedelta(hours=1)
-        week_ago = now - datetime.timedelta(days=21)	# TODO - reduce
+        week_ago = now - datetime.timedelta(days=7)
 
         self.stdout.write("Filtering between " + str(hour_ago) + " and " + str(week_ago))
 

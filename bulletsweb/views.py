@@ -47,20 +47,20 @@ def index(request):
     strava_runners = site.settings.runners 
     strava_cyclists = site.settings.cyclists
 
-    now = timezone.now()
+#    now = timezone.now()
 
-    week_run_miles =  ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__gte=(now-datetime.timedelta(days=7))).aggregate(Sum('distance'))['distance__sum']
-    week_ride_miles =  ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__gte=(now-datetime.timedelta(days=7))).aggregate(Sum('distance'))['distance__sum']
+#    week_run_miles =  ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__gte=(now-datetime.timedelta(days=7))).aggregate(Sum('distance'))['distance__sum']
+#    week_ride_miles =  ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__gte=(now-datetime.timedelta(days=7))).aggregate(Sum('distance'))['distance__sum']
 
-    year_run_miles = ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__year=now.year).aggregate(Sum('distance'))['distance__sum']
+#    year_run_miles = ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__year=now.year).aggregate(Sum('distance'))['distance__sum']
 
-    year_ride_miles = ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__year=now.year).aggregate(Sum('distance'))['distance__sum']
+#    year_ride_miles = ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__year=now.year).aggregate(Sum('distance'))['distance__sum']
 
-    week_runs = ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__gte=(now-datetime.timedelta(days=7))).count()
-    week_rides = ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__gte=(now-datetime.timedelta(days=7))).count()
+#    week_runs = ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__gte=(now-datetime.timedelta(days=7))).count()
+#    week_rides = ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__gte=(now-datetime.timedelta(days=7))).count()
 
-    year_runs = ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__year=now.year).count()
-    year_rides = ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__year=now.year).count()
+#    year_runs = ActivityCache.objects.filter(activity_type=ActivityCache.RIDE).filter(date_added__year=now.year).count()
+#    year_rides = ActivityCache.objects.filter(activity_type=ActivityCache.RUN).filter(date_added__year=now.year).count()
  
     qs = News.objects.order_by("-date_added")
     qs = qs.filter(Q(display_after__lte=now) | Q(display_after=None))
@@ -72,8 +72,8 @@ def index(request):
         cycling_first = False
 
 
-    return render(request, "bullets/index.html", {'strava_runners':strava_runners, 'strava_cyclists':strava_cyclists, 'week_run_miles':week_run_miles, 'week_ride_miles':week_ride_miles,'year_run_miles':year_run_miles, 'year_ride_miles':year_ride_miles, 'week_runs':week_runs, 'week_rides':week_rides, 'year_runs':year_runs, 'year_rides':year_rides, 'news':qs, 'year':now.year, 'cycling_first':cycling_first})
-
+    return render(request, "bullets/index.html", {'strava_runners':strava_runners, 'strava_cyclists':strava_cyclists,'news':qs, 'year':now.year, 'cycling_first':cycling_first})
+#  'week_run_miles':week_run_miles, 'week_ride_miles':week_ride_miles,'year_run_miles':year_run_miles, 'year_ride_miles':year_ride_miles, 'week_runs':week_runs, 'week_rides':week_rides, 'year_runs':year_runs, 'year_rides':year_rides, 
 
 	
 

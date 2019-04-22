@@ -202,18 +202,18 @@ PAYMENT_HOST = get_host
 #
 PAYMENT_MODEL = 'bulletsshop.Payment'
 #
-# if DEBUG:
-PAYMENT_VARIANTS = {
-    'default': ('payments.dummy.DummyProvider', {})
-    }
-#else:
-#    PAYMENT_VARIANTS = {
-#        'paypal': ('payments.paypal.PaypalProvider', {
-#            'client_id': os.environ.get('PAYPAL_CLIENT_ID'),   
-#            'secret': os.environ.get('PAYPAL_SECRET'),
-#            'endpoint': 'https://api.paypal.com',
-#            'capture': True}),       
-#        }
+if DEBUG:
+    PAYMENT_VARIANTS = {
+        'default': ('payments.dummy.DummyProvider', {})
+        }
+else:
+    PAYMENT_VARIANTS = {
+        'paypal': ('payments.paypal.PaypalProvider', {
+            'client_id': os.environ.get('PAYPAL_CLIENT_ID'),   
+            'secret': os.environ.get('PAYPAL_SECRET'),
+            'endpoint': 'https://api.paypal.com',
+            'capture': True}),       
+        }
 
 
 

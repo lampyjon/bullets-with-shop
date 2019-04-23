@@ -527,7 +527,9 @@ class Order(models.Model):
 
     @property
     def status(self):
-        if self.cancelled:
+        if self.items.count() == 0:
+            return "Empty Order"		# should not occur...
+        elif self.cancelled:
             return "Cancelled"
         elif self.fully_paid != True:
             return "Waiting payment"

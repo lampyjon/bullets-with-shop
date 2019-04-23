@@ -493,6 +493,8 @@ class Order(models.Model):
  
     @property							# Is this order completely paid for?
     def fully_paid(self):
+        if self.items.count() == 0:			# Bug: if there are zero items then this is not a real order so it can't be paid.
+            return False			
         return self.amount_paid() == self.grand_total
 
     @property

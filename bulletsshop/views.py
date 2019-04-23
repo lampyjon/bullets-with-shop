@@ -360,7 +360,10 @@ def CheckoutSummary(request):
     basket = get_basket(request)
 
     if basket == None:
-       return redirect('shop:home')		
+       return redirect('shop:home')
+
+    if basket.has_items != True:
+       return redirect('shop:home')		# can't create an order if there are no items in the basket	
 
     if basket.voucher != None:			# validate on entry that any voucher on this basket is ok (and remove if not)
         if basket.add_voucher(basket.voucher) != True:		# bit of a cheeky way of 

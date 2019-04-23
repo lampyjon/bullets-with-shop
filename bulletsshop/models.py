@@ -528,6 +528,7 @@ class Order(models.Model):
     @property
     def status(self):
         if self.items.count() == 0:
+            print("Problem with order " + str(self))
             return "Empty Order"		# should not occur...
         elif self.cancelled:
             return "Cancelled"

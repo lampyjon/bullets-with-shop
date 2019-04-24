@@ -456,7 +456,7 @@ def do_payment(request, order):					# make a payment and redirect to the payment
     Payment = get_payment_model()
     payment = Payment.objects.create(
                 order=order,
-                variant='default',  # this is the variant from PAYMENT_VARIANTS
+                variant=DEFAULT_PAYMENT,  # this is the variant from PAYMENT_VARIANTS		
                 description='Boldmere Bullet Shop Purchase',
                 total=order.grand_total,
                 tax=Decimal(0),

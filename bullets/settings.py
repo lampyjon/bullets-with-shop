@@ -206,12 +206,14 @@ PAYMENT_HOST = get_host
 PAYMENT_MODEL = 'bulletsshop.Payment'
 #
 if DEBUG_PAY:
+    DEFAULT_PAYMENT = 'default'
     PAYMENT_VARIANTS = {
         'default': ('payments.dummy.DummyProvider', {})
         }
 else:
+    DEFAULT_PAYMENT = 'paypal'
     PAYMENT_VARIANTS = {
-        'default': ('payments.paypal.PaypalProvider', {
+        'paypal': ('payments.paypal.PaypalProvider', {
             'client_id': os.environ.get('PAYPAL_CLIENT_ID'),   
             'secret': os.environ.get('PAYPAL_SECRET'),
             'endpoint': 'https://api.paypal.com',

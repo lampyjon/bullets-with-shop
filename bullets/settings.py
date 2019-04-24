@@ -31,8 +31,7 @@ ALLOWED_HOSTS = []
 
 LOGOUT_REDIRECT_URL = "/"
 
-SECURE_SSL_REDIRECT = True
-
+SECURE_SSL_REDIRECT = get_bool_from_env('SSL_REDIRECT', True)
 
 # EMAIL
 EMAIL_URL = os.environ.get('EMAIL_URL')

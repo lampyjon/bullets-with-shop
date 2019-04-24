@@ -201,11 +201,11 @@ class ProductItem(models.Model):
         return (self.OK_TO_BUY_OR_ORDER, from_stock, from_order, to_order)
  
     def ok_to_add_to_basket(self, quantity):
-        print("OBON : " + str(self.product.only_buy_one) + " - " + str(quantity))
+        #print("OBON : " + str(self.product.only_buy_one) + " - " + str(quantity))
         if self.product.only_buy_one and quantity > 1:
             return False
         (status, a, b, c) = self.order_or_allocate(quantity)
-        print(str(status))
+        #print(str(status))
         return (status != self.CANNOT_BUY)
 
     @property

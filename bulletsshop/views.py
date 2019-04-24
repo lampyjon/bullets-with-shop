@@ -456,7 +456,7 @@ def do_payment(request, order):					# make a payment and redirect to the payment
     Payment = get_payment_model()
     payment = Payment.objects.create(
                 order=order,
-                variant=DEFAULT_PAYMENT,  # this is the variant from PAYMENT_VARIANTS		
+                variant=settings.DEFAULT_PAYMENT,  # this is the variant from PAYMENT_VARIANTS		
                 description='Boldmere Bullet Shop Purchase',
                 total=order.grand_total,
                 tax=Decimal(0),
@@ -611,7 +611,7 @@ def product_analytics(request, product_pk, year=None):
             month_start = datetime.datetime(year, month, 1)
             (start_day, days_in_month) = calendar.monthrange(year, month)
             month_end = datetime.datetime(year, month, days_in_month, 23, 59, 59)
-            print("Month " + str(month_abr) + " = " + str(month_start) + " - " + str(month_end))
+            #print("Month " + str(month_abr) + " = " + str(month_start) + " - " + str(month_end))
             h = ProductHistory.objects.filter(item=item, event=ProductHistory.DISPATCHED, created__gte=month_start, created__lte=month_end).aggregate(Sum('quantity'))
             if h["quantity__sum"]:
                x = h["quantity__sum"]
@@ -999,7 +999,7 @@ def supplier_order(request, supplier_pk):
         items_count = 0
         preview_items = {}
         for key, value in request.POST.items():    # filter out all the stuff we don't need for this order and just give a preview of what is needed
-            print(str(key) + " - " + str(value))
+            #print(str(key) + " - " + str(value))
             if key.startswith("product_qty_"):
                 x = key[12:]
                 y = int(x)
@@ -1241,7 +1241,7 @@ def order_item_return(request, pk):		# Return an item from an order
             amount = rif.cleaned_data["quantity"]
             if amount > 0 and amount <= orderitem.quantity_delivered:
                 refund_amount = (orderitem.item_price * amount)
-                print("Need to refund " + str(refund_amount))
+                #print("Need to refund " + str(refund_amount))
                 orderitem.refund(amount)		# return the items to stock
 		
 		# refund the requsite sum (refund_amount) - refund successful payments until we've paid back what we owe

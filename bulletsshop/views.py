@@ -1077,7 +1077,7 @@ def order_list(request, status='all'):
     page = request.GET.get('page')
     results_list = paginator.get_page(page)
 
-    return render(request, 'dashboard/order_list.html', {'orders':results_list, 'order_status':status, 'orders_all':orders_all, 'orders_unpaid':orders_unpaid, 'orders_paid':orders_unpaid, 'orders_paid_outstanding':orders_paid_outstanding})
+    return render(request, 'dashboard/order_list.html', {'orders':results_list, 'order_status':status, 'orders_all':orders_all, 'orders_unpaid':orders_unpaid, 'orders_paid':orders_paid, 'orders_paid_outstanding':orders_paid_outstanding})
   
 
 @login_required

@@ -13,16 +13,18 @@
 <table class="table table-sm table-hover">
   <thead>
 	<tr>
-		<th>Item</th>
 		<th class="text-right">Qty</th>
+		<th></th>
+		<th>Item</th>
 		<th>For</th>
 	</tr>
   </thead>
   <tbody>
 	{% for item in allocations %}
 	<tr class='clickable-row' data-href='{% url 'dashboard:order' item.order.pk %}#dispatch'>
-		<td>{{item.item_name}}</td>
 		<td class="text-right">{{item.quantity_allocated}}</td>
+		<td>{% if item.order.postage_amount > 0 %}<span class="badge badge-primary">post</span>{% endif %}</td>
+		<td>{{item.item_name}}</td>
 		<td>{{item.order.name}}</td>		
 	</tr>
 	{% endfor %}
@@ -35,7 +37,7 @@
   			<div class="card-header">Latest purchases</div>
 	    	    	<div class="card-body">
 				<div class="table-responsive">
-					<table class="table-sm table-hover">
+					<table class="table table-sm table-hover">
   						<thead>
 							<tr>
 							<th>#</th>
@@ -74,10 +76,10 @@
   </thead>
   <tbody>
 	{% for item in stock_required %}
-	<tr class='clickable-row' data-href='{% url 'dashboard:supplier-order' item.product.supplier.pk %}'>
+	<tr class='clickable-row' data-href='{% url 'dashboard:supplier-order' item.supplier.pk %}'>
 		<td>{{item}}</td>
-		<td>{{item.product.supplier}}</td>
-		<td class="text-right">{{item.quantity_to_order}}</td>
+		<td>{{item.supplier}}</td>
+		<td class="text-right">{{item.to_order}}</td>
 	</tr>
 	{% endfor %}
   </tbody>

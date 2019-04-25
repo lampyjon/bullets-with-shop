@@ -441,7 +441,7 @@ def payment_details(request, payment_id):
 @csrf_exempt
 def payment_success(request, uuid):
     order = get_object_or_404(Order, unique_ref=uuid)		
-    messages.success(request, "Your payment was received")
+    messages.success(request, "Thank you! Your payment was received")
     return redirect(reverse('shop:view-order', args=[order.unique_ref]))
 
 @csrf_exempt
@@ -502,7 +502,9 @@ def dashboard(request):			# stuff we see first
         if order.fully_paid:
             purchases.append(order)
 
-    items = ProductItem.objects.filter(quantity_to_order__gt=0).order_by('product__supplier')
+
+#    items = ProductItem.objects.filter(quantity_to_order__gt=0).order_by('product__supplier')
+    items = Product.objects.annotate(to_order=Sum('items__quantity_to_order')).filter(to_order__gt=0)
 
     allocations = OrderItem.objects.order_by('order__created').filter(quantity_allocated__gt=0)
 

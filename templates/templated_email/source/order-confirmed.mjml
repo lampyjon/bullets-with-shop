@@ -11,7 +11,7 @@
           </mj-text>
           	<mj-text>Thank you for your order from the Boldmere Bullets Online Shop. We have successfully received your payment.</mj-text>
 
-   	  	<mj-text>Order {{ order.id }}:</mj-text>
+   	  	<mj-text>Order #{{ order.id }}:</mj-text>
         	<mj-table>
           		<tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
             			<th>Item</th>

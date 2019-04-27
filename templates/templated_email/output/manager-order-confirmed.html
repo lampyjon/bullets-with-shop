@@ -265,7 +265,7 @@
               <td align="left" style="font-size: 0px; padding: 10px 25px; word-break: break-word;">
                 
       <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">
-        Order {{ order.id }} for  {{ order.name }} ({{order.email}}).
+        Order #{{ order.id }} for  {{ order.name }} ({{order.email}}).
       </div>
     
               </td>
@@ -314,7 +314,7 @@
               <td align="left" style="font-size: 0px; padding: 10px 25px; word-break: break-word;">
                 
       <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">
-        Items marked with (*) will be ordered from the supplier, and may take some time to deliver.
+        {% if order.customer_notes %}<b>Note:</b> {{ order.customer_notes }}{% endif %}
       </div>
     
               </td>

@@ -271,7 +271,7 @@ def contact(request):
         			context=context)
 
 			send_bullet_mail(
-        			template_name='emails/contact_thanks',
+        			template_name='emails/contact-thanks',
                			recipient_list=[contact_form.cleaned_data['email']],
         			context={})
 

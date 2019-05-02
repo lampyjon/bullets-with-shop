@@ -515,6 +515,7 @@ def dashboard(request):			# stuff we see first
 class ProductList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Product
     template_name="dashboard/product_list.html"
+    ordering = ['name']
     def test_func(self):
         return is_shop_team(self.request.user)
 

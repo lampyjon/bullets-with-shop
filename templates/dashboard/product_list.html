@@ -13,6 +13,7 @@
   <thead>
 	<tr>
 		<th>Name</th>
+		<th>Supplier</th>
 		<th class="text-right">Items</th>
 		<th class="text-right">Price</th>
 		<th class="text-right">Visible?</th>
@@ -22,6 +23,7 @@
 	{% for product in object_list %}
 	<tr>
 		<td><a href="{% url 'dashboard:product-view' product.pk %}">{{ product.name }}</a></td>
+		<td>{{product.supplier}}</td>
 		<td class="text-right">{% if product.no_options %}-{%else%}{{ product.items.count }}{% endif %}</td>
 		<td class="text-right">{{ product.display_price }}</td>
 		<td class="text-right">{{ product.is_visible }}</td>

@@ -298,20 +298,21 @@ class ProductItem(models.Model):
 	# TODO: need to check above for refunded items confusing things.
 
         for orderitem in orderitems_for_item:
-	    # Step 2: go over each of these until we've got rid of all of the items that arrived in the order.
-            remaining_for_item = orderitem.quantity_ordered - (orderitem.quantity_delivered + orderitem.quantity_allocated + orderitem.quantity_refunded)
-            oi_to_allocate = min(remaining_for_item, self.quantity_in_stock)
-            if oi_to_allocate > 0:
-                orderitem.quantity_allocated = orderitem.quantity_allocated + oi_to_allocate
-                orderitem.save()
+            if orderitem.order.ok_to_allocate:
+  	        # Step 2: go over each of these until we've got rid of all of the items that arrived in the order.
+                remaining_for_item = orderitem.quantity_ordered - (orderitem.quantity_delivered + orderitem.quantity_allocated + orderitem.quantity_refunded) 
+                oi_to_allocate = min(remaining_for_item, self.quantity_in_stock)
+                if oi_to_allocate > 0:
+                    orderitem.quantity_allocated = orderitem.quantity_allocated + oi_to_allocate
+                    orderitem.save()
 
-                oh = OrderHistory(order=orderitem.order, comment=str(oi_to_allocate) + " x " + str(orderitem.item_name) + " - allocated")
-                oh.save()
+                    oh = OrderHistory(order=orderitem.order, comment=str(oi_to_allocate) + " x " + str(orderitem.item_name) + " - allocated")
+                    oh.save()
 
-                self.quantity_in_stock -= oi_to_allocate
-                self.save()
+                    self.quantity_in_stock -= oi_to_allocate
+                    self.save()
                  
-                allocations.append({'orderitem':orderitem, 'just_allocated':oi_to_allocate})
+                    allocations.append({'orderitem':orderitem, 'just_allocated':oi_to_allocate})
          
         return allocations
 
@@ -544,7 +545,16 @@ class Order(models.Model):
             return "Processing"
         else:
             return "Complete"
-    
+   
+
+    # is this order safe to allocate items to?
+    @property
+    def ok_to_allocate(self):
+        if (self.items.count() == 0) or self.cancelled or self.fully_paid != True:
+            return False
+        else:
+            return True
+
 
 # some helper methods to return filtered querysets 
     def dispatch_items(self):				# All items waiting to be given out / dispatched

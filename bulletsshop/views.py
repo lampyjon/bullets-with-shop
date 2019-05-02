@@ -1204,9 +1204,11 @@ def order_cancel(request, pk):
             if payment.variant == 'cash':
                 messages.info(request, "You must refund " + str(order.name) + " £" + str(payment.total) + " cash")
                 payment.change_status(PaymentStatus.REFUNDED)		# Have to do this manually as there's no cash variant in reality
-		# TODO: change captured amount to zero?
+		# TODO: change captured amount to zero? - don't think so?
             else:
+                print("Calling refund - in cancel - on " + str(payment))
                 payment.refund()
+                print("Back from calling refund - in cancel - on " + str(payment))
  
         any_problems = False
         for orderitem in order.items.all():			# cancel all of the items we have waiting
@@ -1264,6 +1266,7 @@ def order_item_return(request, pk):		# Return an item from an order
                         messages.info(request, "You must refund " + str(orderitem.order.name) + " £" + str(x) + " cash")
                         payment.change_status(PaymentStatus.REFUNDED)		# Have to do this manually as there's no cash variant in reality
                     else:
+                        print("About to refund " + str(payment))
                         payment.refund(amount=x)		# do genuine refund via Paypal etc.
                         messages.success(request, "£" + str(x) + " was refunded")
 

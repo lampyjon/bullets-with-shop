@@ -3,6 +3,192 @@
 {% block dashboardSuppliers %}active{% endblock %}
 
 
+{% block extraheader %}
+<style>
+.btn-toggle {
+  margin: 0 4rem;
+  padding: 0;
+  position: relative;
+  border: none;
+  height: 1.5rem;
+  width: 3rem;
+  border-radius: 1.5rem;
+  color: #6b7381;
+  background: #bdc1c8;
+}
+.btn-toggle:focus,
+.btn-toggle.focus,
+.btn-toggle:focus.active,
+.btn-toggle.focus.active {
+  outline: none;
+}
+.btn-toggle:before,
+.btn-toggle:after {
+  line-height: 1.5rem;
+  width: 4rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: absolute;
+  bottom: 0;
+  transition: opacity 0.25s;
+}
+.btn-toggle:before {
+  content: 'No';
+  left: -4rem;
+}
+.btn-toggle:after {
+  content: 'Yes';
+  right: -4rem;
+  opacity: 0.5;
+}
+.btn-toggle > .handle {
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 1.125rem;
+  background: #fff;
+  transition: left 0.25s;
+}
+.btn-toggle.active {
+  transition: background-color 0.25s;
+}
+.btn-toggle.active > .handle {
+  left: 1.6875rem;
+  transition: left 0.25s;
+}
+.btn-toggle.active:before {
+  opacity: 0.5;
+}
+.btn-toggle.active:after {
+  opacity: 1;
+}
+.btn-toggle.btn-sm:before,
+.btn-toggle.btn-sm:after {
+  line-height: -0.5rem;
+  color: #fff;
+  letter-spacing: 0.75px;
+  left: 0.4125rem;
+  width: 2.325rem;
+}
+.btn-toggle.btn-sm:before {
+  text-align: right;
+}
+.btn-toggle.btn-sm:after {
+  text-align: left;
+  opacity: 0;
+}
+.btn-toggle.btn-sm.active:before {
+  opacity: 0;
+}
+.btn-toggle.btn-sm.active:after {
+  opacity: 1;
+}
+.btn-toggle.btn-xs:before,
+.btn-toggle.btn-xs:after {
+  display: none;
+}
+.btn-toggle:before,
+.btn-toggle:after {
+  color: #6b7381;
+}
+.btn-toggle.active {
+  background-color: #FC4C02;
+}
+.btn-toggle.btn-sm {
+  margin: 0 0.5rem;
+  padding: 0;
+  position: relative;
+  border: none;
+  height: 1.5rem;
+  width: 3rem;
+  border-radius: 1.5rem;
+}
+.btn-toggle.btn-sm:focus,
+.btn-toggle.btn-sm.focus,
+.btn-toggle.btn-sm:focus.active,
+.btn-toggle.btn-sm.focus.active {
+  outline: none;
+}
+.btn-toggle.btn-sm:before,
+.btn-toggle.btn-sm:after {
+  line-height: 1.5rem;
+  width: 0.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: absolute;
+  bottom: 0;
+  transition: opacity 0.25s;
+}
+.btn-toggle.btn-sm:before {
+  content: 'No';
+  left: -0.5rem;
+}
+.btn-toggle.btn-sm:after {
+  content: 'Yes';
+  right: -0.5rem;
+  opacity: 0.5;
+}
+.btn-toggle.btn-sm > .handle {
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 1.125rem;
+  background: #fff;
+  transition: left 0.25s;
+}
+.btn-toggle.btn-sm.active {
+  transition: background-color 0.25s;
+}
+.btn-toggle.btn-sm.active > .handle {
+  left: 1.6875rem;
+  transition: left 0.25s;
+}
+.btn-toggle.btn-sm.active:before {
+  opacity: 0.5;
+}
+.btn-toggle.btn-sm.active:after {
+  opacity: 1;
+}
+.btn-toggle.btn-sm.btn-sm:before,
+.btn-toggle.btn-sm.btn-sm:after {
+  line-height: -0.5rem;
+  color: #fff;
+  letter-spacing: 0.75px;
+  left: 0.4125rem;
+  width: 2.325rem;
+}
+.btn-toggle.btn-sm.btn-sm:before {
+  text-align: right;
+}
+.btn-toggle.btn-sm.btn-sm:after {
+  text-align: left;
+  opacity: 0;
+}
+.btn-toggle.btn-sm.btn-sm.active:before {
+  opacity: 0;
+}
+.btn-toggle.btn-sm.btn-sm.active:after {
+  opacity: 1;
+}
+.btn-toggle.btn-sm.btn-xs:before,
+.btn-toggle.btn-sm.btn-xs:after {
+  display: none;
+}
+
+</style>
+
+{% endblock %}
+
 {% block content %} 
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h1">{{ supplier }}</h1>
@@ -16,6 +202,8 @@
 				<thead>
 					<tr>
 						<th>Product</th>
+						<th>Order if not in stock?</th>
+						<th>Hidden?</th>
 						<th>Item</th>
 						<th class="text-right">Stock</th>
 						<th class="text-right">Allocated</th>
@@ -28,7 +216,14 @@
 				{% for product in supplier.products.all %}
 				  {% for item in product.items.all %}
 					<tr>
-						<td>{% if forloop.first %}<a href="{% url 'dashboard:product-view' product.pk %}">{{ product }}</a>{% endif %}</td>
+					{% if forloop.first %}
+						<td><a href="{% url 'dashboard:product-view' product.pk %}">{{ product }}</a></td>
+						<td><button type="button" id="allow_supplier_orders" class="btn btn-sm btn-toggle {{ product.allow_supplier_orders|yesno:"active," }}" product="{{ product.pk }}" data-toggle="button" aria-pressed="{{ product.allow_supplier_orders|lower }}" autocomplete="off"><div class="handle"></div></button>
+</td>
+<td><button type="button" id="hidden" product="{{ product.pk }}" class="btn btn-sm btn-toggle {{ product.hidden|yesno:"active," }}" data-toggle="button" aria-pressed="{{ product.hidden|lower }}" autocomplete="off"><div class="handle"></div></td>
+					{% else %}
+						<td></td><td></td><td></td>
+					{% endif %}
 						<td>{{ item.extra_text|default_if_none:"-" }}</td>
 						<td class="text-right">{{ item.quantity_in_stock }}</td>
 						<td class="text-right"><a href="{% url 'dashboard:allocations-specific-item' item.pk %}">{{ item.quantity_allocated }}</a></td>
@@ -43,6 +238,10 @@
    
 <div class="row">
  <div class="col">
+  <a class="btn btn-block btn-outline-secondary" href="{% url 'dashboard:supplier-no-order' supplier.pk %}" role="button">turn off all 'order if not in stock'</a>
+
+ </div>
+ <div class="col">
   <a class="btn btn-block btn-outline-secondary" href="{% url 'dashboard:supplier-delivery' supplier.pk %}" role="button">receive delivery</a>
  </div>
  <div class="col">
@@ -52,4 +251,66 @@
  {% endblock %}
 
 
+
+{% block extrafooter %}
+<script>
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+	jQuery(document).ready(function($) {
+		$(".btn-toggle").click(function(){
+			var x = $(this).hasClass('active');
+			var i = $(this).attr('id');
+                        var p = $(this).attr('product');
+			sendData(i, x, p);
+			if (i == "hidden") {
+				j = "No";
+				if (x) { j = "Yes"; }
+				$("#is_visible").text(j);
+			}
+		});	
+	
+	});
+
+function sendData(store_to, on_off, product_pk) {
+        base_url = "{% url 'dashboard:product-edit-ajax' 999999 %}";
+        new_url = base_url.replace("999999", product_pk);
+
+	on_off = !on_off;
+	console.log("sending data " + store_to + " - " + on_off + " to " + new_url);
+
+ 	$.post(new_url,{ store_to: store_to, on_off: on_off }, function( data ) {
+  		console.log(data );
+	});
+}
+
+</script>
+{% endblock %}
 

@@ -93,6 +93,8 @@ dashboard_patterns = ([
     path('suppliers/<int:supplier_pk>/delivery', views.supplier_delivery, name='supplier-delivery'),
     path('suppliers/delivery/dispatch', views.supplier_delivery_dispatch, name='supplier-delivery-dispatch'),
     path('suppliers/<int:supplier_pk>/order', views.supplier_order, name='supplier-order'),
+    path('suppliers/no-order-if-not-in-stock/<int:supplier_pk>', views.supplier_no_order, name='supplier-no-order'),
+
 #   path('suppliers/<int:supplier_pk>/order/save', views.supplier_order_save, name='supplier-order-save'),
 
     path('postage', views.PostageList.as_view(), name='postage'),

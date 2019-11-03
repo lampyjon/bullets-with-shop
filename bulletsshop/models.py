@@ -150,6 +150,8 @@ class Product(models.Model):
         return self.items.filter(quantity_to_order__gt=0).exists()
 
 
+    class Meta:
+        ordering = ["name"]
 
 # create at least one of these per product, this is stock keeping unit
 class ProductItem(models.Model):

@@ -980,6 +980,21 @@ def supplier_delivery_dispatch(request):
 
 
 
+@login_required
+@user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
+def supplier_no_order(request, supplier_pk):		# cancel all 'order-if-not-in-stock' for this supplier's products
+    supplier = get_object_or_404(Supplier, pk=supplier_pk)
+
+    products = supplier.products.filter(allow_supplier_orders=True)
+
+    for p in products:
+        p.allow_supplier_orders = False
+        p.save()
+       
+    messages.success(request, "Items changed successfully")
+    return redirect(reverse('dashboard:supplier-view', kwargs={'pk': supplier.pk}))
+
+
 
 # create a new order for this supplier, and adjust stock levels accordingly
 @login_required

@@ -1318,7 +1318,7 @@ def allocations(request, order_by='name', item_pk=None):
     elif order_by == 'order':
         ordering = 'order__pk'
     elif order_by == 'name':
-        ordering = 'order__delivery_name'
+        ordering = 'order__billing_name'
 
     allocations = OrderItem.objects.order_by(ordering).filter(quantity_allocated__gt=0)
 

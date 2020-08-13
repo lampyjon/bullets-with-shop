@@ -109,7 +109,70 @@ class Bullet(Person):
         else:
             return False
 
-## TODO: IMPORT OLD BULLETS into BULLETS
+
+
+# This model defines the leaders we use for the Leaders app - special case of bullet people
+class Leader(models.Model):
+    bullet = models.OneToOneField(Bullet,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+
+    rider = models.BooleanField("ride leader?", default=False)
+    runner = models.BooleanField("run leader?", default=False)
+
+    #boss = models.BooleanField("boss?", default=False)
+    # have_satnav = models.BooleanField("SatNav?", default=False)
+
+    email_preference = models.BooleanField("Email me?", default=True)
+    last_login = models.DateTimeField("Last Login", blank=True, null=True)
+
+    show_sat_rides = models.BooleanField("Show Saturday Rides?", default=True)
+    show_sun_rides = models.BooleanField("Show Sunday Rides?", default=True)
+	
+    def get_absolute_url(self):
+        return reverse('leaderView', kwargs={'leader_id': self.pk})
+
+    def rider_and_runner(self):
+        return (self.rider and self.runner)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return str(self.bullet)
+
+
+    def show_ride_on_day(self, event):  
+        # Work out if the rider would want to see the event, based on their preferences
+        if event.is_run():
+            return True
+
+        day_of_week = event.date.strftime("%A")
+
+        if day_of_week == "Saturday":
+            return self.show_sat_rides
+        elif day_of_week == "Sunday":
+            return self.show_sun_rides
+        else:
+            return True
+
+
+    def get_next_events(self):
+        if ((self.rider == True) and (self.runner == False)):
+	    # filter to rides only
+            events = BulletEvent.objects.order_by("date").filter(date__gte=datetime.datetime.now()).filter(cycling_event=True)
+        elif ((self.rider == False) and (self.runner == True)):
+	    # filter to runs only
+            events = BulletEvent.objects.order_by("date").filter(date__gte=datetime.datetime.now()).filter(running_event=True)
+        else:
+            events = BulletEvent.objects.order_by("date").filter(date__gte=datetime.datetime.now())
+		
+        results = []
+
+        for x in events:
+            if self.show_ride_on_day(x):
+                results.append(x)
+
+        return results
+
 
 
 
@@ -141,6 +204,30 @@ class News(models.Model):
 
 
 
+class DefaultSpeedGroup(models.Model):
+    name = models.CharField("speed", max_length=30)
+
+    display_order = models.SmallIntegerField("display order", default=1)
+
+    RUN = 'run'
+    RIDE = 'ride'
+
+    EVENT_TYPE_CHOICES = (
+        (RUN, 'run'),
+        (RIDE, 'ride'),
+    )
+
+    group_type = models.CharField(max_length=4, choices=EVENT_TYPE_CHOICES, default=RUN)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return self.name
+
+    class Meta:
+        ordering = ['display_order']
+
+
+
+# TODO: merge into BulletEvents
 ## for the Runs on Tuesdays 
 @python_2_unicode_compatible
 class RunningEvent(models.Model):
@@ -167,6 +254,9 @@ class RunningEvent(models.Model):
 		return smart_text("Run on " + str(self.date))
 
 
+
+
+
 @python_2_unicode_compatible
 class BulletEvent(models.Model):
     date = models.DateField("Event Date")
@@ -177,9 +267,101 @@ class BulletEvent(models.Model):
     cycling_event = models.BooleanField("Cycling Event", default=False)
     social_event = models.BooleanField("Social Event", default=False)
 
+    have_sent_email = models.BooleanField("Have chased leaders about this event", default=False)
+    have_sent_initial_email = models.BooleanField("Have told leaders about this event", default=False)
 
     def __str__(self):
-        return smart_text(self.name)
+        if self.name:
+            return smart_text(self.name)
+
+        r = self.event_type.capitalize()
+        return r + " event on " + str(self.date)
+
+# Functions below are for the leaders app
+
+    @property
+    def event_type(self):
+        if (self.running_event and self.cycling_event):
+            return "combined"
+        elif self.social_event:
+            return "social"
+        elif self.running_event:
+            return "run"
+        elif self.cycling_event:
+            return "ride"
+        else:
+            return "other"
+
+    @property
+    def when(self):
+        return self.date
+
+    def is_ride(self):
+        return self.cycling_event
+		
+    def is_run(self):
+        return self.running_event
+
+    def get_absolute_url(self):
+        return reverse('event', kwargs={'pk': self.pk})
+
+    def said_yes(self):
+        return Availability.objects.filter(event_id=self.id).filter(leading=True)
+
+    def said_no(self):
+        return Availability.objects.filter(event_id=self.id).filter(leading=False)
+
+    def said_maybe(self):
+        return Availability.objects.filter(event_id=self.id).filter(leading=None)
+
+    def said_maybe_or_nothing(self):
+	# get all the leaders who have said 'yes' or 'no' to this event (i.e. everyone who has said something other than 'maybe'
+        l = Availability.objects.filter(event_id=self.id).exclude(leading=None).values('leader')
+
+        if (self.is_run()):		# then exclude them from the leaders set - i.e. we get back all the leaders who have said 'maybe' or nothing for this event
+            temp = Leader.objects.exclude(pk__in=l).filter(runner=True)
+        else:
+            temp = Leader.objects.exclude(pk__in=l).filter(rider=True)
+
+	# get rid of the people who don't want to ride on the day in question
+        day_of_week = self.when.strftime("%a")
+        if day_of_week == "Sat":
+            maybe = temp.exclude(show_sat_rides = False)
+        elif day_of_week == "Sun":
+            maybe = temp.exclude(show_sun_rides = False)
+        else:
+            maybe = temp
+        return maybe
+
+
+    def count_yes(self):
+        return self.said_yes().count()
+
+    def count_maybe(self):
+        return self.said_maybe().count()
+
+    def count_no(self): 
+        return self.said_no().count()
+		
+    def count_unknown(self):
+        return self.said_maybe_or_nothing().count()
+
+    def get_default_speedgroups(self):
+        return DefaultSpeedGroup.objects.filter(group_type=self.event_type)
+
+    def get_speedgroups(self):
+        return self.speeds.all()
+
+    def get_speedgroups_no_leaders(self):
+        s = self.get_speedgroups()
+        return s.exclude(speed_plan__event__id=self.pk)
+		
+
+    def get_not_leading(self):			
+        if self.is_run():
+            return Leader.objects.filter(runner=True).exclude(pk__in=Availability.objects.filter(event_id=self.id).values_list('leader', flat=True))
+        else:
+            return Leader.objects.filter(rider=True).exclude(pk__in=Availability.objects.filter(event_id=self.id).values_list('leader', flat=True))
 
 
 
@@ -187,6 +369,43 @@ class BulletEvent(models.Model):
 
 
 
+
+class EventSpeed(models.Model):
+    name = models.CharField("speed", blank=True, max_length=100)
+    event = models.ForeignKey(BulletEvent, related_name="speeds", on_delete=models.CASCADE)
+    display_order = models.SmallIntegerField("display order", default=1)
+
+    class Meta:
+        ordering = ['display_order']
+	
+    def __str__(self):
+        return str(self.name)
+
+
+class Availability(models.Model):
+    leader = models.ForeignKey(Leader, on_delete=models.CASCADE)
+    event = models.ForeignKey(BulletEvent, on_delete=models.CASCADE)
+	
+    speed_options = models.ManyToManyField(EventSpeed, blank=True)	# which speeds do they want to lead at?
+    leading = models.NullBooleanField(default=None)			# do they even want to lead?
+
+    plan =  models.ForeignKey(EventSpeed, blank=True, null=True, related_name="speed_plan", on_delete=models.CASCADE)
+			
+    def __str__(self):
+        return str(self.leader) + " availability for " + str(self.event)
+
+    class Meta:
+        verbose_name_plural = "Availabilities"
+        ordering = ['leader', 'plan']  
+
+
+    def availability_display(self):
+        if self.leading == True:
+            return "Yes"
+        elif self.leading == False:
+            return "No"
+        else:
+            return "Maybe"
 
 
 

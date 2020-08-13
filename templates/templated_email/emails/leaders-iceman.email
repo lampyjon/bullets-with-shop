@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - The ICEMAN strikes{% endblock %}
+{% block html %}
+{% include 'templated_email/output/leaders-iceman.html' %}
+{% endblock %}

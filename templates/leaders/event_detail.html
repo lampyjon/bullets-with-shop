@@ -1,0 +1,228 @@
+{% extends "simple.html" %}
+
+{% block title %}Event detail{% endblock %}
+
+{% block extraheader %}
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+{% endblock extraheader %}
+
+{% block header-links %}
+	<li><a href="{% url 'leaders:event_update' event.id %}">edit event</a></li>
+	<li><a href="{% url 'leaders:event_delete' event.id %}">delete event</a></li>
+	{% if event.is_ride %}<li><a href="{% url 'leaders:iceman' event.id %}">cancel this event (ICEMAN!)</a></li>{% endif %}
+	<li><a href="{% if event.event_type == "run" %}{% url 'leaders:events-next-runs' %}{%else%}{% url 'leaders:events-next-rides' %}{%endif%}">events list</a></li>
+ 
+	<li><a href="{% url 'leaders:boss-mode' %}">Control panel</a><li>
+	<li><a href="{% url 'core-team-admin' %}">Logged in as {{ user.username }}</a></li>
+ 
+{% endblock header-links %}
+
+{% block content %}
+     	<h1>{{event.event_type|capfirst}}</h1> 
+        <h3>{{ event.when|date:"D j M Y" }}</h3>
+	<h4>Speeds:</h4>
+	<div>
+	{% for s in event.get_speedgroups %}
+		<span class="badge">{{ s }}</span>
+	{% endfor %}
+	</div>
+
+<h2>Leaders who are available:</h2>
+
+{% if not avail %}
+<div>No one has said 'yes' for this event!</div>
+{% else %}
+<form action="{% url 'leaders:planSave' %}" method="post">
+<div class="table-responsive">
+<table class="table table-hover sortable">
+<input type="hidden" name="event" value="{{ event.id }}"/>
+{% csrf_token %}
+	<thead>
+		<tr>
+			<th>Name</th><th>&nbsp;</th>
+		    	{% for s in speeds %}
+		    	<th class="text-center">{{s}}</th>
+		    	{%endfor%}
+		</tr>
+	</thead>
+	<tbody>
+{% for a in avail %}
+		<tr>
+			<td class="vert-align">{{ a.0.leader }}</td>
+			<td class="vert-align">{% if a.1 == 2 %}<span class="label label-warning">{{a.1}} weeks leading</span>{% elif a.1 > 2 %}<span class="label label-danger">{{a.1}} weeks leading!</span>{% endif %}</td>
+			{% for s in speeds %}
+			<td class="vert-align text-center">{% if s in a.0.speed_options.all %}
+			<div class="btn-group" data-toggle="buttons">
+				<button class="btn {% if a.0.plan == s %}btn-primary{%else%}btn-light{%endif%}" type="button">
+				    <span class="glyphicon glyphicon-ok rowA{{a.0.id}} {% if a.0.plan == s %}active{%endif%}" id="cellA{{a.0.id}}-{{s.id}}">
+					<input type="checkbox" autocomplete="off" {% if a.0.plan == s %}checked{%endif%} class="col{{s.id}}" onchange="checkRow({{a.0.id}}, {{s.id}});" name="avail-{{a.0.id}}" value="{{s.id}}">
+				    </span>
+				</button>
+			</div> <!-- .btn-group !-->
+			{%else%}&nbsp;{%endif%}</td>
+			{% endfor %}
+
+		</tr>
+{% endfor %}
+
+	<tfoot>
+		<tr>
+			<td colspan="2" class="text-right"><b>Total:</b></td>
+			{% for s in speeds %}
+				<td class="text-center"><span id="total{{s.id}}" class="badge">0</span></</td>
+			{% endfor %}		
+		</tr>
+	</tfoot>
+	</tbody>
+</table>
+</div>
+
+<div>
+<button type="submit" class="btn btn-primary">Save</button>
+<button type="button" class="btn btn-primary" onclick="allocate(); return false;">Suggest leaders...</button>
+<a class="btn btn-primary" href="{% url 'leaders:event-groups' event.id %}">View the plan so far...</a>
+</div>
+</form>
+
+{% endif %}
+
+<h2>Leaders who are maybes:</h2>
+{% if not maybe %}
+<div>Everyone has either said 'yes' or 'no'!</div>
+{% else %}
+<div class="table-responsive">
+<table class="table table-hover sortable">
+	<thead>
+		<tr><th>Name</th></tr>
+	</thead>
+	<tbody>
+{% for a in maybe %}
+		<tr>
+			<td class="vert-align">{{a}}</td>
+		</tr>
+{% endfor %}
+	</tbody>
+</table>
+</div>
+
+<div>
+<a href="{% url 'leaders:send-message-update-event' event.id %}" class="btn btn-primary">Email all the 'maybes' asking them to say 'yes'!</a>
+</div>
+{% endif %}
+
+
+<h2>Leaders who are not available:</h2>
+{% if not nos %}
+	<div>Everyone has either said 'yes' or 'maybe'!</div>
+{% else %}
+<div class="table-responsive">
+<table class="table table-hover sortable">
+	<thead>
+		<tr><th>Name</th></tr>
+	</thead>
+	<tbody>
+{% for a in nos %}
+		<tr>
+			<td class="vert-align">{{ a.leader.bullet.name }}</td>
+		</tr>
+{% endfor %}
+	</tbody>
+</table>
+</div>
+
+
+{% endif %}
+
+<div>
+<br/>
+<a class="btn btn-primary" href="{% url 'leaders:boss-mode' %}">Control panel</a>
+<br/>
+</div>
+{% endblock content %}
+
+
+{% block extrafooter %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+
+<script>
+function allocate() {
+
+	{% for avl, speed in allocation.items %}
+		checkRow({{avl}}, {{speed.id}});
+		
+		cellSet = "#cellA" + {{avl}} + "-" + {{speed.id}};
+
+		$(cellSet).addClass('active');
+		$(cellSet).children("input").prop('checked', true);
+
+		
+	{%endfor%}	
+
+	totalup();
+
+	return;
+}
+
+
+function totalup() {
+	speeds = [{% for s in speeds %}"{{s.id}}",{%endfor%}];
+
+	$.each(speeds, function(index, value) {
+			count=0;
+			col = ".col" + value;
+			console.log(" counting " + col);
+			cols = $(col);
+			cols.each(function() {
+				if ($(this).prop("checked")) {
+					count = count + 1;
+				}
+			});
+			console.log(" count was " + count);
+			$("#total"+value).text(count);	
+		});
+	return false;
+}
+
+function checkRow(x, y) {		// a button in row X was clicked - make <y> the only one!
+        console.log("here");
+	rowA = $(".rowA" + x);	// remove active from all row elements
+	skip = "#cellA" + x + "-" + y;
+
+	rowA.each(function(index) {
+		console.log("Checking " + index + " of row " + x);
+		if ( $(this).is(skip) ) {
+			console.log(" Skipping");
+			$(this).parent().addClass('btn-primary');
+                        $(this).parent().removeClass('btn-light');
+			$(this).parent().removeClass('active');
+			
+		} else {
+			console.log(" Setting to not active");
+			$(this).removeClass('active');
+			$(this).parent().addClass('btn-light');
+                        $(this).parent().removeClass('btn-primary');
+			$(this).children("input").prop('checked', false);
+		}
+		});
+
+	// now count down each speed row and see what the total number of 'checked' inputs are...
+	
+	totalup();
+
+
+	return false;
+}
+
+
+$(function() {
+	console.log("Setting up table on load");
+	totalup();
+});
+
+
+</script>
+
+
+{% endblock extrafooter %}

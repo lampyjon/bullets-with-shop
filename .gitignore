@@ -14,4 +14,5 @@ __pycache__/
 /media/
 /static/
 /templates/templated_email/compiled/*
+todo.txt
 setup.sh

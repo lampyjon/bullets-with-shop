@@ -1,0 +1,52 @@
+{% extends "simple.html" %}
+
+{% block title %}Leader plans for event{% endblock %}
+
+{% block header-links %}
+	<li><a href="{% url 'leaders:event' event.id %}">assign leaders</a></li>
+        {% include 'leaders/leader_header.html' %}
+{% endblock %}
+
+{% block content %}
+
+     	<h1>{{ event.event_type|capfirst }}</h1> 
+        <h3>{{ event.when|date }} at {{ event.time|time }}</h3>
+
+<h2>Speed groups:</h2>
+
+{% if not avail %}
+<div>No one has said 'yes' for this event!</div>
+{% else %}
+
+<table class="table table-hover sortable">
+	<thead>
+		<tr><th>Speed</th><th>Name</th><th>Availability</th></tr>
+	</thead>
+	<tbody>
+{% for a in avail %}
+		<tr>
+			<td class="vert-align">{{ a.plan|default_if_none:"Not assigned" }}</td>
+			<td class="vert-align">{{ a.leader.bullet }}</td>
+			<td class="vert-align">{{ a.availability_display|capfirst }}</td>
+		</tr>
+{% endfor %}
+	</tbody>
+</table>
+
+{% endif %}
+
+{% if no_leaders %}
+<h2>Groups with no leaders!</h2>
+<ul>
+{% for g in no_leaders %}
+<li>{{ g }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<a class="btn btn-custom" href="{% url 'leaders:event' event.pk %}" role="button">Assign Leaders</a>
+
+<br/>
+
+{% endblock content %}
+

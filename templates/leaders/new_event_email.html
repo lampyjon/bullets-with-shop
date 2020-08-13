@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+     <title>An email from the Boldmere Bullets Leaders Website</title>
+  </head>
+  <body>
+	<h1>There's a new Boldmere Bullets event!</h1>
+
+	<p>Hi {{send_to.name}}!</p>
+	<p>Exciting news! {{ sent_from.name }} has just created some new Boldmere Bullets events, which need leaders:</p>
+	{% for event in events %}
+	<div>
+		<p>There's a {{ event.0.event_type }} which is on {{ event.0.when|date:"D j M Y"}}{% if event.0.description %} - {{ event.0.description }}{% endif %}. Could you help by being a leader for it? </p>
+
+		<ul>
+		{% for speed in event.1 %}
+			<li>I'd like to lead the <a href="{{speed.1}}">{{speed.0}}</a> group</li>
+		{% endfor %}
+		<li><a href="{{ event.2 }}">No - I'm afraid I can't lead this time.</a></li>
+		</ul>
+	</div>
+	<br/>
+	{% endfor %}
+
+	<p>This email was sent to {{ send_to.email }} by the <a href="http://www.boldmerebullets.com/leaders">Boldmere Bullets Leaders web application</a>. If you don't want to get emails from this site, <a href="{{ stop_url}}">click here and we'll stop sending them</a>!</p>
+
+	<p>As ever, your help leading Boldmere Bullets events is hugely appreciated! </p>
+
+	<p><b>VLB!</b></p>
+	<p><h4>(this was an automated email from the Boldmere Bullets Leaders website)</h4></p>
+</body>
+</html>
+

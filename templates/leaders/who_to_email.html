@@ -1,0 +1,41 @@
+{% extends "simple.html" %}
+
+{% block title %}Send a chasing email!{% endblock %}
+
+
+{% block content %}
+
+     	<h1>Send an email to some Bullets?</h1> 
+
+
+{% if event.have_sent_email %}
+<div class="alert alert-danger" role="alert">An email was previously sent to people about this event - do you want to pester them again??</div>
+{% endif %}
+<form method="POST">
+{% csrf_token %}
+<div>You are about to send an email to {{ emails.count }} leaders, who have not said 'yes' or 'no' to leading this event. Are you sure? </div>
+<br/>
+<p>
+<input type="submit" class="btn btn-primary btn-lg" value="Yes - send it!">
+<a class="btn btn-info btn-lg" href="{% url 'leaders:event' event.id %}">No - don't send!</a>
+</p>
+<h3>The emails will be sent to:</h3>
+<div>
+<ul>
+{% for email in emails %}
+<li> {{ email }} ({{ email.bullet.email }})</li>
+{% endfor %}
+</ul>
+</div>
+<h3>Do you want to add a special message?</h3>
+<textarea name="custom_message" class="form-control" rows="3"></textarea>
+</form>
+<h3>The email will say:</h3>
+<div class="well well-lg">
+<samp>
+	{% include "templated_email/output/leaders-hurry-up.html" %}
+</samp>
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,51 @@
+{% extends "simple.html" %}
+
+{% block title %}Event detail {% endblock %}
+
+
+{% block header-links %}
+	    {% if request.session.leader %}
+              <li {% if request.resolver_match.url_name == "leaders:view" %}class="active" {%endif%}><a href="{% url 'leaders:view' %}">My availability</a></li>
+             
+	    {% endif %}
+{% endblock header-links %}
+
+{% block content %}
+	<h1>Edit your preferences</h1>
+
+	<form action="{% url 'leaders:preferences-save' %}" method="post" class="form-horizontal" id="myForm">
+	{% csrf_token %}
+
+	{% if leader.rider %}
+		<div class="form-group">
+			<label for="showSat" class="col-md-4 control-label" data-toggle="tooltip" title="Select this if you want to see bike rides that occur on Saturdays">Show Saturday Rides?</label>
+    			<div class="col-md-8">
+      				<input type="checkbox" class="form-control" name="showSat" id="showSat" {% if leader.show_sat_rides %}checked{%endif%}>
+   			 </div>
+  		</div>
+
+		<div class="form-group">
+			<label for="showSun" class="col-md-4 control-label" data-toggle="tooltip" title="Select this if you want to see bike rides that occur on Sundays">Show Sunday Rides?</label>
+    			<div class="col-md-8">
+      				<input type="checkbox" class="form-control" name="showSun" id="showSat" {% if leader.show_sun_rides %}checked{%endif%}>
+   			 </div>
+  		</div>
+
+	{% endif %}
+
+		<div class="form-group">
+			<label for="emailPref" class="col-md-4 control-label" data-toggle="tooltip" title="Controls whether we automatically send you emails about new events etc.">Want emails?</label>
+    			<div class="col-md-8">
+      				<input type="checkbox" class="form-control" name="emailPref" id="emailPref" {% if leader.email_preference %}checked{%endif%}>
+   			 </div>
+  		</div>
+
+  		<div class="form-group">
+    			<div class="col-md-offset-4 col-md-8">
+  				<input type="submit" class="btn btn-custom btn-lg" value="Save Changes"/>
+			</div>
+		</div>
+	</form>
+
+{% endblock content %}
+

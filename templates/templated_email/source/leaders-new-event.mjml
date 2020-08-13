@@ -1,0 +1,41 @@
+<mjml>
+  <mj-head>
+    <mj-include path="./shared/styles.mjml" />
+  </mj-head>
+  <mj-body>
+      <mj-include path="./shared/header.mjml" />
+      <mj-section>
+        <mj-column>
+	<mj-text>Hi {{send_to.bullet.name}}!</mj-text>
+	<mj-text>Exciting news! {{ sent_from.name }} has just created some new Boldmere Bullets events, which need leaders: </mj-text>
+<mj-divider border-width="1px" border-style="dashed" border-color="lightgrey" />
+
+
+	<mj-table>
+		{% for event in events %}
+          		<tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+            			<th>There's a {{ event.0.event_type }} which is on {{ event.0.date|date:"D j M Y"}}. Could you help by being a leader for it?</th>
+          		</tr>
+          			{% for speed in event.1 %}
+          			<tr>
+            				<td>I'd like to lead the <a href="{{speed.1}}">{{speed.0}}</a> group</td>
+              			</tr>
+          			{% endfor %}
+      				<tr>
+       					<td><a href="{{ event.2 }}">No - I'm afraid I can't lead this time.</a></td>
+      				</tr>
+		{% endfor %}	
+        </mj-table>
+
+        	<mj-divider border-width="1px" border-style="dashed" border-color="lightgrey" />
+
+	<mj-text>This email was sent to {{ send_to.bullet.email|default:"(email address)" }} by the <a href="http://www.boldmerebullets.com/leaders/">Boldmere Bullets Leaders system</a>. If you don't want to get emails from the leaders system, <a href="{{ stop_url|default:"#" }}">click here and we'll stop sending them</a>!</mj-text>
+
+	<mj-text>As ever, your help leading Boldmere Bullets events is hugely appreciated! </mj-text>
+
+	<mj-text><b>VLB!</b></mj-text>
+        </mj-column>
+      </mj-section>
+     <mj-include path="./shared/footer.mjml" />
+  </mj-body>
+</mjml>

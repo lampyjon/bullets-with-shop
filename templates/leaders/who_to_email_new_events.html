@@ -1,0 +1,31 @@
+{% extends "simple.html" %}
+
+{% block title %}Send an email about new events!{% endblock %}
+
+
+{% block content %}
+
+     	<h1>Tell leaders about these new events?</h1> 
+
+<form action="{% url 'leaders:send-message-new-event-send' %}" method="POST">
+{% csrf_token %}
+
+{% for e in events %}
+	<div class="form-group">
+	<div class="checkbox">
+       		<label>
+         		<input type="checkbox" checked id="event" name="event" value="{{ e.id }}">{% if e.id == new_event.id %}<b>New!</b> {% endif%}{{ e.when|date:"D j M Y"}} ({{e.event_type}}) 
+		</label>
+      	</div>
+	</div>
+{% endfor %}
+
+
+ <input type="submit" value="Confirm" class="btn btn-primary btn-lg" value="Yes - send emails!"/>
+ <a class="btn btn-info btn-lg" href="{% url 'leaders:event' new_event.id %}">No - don't send them!</a>
+
+</form>
+
+<br/>
+
+{% endblock content %}

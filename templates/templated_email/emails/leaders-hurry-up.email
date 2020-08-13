@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - An email from the leaders app{% endblock %}
+{% block html %}
+{% include 'templated_email/output/leaders-hurry-up.html' %}
+{% endblock %}

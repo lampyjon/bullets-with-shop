@@ -57,3 +57,7 @@ def is_stats_team(user):
 # Decorator style for checking user is in the Shop Team, and can edit things in the shop
 def is_shop_team(user):
     return user.groups.filter(name='ShopTeam').exists()
+
+# Decorator style for checking user is in the Leaders Team, and can edit things in the Leaders app
+def is_leaders_team(user):
+    return user.groups.filter(name='LeadersTeam').exists()

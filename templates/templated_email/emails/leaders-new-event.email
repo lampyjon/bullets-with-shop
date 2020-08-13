@@ -1,0 +1,4 @@
+{% block subject %}Boldmere Bullets - New Event{% endblock %}
+{% block html %}
+{% include 'templated_email/output/leaders-new-event.html' %}
+{% endblock %}

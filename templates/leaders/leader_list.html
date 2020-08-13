@@ -1,0 +1,64 @@
+{% extends "simple.html" %}
+{% load static %}
+
+{% block title %}Leaders{% endblock %}
+
+{% block header-links %}
+        {% include 'leaders/leader_header.html' %}
+{% endblock %}
+
+{% block extraheader %}
+	<link href="{% static 'css/bootstrap-sortable.css' %}" rel="stylesheet"> 
+{% endblock %}
+
+
+{% block content %}
+
+     	<h1>Leaders</h1> 
+
+<p>Click on any name to edit their preferences.</p>
+<table class="table table-hover sortable">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Email</th>
+			<th>Run Leader?</th>
+			<th>Ride Leader?</th>
+			<th>Last login</th>
+			<th>Getting emails?</th>
+			<th>Delete</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for leader in object_list %}
+		<tr>
+			<td class="vert-align"><a href="{% url 'leaders:leader_update' leader.pk %}">{{leader.bullet}}</a></td>
+			<td class="vert-align">{{leader.bullet.email}}</td>
+			<td class="vert-align">{{leader.runner}}</td>
+			<td class="vert-align">{{leader.rider}}</td>
+			<td class="vert-align" data-dateformat="DD-MMM-YYYY">{{ leader.last_login|date:"d-M-Y" }}</td>
+			<td class="vert-align">{{ leader.email_preference }}</td>
+			<td class="vert-align"><a href="{% url 'leaders:leader_delete' leader.pk %}" class="glyphicon glyphicon-flash"></a></td>
+		</tr>
+	{%endfor%}
+</table>
+
+{% endblock content %}
+
+{% block extrafooter %}
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+	<script src="{% static 'js/bootstrap-sortable.js' %}"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+
+<script>
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.document.location = $(this).data("href");
+    });
+});
+
+</script>
+
+{% endblock extrafooter %}

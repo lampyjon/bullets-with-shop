@@ -6,12 +6,12 @@
 {% block topurl %}{% url 'index' %}{% endblock %}
 
 {% block header-links %}
+<li><a href="">Hello {{ user.username }}</a></li>
 {% endblock %}
 
 
 {% block extraheader %}
-<link href="{% static 'css/bootstrap-sortable.css' %}" rel="stylesheet"> 
-
+	<link href="{% static 'css/bootstrap-sortable.css' %}" rel="stylesheet"> 
 {% endblock %}
 
 {% block content %}

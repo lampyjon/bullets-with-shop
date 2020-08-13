@@ -1,0 +1,46 @@
+{% extends "simple.html" %}
+
+{% block title %}Event detail {% endblock %}
+
+{% block header-links %}
+        {% include 'leaders/leader_header.html' %}
+{% endblock header-links %}
+
+{% block content %}
+     	<h1>Forthcoming Events</h1> 
+    
+<table class="table table-hover sortable">
+	<thead>
+		<tr><th>Date</th><th>Time</th><th>Type</th><th>Yes</th><th>Maybe</th><th>No</th></tr>
+	</thead>	
+	<tbody>
+{% for event in object_list %}
+	<tr class='clickable-row' style="cursor: pointer;" data-href='{% url 'leaders:event' event.pk %}'>
+		<td>{{event.when|date}}</td>
+		<td>{{event.time|time}}</td>
+		<td>{{event.event_type|capfirst}}</td>
+		<td>{{event.count_yes}}</td>
+		<td>{{event.count_unknown}}</td>
+		<td>{{event.count_no}}</td>			
+	</tr>
+{% endfor %}
+	</tbody>
+	</table>
+
+
+{% endblock content %}
+
+{% block extrafooter %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.document.location = $(this).data("href");
+    });
+});
+
+</script>
+
+{% endblock extrafooter %}

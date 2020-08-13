@@ -1,0 +1,32 @@
+{% extends "simple.html" %}
+{% load static %}
+{% load bootstrap_form from bootstrap4 %}
+
+{% block title %} - Leaders App - Event Details{%endblock %}
+
+{% block header-links %}
+        {% include 'leaders/leader_header.html' %}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-8 col-sm-push-2">
+        <form method="post" class="form-horizontal" >
+            {% csrf_token %}
+            <h1>Event Details</h1>
+            <br>
+            {% bootstrap_form form layout="horizontal" %}
+            <p class="text-right">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </p>
+        </form>
+    </div>
+</div>
+
+    <script>
+	$('.datepicker').datepicker({dateFormat: 'dd-mm-y'}); 
+    </script>
+{% endblock content %}
+
+ 

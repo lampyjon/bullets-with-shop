@@ -1,12 +1,13 @@
 from django.conf.urls import include, url, handler404
-from . import views
+from . import views, leaders
 from django.views.generic import TemplateView, RedirectView
 from django.shortcuts import redirect
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import path, include
 
-urlpatterns = [
+web_patterns = ([
     url(r'^$', views.index, name='index'),
     url(r'^privacy/$', TemplateView.as_view(template_name="bullets/privacy.html"), name='privacy'),
 
@@ -53,14 +54,116 @@ urlpatterns = [
     url(r'^events/admin/update/(?P<pk>[0-9]+)/$', views.EventUpdate.as_view(), name='event-update'),
     url(r'^events/admin/delete/(?P<pk>[0-9]+)/$', views.EventDelete.as_view(), name='event-delete'),
   
-    url(r'^core-team-admin/$', views.bullets_core_team, name='core-team-admin'), 
-
+    url(r'^vlb/$', views.bullets_core_team, name='core-team-admin'),
+ 
 
     url(r'^mailchimp-webhook/(?P<apikey>[0-9a-z-]+)/$', views.mailchimp_webhook, name='mailchimp-webhook'),
 
     url(r'^bullets-run-2018/$', RedirectView.as_view(url="https://www.ole-jcracesolutions.co.uk/Boldmere-bullets-10k-5k-race-p/bb2018.htm", permanent=True)),
 
     url(r'^cts/$', views.cts, name='ctstime'),
+
+
+   #### SPECIAL URLS
+    url(r'^.well-known/acme-challenge/(?P<part1>[a-zA-Z0-9_.-]+)$', views.CertBot, name='certbot'),	# For CertBot
+    url(r'^google03f79ced8f1af3fd.html$', TemplateView.as_view(template_name="google.html"), name='google'),   # For google
+    url(r'^robots.txt$',  TemplateView.as_view(template_name="robots.txt"), name="robots-txt"),		# for robots
+    url(r'BingSiteAuth.xml$', TemplateView.as_view(template_name="BingSiteAuth.xml"), name="bing"),
+
+
+    ### LEGACY URLS
+    url(r'^velo/$', RedirectView.as_view(pattern_name='index', permanent=False)),
+    url(r'^special-events/spring-classics/$', RedirectView.as_view(pattern_name='index', permanent=False)),
+    url(r'^bullets-run-2017/$', RedirectView.as_view(pattern_name='index', permanent=True)),
+    url(r'^Tour-de-Boldmere-2017/$', RedirectView.as_view(pattern_name='index', permanent=False)),
+
+
+    url(r'^who-are-the-bullets-2/$', RedirectView.as_view(pattern_name='index', permanent=True)),
+    url(r'^who-are-the-bullets-2/cycling-collective/cycling-routes/$', RedirectView.as_view(pattern_name='ride-routes', permanent=True)),
+    url(r'^running/$', RedirectView.as_view(pattern_name='run-info', permanent=True)),
+    url(r'^events_all/', RedirectView.as_view(pattern_name='events', permanent=True)),
+    url(r'^event/', RedirectView.as_view(pattern_name='events', permanent=True)),
+    url(r'^who-are-the-bullets-2/running-collective/', RedirectView.as_view(pattern_name='run-info', permanent=True)),
+    url(r'^who-are-the-bullets-2/cycling-collective/', RedirectView.as_view(pattern_name='ride-info', permanent=True)),
+    url(r'^who-are-the-bullets-2/', RedirectView.as_view(pattern_name='history', permanent=True)),
+
+])
+
+
+
+
+
+leaders_patterns = ([					# For the new Leaders App
+    # Core functions - login, view, save availability:
+    path('', leaders.leaders_start, name='start'),
+    path('view', leaders.leaders_view, name='view'),	# view my availability
+    path('save', leaders.leaders_save, name='save'),	# save changes to my availability
+
+    path('prefs', leaders.preferences, name='preferences'),
+    path('prefs/save', leaders.preferences_save, name='preferences-save'),
+    path('logout', leaders.logout, name='logout'),
+
+    # quick links - to use in emails
+    path('view/event/<int:leader_id>/<int:event_id>/<int:speed_id>/i-am-in', leaders.leader_event_view_set, name='eventYes'),
+    path('view/event/<int:leader_id>/<int:event_id>/no', leaders.leader_event_view_no, name='eventNo'),
+
+    path('view/event/<int:event_id>', leaders.view_single_event, name='single_event'),
+
+    path('no-more-emails/<int:pk>', leaders.set_email_preference_off, name='email-off'),
+    path('event', RedirectView.as_view(pattern_name='leaders:start'), ),
+
+
+    # Admininstrative functions:
+    path('vlb', leaders.boss_view, name='boss-mode'),
+
+    path('vlb/event/add', leaders.CreateEvent, name='event_add'),
+    path('vlb/event/<int:event_id>/edit', leaders.CreateEvent, name='event_update'),
+    path('vlb/event/<int:pk>/delete', leaders.EventDelete.as_view(), name='event_delete'),
+
+    path('vlb/events/next', leaders.EventViewNext.as_view(), name='events-next'),
+    path('vlb/events/next/runs', leaders.EventViewNextRuns.as_view(), name='events-next-runs'),
+    path('vlb/events/next/rides', leaders.EventViewNextRides.as_view(), name='events-next-rides'),
+    path('vlb/events/all', leaders.EventViewAll.as_view(), name='events-all'),
+
+    path('vlb/event/<int:pk>/groups', leaders.EventGroupDetail, name='event-groups'),
+    path('vlb/event/save', leaders.EventSavePlan, name='planSave'),
+
+
+    path('vlb/event/<int:pk>/iceman', leaders.iceman, name='iceman'), 
+    path('vlb/event/<int:pk>/hurry-up', leaders.send_message_update_event, name='send-message-update-event'),
+
+
+    path(r'vlb/event/add/send-message/<int:pk>', leaders.send_message_new_event_partA, name='send-message-new-event'),
+    path(r'vlb/event/add/send-message/go-go-go', leaders.send_message_new_event_partB, name='send-message-new-event-send'),
+
+     # add ride leader / run leader
+    path('vlb/new-leader', leaders.LeaderCreate.as_view(), name='leader_add'),
+    path('vlb/delete-leader/<int:pk>/delete', leaders.LeaderDelete.as_view(), name='leader_delete'),
+    path('vlb/edit-leader/<int:pk>', leaders.LeaderEdit.as_view(), name='leader_update'),
+    path('vlb/leaders', leaders.LeaderList.as_view(), name='leaders-list'),
+
+    path('vlb/event/<int:pk>', leaders.EventDetail, name='event'),
+
+], 'leaders')
+
+
+
+urlpatterns = [
+    path("", include(web_patterns)),
+    path("leaders/", include(leaders_patterns)),
+]
+
+
+
+
+
+
+
+
+#handler404 = 'bullets.views.error404'
+
+
+
 
 #    url(r'^10-10-for-Acacia-Mums/$', views.big_bullets_ride, name="big-bullets-ride"),
 #    url(r'^10-10-for-Acacia-Mums/strava-register/(?P<uuid>[0-9a-z-]+)/$', views.big_bullets_ride_confirm_strava, name='big-bullets-confirm-strava'),
@@ -88,31 +191,8 @@ urlpatterns = [
 
 
     ## REDIRECT for leaders app
-    url(r'^leaders/$', views.leaders, name='leaders'),
+#    url(r'^leaders/$', views.leaders, name='leaders'),
 
-
-   #### SPECIAL URLS
-    url(r'^.well-known/acme-challenge/(?P<part1>[a-zA-Z0-9_.-]+)$', views.CertBot, name='certbot'),	# For CertBot
-    url(r'^google03f79ced8f1af3fd.html$', TemplateView.as_view(template_name="google.html"), name='google'),   # For google
-    url(r'^robots.txt$',  TemplateView.as_view(template_name="robots.txt"), name="robots-txt"),		# for robots
-    url(r'BingSiteAuth.xml$', TemplateView.as_view(template_name="BingSiteAuth.xml"), name="bing"),
-
-
-    ### LEGACY URLS
-    url(r'^velo/$', RedirectView.as_view(pattern_name='index', permanent=False)),
-    url(r'^special-events/spring-classics/$', RedirectView.as_view(pattern_name='index', permanent=False)),
-    url(r'^bullets-run-2017/$', RedirectView.as_view(pattern_name='index', permanent=True)),
-    url(r'^Tour-de-Boldmere-2017/$', RedirectView.as_view(pattern_name='index', permanent=False)),
-
-
-    url(r'^who-are-the-bullets-2/$', RedirectView.as_view(pattern_name='index', permanent=True)),
-    url(r'^who-are-the-bullets-2/cycling-collective/cycling-routes/$', RedirectView.as_view(pattern_name='ride-routes', permanent=True)),
-    url(r'^running/$', RedirectView.as_view(pattern_name='run-info', permanent=True)),
-    url(r'^events_all/', RedirectView.as_view(pattern_name='events', permanent=True)),
-    url(r'^event/', RedirectView.as_view(pattern_name='events', permanent=True)),
-    url(r'^who-are-the-bullets-2/running-collective/', RedirectView.as_view(pattern_name='run-info', permanent=True)),
-    url(r'^who-are-the-bullets-2/cycling-collective/', RedirectView.as_view(pattern_name='ride-info', permanent=True)),
-    url(r'^who-are-the-bullets-2/', RedirectView.as_view(pattern_name='history', permanent=True)),
 
 
 #    url(r'^bullets-shop/', RedirectView.as_view(pattern_name='index', permanent=False), name='home'),
@@ -123,15 +203,6 @@ urlpatterns = [
     # Other apps
 #    url(r'^bullets-shop/', include('saleor.urls')),
 #    url(r'^vlb-admin/', admin.site.urls),
-]
-
-
-#handler404 = 'bullets.views.error404'
-
-
-
-
-
 
 #    url(r'^cts-mobile/$', views.cts_mobile, name='cts-mobile'),
 #    url(r'^cts-mobile/menu/$', views.cts_mobile_menu, name='cts-mobile-menu'),
@@ -160,6 +231,8 @@ urlpatterns = [
 #
 #   url(r'^bullets-run-2017/reminder/(?P<uuid>[0-9a-z-]+)/$', views.bullets_run_reminder, name='bullets-run-reminder'),	# used in reminder emails!
 #
+
+
 #   url(r'^bullets-run-2017/stats$', views.bullets_run_stats, name='bullets-run-stats'),
 #   url(r'^bullets-run-2017/offline$', views.bullets_run_offline, name='bullets-run-offline'),		# For Lisa to add offline payments
 #   url(r'^bullets-run-2017/admin$', views.bullets_run_admin, name='bullets-run-admin'),			# For Lisa to view runner details
@@ -193,7 +266,6 @@ urlpatterns = [
 #    url(r'^special-events/chase-the-sun/$', TemplateView.as_view(template_name="bullets/cts.html"), name='cts'),
 
 #    url(r'^cts/$', views.cts_big_map, name='cts-big-map'),
-
 
 
 

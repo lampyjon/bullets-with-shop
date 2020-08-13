@@ -1,0 +1,17 @@
+{% extends "simple.html" %}
+{% block header-links %}
+        {% include 'leaders/leader_header.html' %}
+{% endblock header-links %}
+
+{% block title %}Delete Leader?{% endblock %}
+{% block content %}
+
+     	<h1>Delete Leader?</h1> 
+   <form action="" method="post">{% csrf_token %}
+    <p>Are you sure you want to delete "{{ object.bullet }}"?</p>
+    <input type="submit" value="Confirm" class="btn btn-primary" />
+</form> 
+       
+{% endblock content %}
+
+

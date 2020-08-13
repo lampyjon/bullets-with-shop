@@ -1,0 +1,211 @@
+{% extends "simple.html" %}
+
+{% block title %}{% if event %}Update{%else%}Create{%endif%} Event{% endblock %}
+
+{% block header-links %}
+        {% include 'leaders/leader_header.html' %}
+{% endblock %}
+
+{% block extraheader %}
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+{% endblock extraheader %}
+
+{% block content %}
+     	<h1>{% if event %}Edit event{%else%}Create a new event{%endif%}</h1> 
+   
+<form method="POST" class="form-horizontal">
+{% csrf_token %}
+{% if event %}
+<input type="hidden" name="event_id" value="{{ event.id }}">
+{% endif %} 
+	<div class="form-group">
+    		<label for="event_type" class="col-sm-2 control-label">Event Type:</label>
+   	 	<div class="col-sm-2"><select class="form-control" id="event_type" name="event_type"><option value="run">run</option><option value="ride">ride</option></select></div>
+  	</div>
+
+	<div class="form-group">
+    		<label for="event_date" class="col-sm-2 control-label">Date:</label>
+   	 	<div class="col-sm-2"><input id="event_date" name="event_date" type="text" class="form-control datepicker" placeholder="01-01-2016" value="{{event.when|date:"d-m-y" }}"></div>
+      	</div>
+
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Which speeds?</label>
+		<div class="col-sm-10">
+				<div class="radio runSpeeds">
+  					<label>
+    						<input type="radio" name="speedOpt" id="speedOpt1" value="runDefault" checked>Default Run Speeds
+  					</label>
+				</div>
+				<div class="radio runSpeeds">
+  					<label>
+    						<input type="radio" name="speedOpt" id="speedOpt2" value="runCustom">Custom Run Speeds
+  					</label>
+				</div>
+				<div class="radio rideSpeeds">
+  					<label>
+    						<input type="radio" name="speedOpt" id="speedOpt3" value="rideDefault">Default Ride Speeds
+  					</label>
+				</div>
+				<div class="radio rideSpeeds">
+  					<label>
+    						<input type="radio" name="speedOpt" id="speedOpt4" value="rideCustom">Custom Ride Speeds
+  					</label>
+				</div>
+
+
+				<div class="radio">
+  					<label>
+    						<input type="radio" name="speedOpt" id="speedOpt5" value="custom">Custom Speeds (remember, you don't need a "no" option!)
+					</label>
+				</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<div class="btn-group disabled runSpeeds runOpts" data-toggle="buttons">
+			{% for s in run_speeds %}
+  				<label class="btn btn-primary">
+    					<input type="checkbox" name="runSpeed" value="{{s}}" autocomplete="off">{{s}}
+  				</label>
+			{% endfor %}
+			</div>
+			<div class="btn-group rideSpeeds rideOpts" data-toggle="buttons">
+			{% for s in ride_speeds %}
+  				<label class="btn btn-primary">
+    					<input type="checkbox" name="rideSpeed" value="{{s}}" autocomplete="off">{{s}}
+  				</label>
+			{% endfor %}
+			</div>
+			<div class="customSpeeds row">
+				<div class="col-sm-1"><input id="cs1" name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs2"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs3"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs4"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs5"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs6"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs7"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs8"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs9"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs10"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs11"  name="customSpeed" type="text" class="form-control"></div>
+				<div class="col-sm-1"><input id="cs12"  name="customSpeed" type="text" class="form-control"></div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<input type="submit" class="btn btn-custom btn-lg" value="{% if event %}Save changes!{%else%}Create event!{%endif%}"/>
+		</div>
+	</div>
+
+	
+
+</form>
+{% endblock content %}
+
+
+{% block extrafooter %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+	$('.datepicker').datepicker({dateFormat: 'dd-mm-y'});
+
+
+	$( document ).ready(function() {
+		$('.runSpeeds').show();
+		$('.rideSpeeds').hide();
+		$('.customSpeeds').hide();
+
+		$('.rideOpts').hide();
+		$('.runOpts').hide();
+
+		{% if event %}
+			console.log("There is an existing event to load into this page");
+
+			// set the event type
+			$('#event_type').val('{{event.event_type}}');
+
+			$('.runSpeeds').hide();
+			$('.rideSpeeds').hide();
+			$('.customSpeeds').show();
+			$('input[type=radio][name=speedOpt]').prop("checked", false);
+			$('#speedOpt5').prop("checked", true);
+			
+			x = 1;
+			{% for s in event.get_speedgroups %}
+				console.log("Speed = '{{s}}'");
+				y = "#cs"+x;
+				$(y).val("{{s}}");
+				x = x + 1;
+			{% endfor %}
+
+		{% endif %}
+
+	});
+
+	$('#event_type').change(function() {
+		var et = $(this).val();
+		console.log("Event type changed to '" + et + "'");
+		
+		// if et = run, hide the ride speed options and vice versa
+		if (et == "ride") {
+			console.log("Hiding runs, showing rides");
+			$('#event_time').val("07:00");
+			// set option to default rides
+			$('input[type=radio][name=speedOpt]').prop("checked", false);
+			$('#speedOpt3').prop("checked", true);
+			$('.runSpeeds').hide();
+			$('.rideSpeeds').show();
+
+			
+			
+		} else {
+			console.log("Hiding rides, showing runs");
+			$('#event_time').val("08:00");
+
+			$('input[type=radio][name=speedOpt]').prop("checked", false);
+			$('#speedOpt1').prop("checked", true);
+			$('.runSpeeds').show();
+			$('.rideSpeeds').hide();
+
+
+		}
+		var so = $('input[type=radio][name=speedOpt]').val();
+		showThings(so);
+		
+		});
+
+  	$('input[type=radio][name=speedOpt]').change(function() {
+		var so = $(this).val();
+		console.log("Speed option changed to " + so);
+		showThings(so);
+		});
+
+
+function showThings(so) {
+		if (so=='custom') {		// only show the custom entries
+			$('.customSpeeds').show();
+			$('.rideOpts').hide();
+			$('.runOpts').hide();
+		} else if ((so=='runDefault') || (so=='rideDefault')) { // hide everything
+			$('.customSpeeds').hide();
+			$('.rideOpts').hide();
+			$('.runOpts').hide();
+		} else if (so=='rideCustom') {	// only show ride speeds
+			$('.customSpeeds').hide();
+			$('.runOpts').hide();
+			$('.rideOpts').show();
+		} else if (so=='runCustom') {	// only show run speeds
+			$('.customSpeeds').hide();
+			$('.rideOpts').hide();
+			$('.runOpts').show();
+		}
+}
+
+ 
+    </script>
+
+{% endblock extrafooter %}
+ 

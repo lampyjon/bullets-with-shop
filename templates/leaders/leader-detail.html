@@ -1,0 +1,166 @@
+{% extends "simple.html" %}
+{% load staticfiles %}
+{% block title %}Event detail {% endblock %}
+
+{% block extraheader %}
+
+<style>
+.btn-custom { 
+  color: #ffffff; 
+  background-color: #AAAACC; 
+  border-color: #CCCCCC; 
+} 
+
+.btn-custom:active, 
+.btn-custom.active, 
+.open .dropdown-toggle.btn-custom { 
+  color: #ffffff; 
+  background-color: #FF5A15; 
+  border-color: #CC8060; 
+} 
+ 
+
+ 
+.btn-custom.disabled, 
+.btn-custom[disabled], 
+fieldset[disabled] .btn-custom, 
+.btn-custom.disabled:hover, 
+.btn-custom[disabled]:hover, 
+fieldset[disabled] .btn-custom:hover, 
+.btn-custom.disabled:focus, 
+.btn-custom[disabled]:focus, 
+fieldset[disabled] .btn-custom:focus, 
+.btn-custom.disabled:active, 
+.btn-custom[disabled]:active, 
+fieldset[disabled] .btn-custom:active, 
+.btn-custom.disabled.active, 
+.btn-custom[disabled].active, 
+fieldset[disabled] .btn-custom.active { 
+  background-color: #ED865A; 
+  border-color: #CC8060; 
+} 
+ 
+.btn-custom .badge { 
+  color: #ED865A; 
+  background-color: #ffffff; 
+}
+
+.table tbody>tr>td.vert-align{
+    vertical-align: middle;
+}
+
+</style>
+
+{% endblock %}
+
+{% block header-links %}
+	    {% if request.session.leader %}
+              <li {% if request.resolver_match.url_name == "leaders:view" %}class="active" {%endif%}><a href="{% url 'leaders:view' %}">My availability</a></li>
+              <li {% if request.resolver_match.url_name == "leaders:preferences" %}class="active" {%endif%}><a href="{% url 'leaders:preferences' %}">My preferences</a></li>
+	   		
+	     <li><a href="{% url 'leaders:logout' %}">Signed in as {{ leader.bullet.name }} (logout)</a></li>
+{% if user.is_authenticated %}
+	     <li><a href="{% url 'leaders:boss-mode' %}">Control Panel</a><li>
+{% endif %}
+	    {% endif %}
+{% endblock header-links %}
+
+{% block content %}
+	<h1>Set your availability for {% if single_event %}this Boldmere Bullets Event{%else%}these Boldmere Bullets Events{%endif%}</h1>
+	{% if single_event %}
+		<p>{{ single_event.when|date:"D j M Y"}} {% if leader.runner_and_rider %} ({{single_event.event_type}}){%endif%}</p>
+	{% endif %}
+
+	<form action="{% url 'leaders:save' %}" method="post" class="form-horizontal" id="myForm">
+
+	<p class="lead">Set your availability by indicating which speeds you'd prefer to lead. If you can't lead, simply click 'not leading'!</p>
+
+	{% csrf_token %}
+
+	{% for d in avail %}
+		<input type="hidden" name="events" value="{{d.1.pk}}">
+	<div class="row">
+		<div class="col-sm-2"><p><a href="{% url 'leaders:single_event' d.0.pk %}">{{ d.0.event_type|title }} {{ d.0.when|date:"D j M"}}</a></p></div>	
+		<div class="col-sm-10">
+			<div class="btn-group" data-toggle="buttons">
+				<label class="btn btn-custom c{{forloop.counter}} {% if d.1.leading == False %}active{%endif%}" onClick="turnOff({{forloop.counter}});">
+					<input type="checkbox" name="es-{{d.1.pk}}" class="off{{forloop.counter}}" value="no" autocomplete="off" {% if d.1.leading == False %}checked{%endif%}>Not leading
+				</label>
+			</div>
+			<div class="btn-group" data-toggle="buttons">
+			{% for s in d.0.get_speedgroups %}
+  				<label class="btn  btn-custom b{{forloop.parentloop.counter}} {% if s in d.1.speed_options.all %}active{%endif%}" onClick="turnOn({{forloop.parentloop.counter}});">
+    					<input type="checkbox" class="on{{forloop.parentloop.counter}}" autocomplete="off" id="{{forloop.counter}}-{{forloop.parentloop.counter}}" name="es-{{d.1.pk}}" value="{{s.id}}" {% if s in d.1.speed_options.all %}checked{%endif%}>{{s}} 
+  				</label>
+			{% endfor %}
+			</div> <!-- btn-group --!>
+		</div> <!-- col-sm-10 --!>
+	</div> <!-- row --!>
+	{% endfor %}
+
+<br/>
+
+
+  	<div class="row">
+    		<div class="col-md-offset-2 col-md-10">
+  			<input type="submit" class="btn btn-custom btn-lg" value="Save Changes"/>
+		</div>
+	</div>
+	</form>
+
+	{% if single_event %}<a class="btn btn-custom" href="{% url 'leaders:view' %}" role="button">View all events</a>{% endif %}
+
+<br/>
+
+<script>
+
+function figureOut() {
+	console.log("Figure out...");
+	var a = $("#1-1");
+	console.log(a);
+	var b = a.prop("checked");
+	console.log(b);
+	return false;
+}
+
+
+function turnOff(x) {		// the 'not leading' button has been pressed - turn off all the other checkboxes in this row
+
+	console.log("turnOff()");
+	console.log(x);
+
+	a = ".b" + x;		// turn off all elements with class b-x
+	
+	b = $(a);
+	b.removeClass('active');
+	
+	// and turn off the checked property of the 'speeds' checkboxes in this row
+
+	var z = ".on" + x;
+	var y = $(z);
+	console.log(z);
+	console.log(y);
+	y.prop("checked", false);
+
+	return;
+}
+
+function turnOn(x) {		// a speed has been selected - turn off the 'not leading' checkbox //
+	console.log("turnOn()");
+	console.log(x);
+	a = ".c" + x;		// turn off all elements with ID c-x	
+	b= $(a);
+	b.removeClass('active');
+	// and turn off the checked property of the 'not leading' checkbox 
+
+	z = ".off" + x
+	y = $(z);
+	y.prop('checked', false);
+	
+	return;
+}
+
+</script>
+
+{% endblock content %}
+

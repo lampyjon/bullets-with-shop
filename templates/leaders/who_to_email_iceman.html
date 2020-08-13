@@ -1,0 +1,147 @@
+{% extends "simple.html" %}
+{% load staticfiles %}
+
+{% block title %}Send an ICEMAN email!{% endblock %}
+
+{% block header-links %}
+        {% include 'leaders/leader_header.html' %}
+{% endblock header-links %}
+
+{% block content %}
+
+     	<h1>Send an ICEMAN email to some Bullets?</h1> 
+
+{% if event.have_sent_email %}
+<div class="alert alert-danger" role="alert">An email was previously sent to people about this event - do you want to pester them again??</div>
+{% endif %}
+<form method="POST">
+{% csrf_token %}
+<div>You are about to send an ICEMAN email to {{ emails.count }} leaders, who are coming to the {{event.event_type|capfirst}} on {{ event.when|date:"D j M Y" }}</div>
+<br/>
+<p>
+<input type="submit" class="btn btn-primary btn-lg" value="Yes - send it!">
+<a class="btn btn-info btn-lg" href="{% url 'leaders:event' event.id %}">No - don't send!</a>
+</p>
+<h3>The emails will be sent to:</h3>
+<div>
+<ul>
+{% for email in emails %}
+<li> {{ email }} ({{ email.bullet.email }})</li>
+{% endfor %}
+</ul>
+</div>
+<h3>Do you want to add a special message?</h3>
+<textarea name="custom_message" class="form-control" rows="3"></textarea>
+</form>
+<h3>The email will say:</h3>
+<div class="well well-lg">
+<samp>
+	{% include "templated_email/output/leaders-iceman.html" %}
+</samp>
+</div>
+
+
+<div class="snowflakes"></div>
+
+
+{% endblock content %}
+
+
+{% block extrafooter %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+
+var doc_width = $(window).width() - 50;
+var doc_height = $(window).height() - 100;
+
+//console.log("Doc H" + doc_height);
+
+var startingSnowflakes = 10 + Math.floor(Math.random() * 30);
+
+
+function setInitial($flake, $initial) {
+
+	var x = Math.floor(Math.random() * doc_width);
+	if ($initial) {
+		var y = Math.floor(Math.random() * (doc_height / 2));
+	} else {
+		var y = 0;
+	}
+
+	$flake.position({
+		my: "left top",
+		at: "left+"+x+" top+"+y,
+		of: $(document)
+		});
+
+
+	$flake.css("z-index", "-1");
+
+	return;
+}
+
+
+function moveFlake($flake) {
+
+	r = Math.random() * 10;
+	if (r < 1) {
+		a = -1;
+	} else if ( r < 2) {
+		a = 1;
+	}
+	else {
+		a = 0;
+	}
+
+	y = parseInt($flake.css("top"));
+	y = y + 1;
+	x = parseInt($flake.css("left"));
+	x = x + a;
+
+//	console.log(" x = " + x);
+//	console.log(" y = " + y);
+//	console.log(" dh = " + doc_height + "    Y = " + y);
+
+	//	console.log("resetting");
+	if (($flake.offset().top + $flake.height()) >= $(window).height()) {
+		setInitial($flake, false);	
+	} else {
+		$flake.css("top", y + "px");
+        	$flake.css("left", x + "px");
+	}
+	
+}
+
+
+function moveSnow() {
+	for (j=0; j < startingSnowflakes; j++) {
+		moveFlake($("#flake"+j));	
+	}
+	setTimeout(moveSnow, 10);
+}
+
+
+
+$(document).ready(function() {
+	
+	for (j=0; j < startingSnowflakes; j++) {
+		p = "<div id='flake" + j + "'><img src='{% static 'images/snowflake.png'%}' width='50' height='50' style='left:0px; top:0px;'></div>";
+		$( ".snowflakes" ).append(p);
+		setInitial($("#flake"+j), true);
+	//	$( "#flake"+j ).css('display','block');
+		
+	}
+
+	moveSnow();
+
+
+});
+
+
+
+
+</script>
+
+{% endblock extrafooter %}

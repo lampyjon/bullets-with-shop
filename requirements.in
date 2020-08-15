@@ -1,0 +1,18 @@
+# boto3
+dj-database-url
+dj-email-url
+Django
+django-autoslug
+django-bootstrap4
+django-payments
+django-recaptcha
+# django-render-block==0.5
+django-ses
+django-storages
+django-summernote
+django-templated-email
+django-versatileimagefield
+mailchimp
+stravalib
+psycopg2		# for Postgres 
+psycopg2-binary		# because PostGres

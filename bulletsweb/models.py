@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.utils.encoding import smart_text, python_2_unicode_compatible
+from django.utils.encoding import smart_text 
 from autoslug import AutoSlugField
 from django.urls import reverse
 import uuid
@@ -229,7 +229,6 @@ class DefaultSpeedGroup(models.Model):
 
 # TODO: merge into BulletEvents
 ## for the Runs on Tuesdays 
-@python_2_unicode_compatible
 class RunningEvent(models.Model):
 	date = models.DateField('Run Date')
 	session_type = models.CharField('Session type', max_length=200, blank=True)
@@ -257,7 +256,6 @@ class RunningEvent(models.Model):
 
 
 
-@python_2_unicode_compatible
 class BulletEvent(models.Model):
     date = models.DateField("Event Date")
     name = models.CharField('Event Name', max_length=200, blank=True)

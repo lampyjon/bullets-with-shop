@@ -3,8 +3,8 @@
 {% block title %}Event detail{% endblock %}
 
 {% block extraheader %}
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 {% endblock extraheader %}
+
 
 {% block header-links %}
 	<li><a href="{% url 'leaders:event_update' event.id %}">edit event</a></li>
@@ -142,8 +142,7 @@
 
 
 {% block extrafooter %}
-
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+{% include 'jqueryui.html' %}
 
 
 <script>

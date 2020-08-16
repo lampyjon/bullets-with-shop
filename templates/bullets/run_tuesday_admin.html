@@ -10,9 +10,7 @@
 
 
 {% block extraheader %}
-<link href="{% static 'css/bootstrap-sortable.css' %}" rel="stylesheet"> 
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
-
+	<link href="{% static 'css/bootstrap-sortable.css' %}" rel="stylesheet"> 
 {% endblock %}
 
 {% block content %}
@@ -54,8 +52,8 @@
 
 
 {% block extrafooter %}
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
+
+{% include 'jqueryui.html' %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
 

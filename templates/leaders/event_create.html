@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block extraheader %}
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 {% endblock extraheader %}
 
 {% block content %}
@@ -107,8 +106,7 @@
 
 
 {% block extrafooter %}
-
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+{% include 'jqueryui.html' %}
     <script>
 	$('.datepicker').datepicker({dateFormat: 'dd-mm-y'});
 
@@ -207,5 +205,6 @@ function showThings(so) {
  
     </script>
 
+{% include 'jqueryui.html' %}
 {% endblock extrafooter %}
  

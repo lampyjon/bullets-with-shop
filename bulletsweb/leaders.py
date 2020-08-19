@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from .models import Leader, BulletEvent, Availability, DefaultSpeedGroup, EventSpeed, Bullet
-from .utils import is_leaders_team, send_bullet_mail
+from .utils import is_leaders_team, send_bullet_mail, build_absolute_uri
 
 from django.contrib import messages
 from django.utils import timezone
@@ -24,6 +24,8 @@ from django.db.models import Count
 from django.core import mail
 from django.utils.html import strip_tags
 from django.template.loader import render_to_string
+
+from captcha.fields import ReCaptchaField
 
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
@@ -63,7 +65,7 @@ def leader_required(function=None):
 
 # Views
 
-# initial login page			# TODO: add recatchpa 
+# initial login page			 
 def leaders_start(request):
     form = LeaderForm(request.POST)
     request.session.set_expiry(0)		# 'logout' after browser close
@@ -541,6 +543,7 @@ class EventViewNextRides(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 class LeaderForm(forms.Form):			# Used in entry page
     email = forms.EmailField(label="Your email", required=True)
+    captcha = ReCaptchaField(label="")
 
 
 class LeaderUpdateForm(forms.ModelForm):
@@ -718,8 +721,6 @@ def send_message_new_event_partB(request):
 
 # This function does the hard work of emailing
 def send_leaders_an_email_about_event(boss, leaders, template, events, custom_message=""):
-    base_url = "https://www.boldmerebullets.com"    # TODO: could this be a setting?
-
     i = 0
 
     for leader in leaders:
@@ -729,17 +730,17 @@ def send_leaders_an_email_about_event(boss, leaders, template, events, custom_me
                 speed_urls = []
             
                 for speed in event.get_speedgroups():
-                    speed_url = base_url + reverse('leaders:eventYes', kwargs={'leader_id':leader.pk, 'event_id':event.id, 'speed_id':speed.id})
+                    speed_url = build_absolute_uri(reverse('leaders:eventYes', kwargs={'leader_id':leader.pk, 'event_id':event.id, 'speed_id':speed.id}))
                     speed_urls.append((speed, speed_url))
 
-                no_url = base_url + reverse('leaders:eventNo', kwargs={'leader_id':leader.pk, 'event_id':event.id})
+                no_url = build_absolute_uri(reverse('leaders:eventNo', kwargs={'leader_id':leader.pk, 'event_id':event.id}))
             
                 if leader.show_ride_on_day(event): # work out whether this event is of interest to this leader...
                     if (((event.is_ride()) and (leader.rider)) or ((event.is_run()) and (leader.runner))):
                         event_details.append((event, speed_urls, no_url))
 
             if len(event_details) > 0:     # anything worth sending?
-                stop_url = base_url + reverse('leaders:email-off', kwargs={'pk':leader.pk})
+                stop_url = build_absolute_uri(reverse('leaders:email-off', kwargs={'pk':leader.pk}))
                        
                 from_address = boss.name + " <leaders@boldmerebullets.com>"
                 ctx = {'stop_url':stop_url, 'send_to':leader, 'sent_from':boss, 'events':event_details, 'custom_message':custom_message, }

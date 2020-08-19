@@ -385,7 +385,7 @@ class Availability(models.Model):
     event = models.ForeignKey(BulletEvent, on_delete=models.CASCADE)
 	
     speed_options = models.ManyToManyField(EventSpeed, blank=True)	# which speeds do they want to lead at?
-    leading = models.NullBooleanField(default=None)			# do they even want to lead?
+    leading = models.BooleanField(default=None, null=True)			# do they even want to lead?
 
     plan =  models.ForeignKey(EventSpeed, blank=True, null=True, related_name="speed_plan", on_delete=models.CASCADE)
 			

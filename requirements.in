@@ -16,3 +16,4 @@ mailchimp
 stravalib
 psycopg2		# for Postgres 
 psycopg2-binary		# because PostGres
+gunicorn 		# needed for Heroku!

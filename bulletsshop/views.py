@@ -1010,9 +1010,13 @@ def supplier_order(request, supplier_pk):
     supplier = get_object_or_404(Supplier, pk=supplier_pk)
 
     items = {}
-    items_qs = ProductItem.objects.filter(product__supplier=supplier).order_by('quantity_to_order')
-    for item in items_qs:
+    items_qs = ProductItem.objects.filter(product__supplier=supplier)
+    for item in items_qs.filter(quantity_to_order__gt=0):
         items[item.pk] = (item, item.quantity_to_order)
+
+    for item in items_qs.filter(quantity_to_order=0):
+        items[item.pk] = (item, item.quantity_to_order)
+        
 
     if request.method == 'POST':
         mode = request.POST.get("save", "preview")

@@ -519,6 +519,7 @@ class ProductList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     def test_func(self):
         return is_shop_team(self.request.user)
 
+
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
 def product_create(request, category_pk=None, product_pk=None, supplier_pk=None):
@@ -578,9 +579,15 @@ def product_edit_ajax(request, product_pk):			# This view allows the product edi
         product.hidden = o
     elif (v == 'allow_supplier_orders'):
         product.allow_supplier_orders = o
-    elif (v== 'only_buy_one'):
+    elif (v == 'only_buy_one'):
         product.only_buy_one = o
-
+    elif (v == 'display_order'):
+        d = request.POST.getlist("ids[]")	# Javascript /shrug
+        for pos, productitem_id in enumerate(d):
+            productitem = get_object_or_404(ProductItem, pk=productitem_id)
+            productitem.display_order = pos
+            productitem.save()
+             
     product.save()
     return JsonResponse({'thank':'you'})
 

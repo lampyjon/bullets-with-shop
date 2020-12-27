@@ -158,7 +158,7 @@ class ProductItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='items')
     extra_text = models.CharField("Item Name", max_length=500, blank=True, null=True)	# this is where sizes, colours, variations on the main Product go
 
-#   TODO: display_order??
+    display_order = models.IntegerField("Display Order", default=0)	# which position to display the item in lists etc.	
 
     quantity_in_stock = models.IntegerField(
         validators=[MinValueValidator(0)], default=Decimal(1))		# amount we physically have available to sell
@@ -172,6 +172,10 @@ class ProductItem(models.Model):
         validators=[MinValueValidator(0)], default=Decimal(0))		# qty on order from suppliers which are already sold
 
     # TODO - allow deep linking to just a productitem (eg. to just large t-shirts) - slug/id maybe? or slug/slug ???
+
+    class Meta:
+        ordering = ['display_order', 'extra_text']
+
 
     OK_TO_BUY_NOW = 1
     OK_TO_BUY_OR_ORDER = 2

@@ -23,7 +23,7 @@
   </li>
 
 </ul>
-<table class="table table-sm table-hover">
+<table class="table table-sm table-hover sortable">
   <thead>
         <tr>
 		<th colspan="5"></th>
@@ -55,7 +55,7 @@
 		<td class="text-right">{{order.dispatched_items.count}}</td>
 		<td class="text-right">{{order.on_order_items.count}}</td>
 		<td class="text-right">{{order.refunded_items.count}}</td>
-		<td class="text-right">{{order.created|date:"H:i d/m/y"}}</td>
+		<td data-dateformat="DD-MM-YY" class="text-right">{{order.created|date:"d/m/y"}}</td>
 	</tr>
 	{% endfor %}
   </tbody>

@@ -9,42 +9,33 @@
           </div>
  	<p>The follow items are allocated to these people:</p>
 
-	{% regroup allocations by order.name as allocation_list %}
-		<div class="row">
-			<div class="col">
-				<strong><a href="{% url 'dashboard:allocations'%}">Name</a></strong>
-			</div>
-			<div class="col-9">
-				<div class="row">
-					<div class="col-2"><strong><a href="{% url 'dashboard:allocations-order' %}">Order #</a></strong></div>
-					<div class="col-1 text-right"><strong><a href="{% url 'dashboard:allocations-date' %}">Date</a></strong></div>
-					<div class="col-1 text-right"><strong>Qty.</strong></div>
-					<div class="col"><strong><a href="{% url 'dashboard:allocations-item' %}">Item</a></strong></div>
-					<div class="col"><strong>notes</strong></div>
-				</div>
-			</div>
-		</div>
-					
-		
+	<table class="table table-sm sortable">
+		<thead>
+			<tr>
+				<th>Order No.</th>
+				<th>Date</th>
+				<th>Name</th>
+				<th>Postage?</th>
+				<th>Qty.</th>
+				<th>Item</th>
+				<th>notes</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in allocations %}
+			<tr>
+				<td><a href="{% url 'dashboard:order' item.order.pk %}">#{{ item.order.pk }}</a></td>
+				<td data-dateformat="DD-MM-YY">{{ item.order.created|date:"d/m/y" }}</td>
+				<td>{{ item.order.name }}</td>
+				<td>{% if item.order.postage_amount > 0 %}<span class="badge badge-primary">post</span>{% endif %}</td>
+				<td class="text-right">{{ item.quantity_allocated }}</td>
+				<td>{{ item.item_name }}</td>
+				<td>{{ item.order.customer_notes }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>			
 
-	{% for person, items in allocation_list %}
-		<div class="row mb-2">
-			<div class="col">
-				{{ person }}
-			</div>
-			<div class="col-9">
-				{% for item in items %}
-				<div class="row">
-					<div class="col-2"><a href="{% url 'dashboard:order' item.order.pk %}">Order #{{ item.order.pk }}</a></div>
-					<div class="col-1 text-right">{{ item.order.created|date:"d/m/y" }}</div>
-					<div class="col-1 text-right">{{ item.quantity_allocated }}</div>
-					<div class="col">{{ item.item_name }}</div>
-					<div class="col">{{ item.order.customer_notes }}</div>
-					</div>
-				{% endfor %}
-			</div>
-		</div>
-	{% endfor %}     
 
 	{% if item_pk %}
         	<a href="{% url 'dashboard:product-bulk-ship' item_pk %}" class="btn btn-outline-primary btn-block">bulk ship these items</a>

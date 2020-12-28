@@ -644,11 +644,9 @@ class OrderItem(models.Model):
     def left_to_deliver(self):
         return self.quantity_ordered - (self.quantity_delivered + self.quantity_refunded)
 
-
     @property
     def unallocated(self):
         return self.quantity_ordered - self.quantity_delivered - self.quantity_allocated - self.quantity_refunded
-
 
     def dispatch(self, quantity):    # mark this many of the item as dispatched (move them from allocated to delivered)
         if (quantity > 0) and (quantity <= self.left_to_deliver):

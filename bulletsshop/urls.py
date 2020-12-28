@@ -102,10 +102,10 @@ dashboard_patterns = ([
     path('postage/<int:pk>/edit', views.PostageUpdate.as_view(), name='postage-update'),
     path('postage/<int:pk>/delete', views.PostageDelete.as_view(), name='postage-delete'),
 
-    path('allocations/name', views.allocations, {'order_by': 'name'}, name='allocations'),
-    path('allocations/date', views.allocations, {'order_by': 'date'}, name='allocations-date'),
-    path('allocations/order', views.allocations, {'order_by': 'order'}, name='allocations-order'),
-    path('allocations/item', views.allocations, {'order_by': 'item'}, name='allocations-item'),
+    path('allocations', views.allocations, name='allocations'),
+#    path('allocations/date', views.allocations, {'order_by': 'date'}, name='allocations-date'),
+ #   path('allocations/order', views.allocations, {'order_by': 'order'}, name='allocations-order'),
+ #   path('allocations/item', views.allocations, {'order_by': 'item'}, name='allocations-item'),
     path('allocations/item/<int:item_pk>', views.allocations, name='allocations-specific-item'),
 
     path('allocations/item/on-order/<int:item_pk>', views.on_order_allocations, name='on-order-allocations'),

@@ -1322,22 +1322,15 @@ def order_item_return(request, pk):		# Return an item from an order
 # Product allocations
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
-def allocations(request, order_by='name', item_pk=None):
-    ordering = 'pk'	# default for item
-    if order_by == 'date':
-        ordering = 'order__created'
-    elif order_by == 'order':
-        ordering = 'order__pk'
-    elif order_by == 'name':
-        ordering = 'order__billing_name'
+def allocations(request, item_pk=None):
 
-    allocations = OrderItem.objects.order_by(ordering).filter(quantity_allocated__gt=0)
+    allocations = OrderItem.objects.order_by('order__billing_name').filter(quantity_allocated__gt=0)
 
     if item_pk:
         item = get_object_or_404(ProductItem, pk=item_pk)
         allocations = allocations.filter(item=item)
 
-    return render(request, "dashboard/allocations.html", {'allocations':allocations, 'order_by':order_by, 'item_pk':item_pk})
+    return render(request, "dashboard/allocations.html", {'allocations':allocations, 'item_pk':item_pk})
 
 
 @login_required

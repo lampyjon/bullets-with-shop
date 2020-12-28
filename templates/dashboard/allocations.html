@@ -8,14 +8,17 @@
             <h1 class="h1">Allocations</h1>
           </div>
  	<p>The follow items are allocated to these people:</p>
+	<form action="{% url 'dashboard:product-bulk-ship' %}" method="post">
+	{% csrf_token %}
 
 	<table class="table table-sm sortable">
 		<thead>
 			<tr>
+				<th>&nbsp;</th>
 				<th>#</th>
 				<th>Date</th>
 				<th>Name</th>
-				<th>Postage?</th>
+				<th>Post?</th>
 				<th>Qty.</th>
 				<th>Item</th>
 				<th>notes</th>
@@ -24,6 +27,7 @@
 		<tbody>
 			{% for item in allocations %}
 			<tr>
+				<td><input name="bulk" class="form-check-input position-static bulk" type="checkbox" id="bulk" value="{{item.pk}}" aria-label="..." {% if item_pk %}checked{% endif %}></td>
 				<td><a href="{% url 'dashboard:order' item.order.pk %}">#{{ item.order.pk }}</a></td>
 				<td data-dateformat="DD-MM-YY">{{ item.order.created|date:"d/m/y" }}</td>
 				<td>{{ item.order.name }}</td>
@@ -37,9 +41,13 @@
 	</table>			
 
 
-	{% if item_pk %}
-        	<a href="{% url 'dashboard:product-bulk-ship' item_pk %}" class="btn btn-outline-primary btn-block">bulk ship these items</a>
-	{% endif %}
+	<div class="row">
+		<div class="col">
+        	<button type="submit" id="ship" disabled class="btn btn-primary">Bulk Ship selected items</button>
+		</div>
+	</div>
+
+	</form>
 
 	<h2>Email addresses for these purchasers</h2>
 	<p>You <strong>must</strong> ensure you use BCC to email these people!</p>
@@ -54,4 +62,31 @@
      {% endblock %}
 
 
+{% block extrafooter %}
+	<script>
+		function checkUpdate() {
+			var x = $('input[type="checkbox"]:checked');
+			if (x.length > 0) {
+				// show the 'do something' button
+				$('#ship').prop("disabled", false);
+			} else {
+				// hide it
+				$('#ship').prop("disabled", true);
+			}
+		}
 
+		jQuery(document).ready(function($) {
+			$('.bulk').change(function() {
+			checkUpdate();
+		});
+
+		{% if item_pk %}
+			$('#ship').prop("disabled", false);
+		{% endif %}
+
+			checkUpdate();
+
+		});
+
+	</script>
+{% endblock %}

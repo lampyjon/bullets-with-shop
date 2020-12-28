@@ -10,7 +10,7 @@
  	<p>Do you wish to mark the following purchases as having {{ productitem }} dispatched?</p>
 	<table class="table table-sm">
 		<thead>
-			<tr><th>Order #</th><th>Name</th><th>Quantity</th></tr>
+			<tr><th>Order #</th><th>Name</th><th>Quantity</th><th>Item</th></tr>
 		</thead>
 		<tbody>
 	{% for item in items %}
@@ -18,6 +18,7 @@
 				<td>{{ item.order.id }}</td>
 				<td>{{ item.order.name }}</td>
 				<td>{{ item.quantity_allocated }}</td>
+				<td>{{ item.item_name }}</td>
 			</tr>
 	{% endfor %}	
 		</tbody>
@@ -25,8 +26,13 @@
 
   	<form method="post" class="form-horizontal" >
             	{% csrf_token %}
+                <input type="hidden" name="confirm" value="True">
+		{% for item in items %}
+			<input type="hidden" name="bulk" value="{{ item.pk }}">
+		{% endfor %}
 	        <p class="text-right">
-			<a class="btn btn-outline-primary" href="{% url 'dashboard:product-view' productitem.product.pk %}" role="button">cancel</a>		    		<button type="submit" class="btn btn-primary">dispatch</button>
+				<a class="btn btn-outline-primary" href="{% url 'dashboard:allocations' %}" role="button">cancel</a>
+				<button type="submit" class="btn btn-primary">dispatch</button>
             	</p>
         </form>
      {% endblock %}

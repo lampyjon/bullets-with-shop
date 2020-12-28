@@ -57,7 +57,7 @@ dashboard_patterns = ([
     path('products/<int:product_pk>/<int:year>/analytics', views.product_analytics, name='product-analytics'),
     path('products/<int:product_pk>/purchases', views.product_purchases, name='product-purchases'),
 
-    path('products/<int:item_pk>/dispatch', views.product_bulk_ship, name='product-bulk-ship'),
+    path('products/bulk-ship', views.product_bulk_ship, name='product-bulk-ship'),
 
     path('orders', views.order_list, {'status':'all'}, name='orders'),
     path('orders/paid', views.order_list, {'status':'paid'}, name='orders-paid'),

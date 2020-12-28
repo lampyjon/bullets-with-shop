@@ -1346,18 +1346,20 @@ def on_order_allocations(request, item_pk):		# This view shows us who has this i
 
 @login_required
 @user_passes_test(is_shop_team, login_url="/") # are they in the shop team group?
-def product_bulk_ship(request, item_pk):			# Bulk ship a particular productItem
-    productitem = get_object_or_404(ProductItem, pk=item_pk)
-    orderitems = OrderItem.objects.filter(quantity_allocated__gt=0).filter(item=productitem)
+def product_bulk_ship(request):			# Bulk ship a set of product items
+    orderitem_ids = request.POST.getlist("bulk")
+    confirm = request.POST.get("confirm", False)
 
-    if request.POST:
+    orderitems = OrderItem.objects.filter(pk__in=orderitem_ids)
+
+    if confirm:
         for item in orderitems.all():
             item.dispatch(item.quantity_allocated)	# This has got safety checks in it.
 
         messages.success(request, "Bulk dispatch was completed")
-        return redirect(reverse('dashboard:product-view', args=[productitem.product.pk]))	
+        return redirect(reverse('dashboard:allocations'))	
 
-    return render(request, "dashboard/product_bulk_ship.html", {'items':orderitems, 'productitem':productitem})
+    return render(request, "dashboard/product_bulk_ship.html", {'items':orderitems})
 
 
 

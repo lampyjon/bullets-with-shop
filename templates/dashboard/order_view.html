@@ -138,7 +138,7 @@
 	        <div class="card-body">
 			<address><strong>{{ order.delivery_name }}</strong><br/>
 			{{ order.delivery_address }}<br/>
-			{{ order.delivery_postcode }}
+			<a href="https://www.google.co.uk/maps/search/{{ order.delivery_postcode }}">{{ order.delivery_postcode }}</a>
 			</address>
 		</div>
 	</div>
